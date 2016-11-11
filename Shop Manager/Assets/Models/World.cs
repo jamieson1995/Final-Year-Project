@@ -21,6 +21,7 @@ public class World {
 			}
 		}
 
+		//Furniture wallProtoType = Furniture;
 
 		Debug.Log("World created with " + m_width * m_height + " tiles.");
 	}
