@@ -9,6 +9,7 @@ public class MouseController : MonoBehaviour {
 	//World position of the mouse this frame
 	Vector3 m_currFramePos;
 
+	bool buildModeIsFurniture = false;
 
 	void Update ()
 	{
@@ -31,5 +32,19 @@ public class MouseController : MonoBehaviour {
 		//Camera Zooming
 		Camera.main.orthographicSize -=Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 1, 20); //This sets the zoom level to always be between 1 and 20.
+	}
+
+	//Returns the tile that the mouse is currently on top of
+	public Tile GetTileUnderMouse ()
+	{
+		return WorldController.instance.m_world.GetTileAt(
+		Mathf.FloorToInt(m_currFramePos.x + 0.5f),
+		Mathf.FloorToInt(m_currFramePos.y + 0.5f)
+		);
+	}
+
+	void SetMode_BuildWall ()
+	{
+		buildModeIsFurniture = true;
 	}
 }
