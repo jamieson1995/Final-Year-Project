@@ -45,11 +45,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Controllers\MouseController.cs" />
-     <Compile Include="Assets\Controllers\WorldController.cs" />
-     <Compile Include="Assets\Models\Furniture.cs" />
-     <Compile Include="Assets\Models\Tile.cs" />
-     <Compile Include="Assets\Models\World.cs" />
+     <Compile Include="Assets\Scripts\Controllers\FurnitureSpriteController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\WorldController.cs" />
+     <Compile Include="Assets\Scripts\Models\Furniture.cs" />
+     <Compile Include="Assets\Scripts\Models\FurnitureActions.cs" />
+     <Compile Include="Assets\Scripts\Models\Tile.cs" />
+     <Compile Include="Assets\Scripts\Models\World.cs" />
+     <Compile Include="Assets\Scripts\UI\AutomaticHorizontalSize.cs" />
+     <Compile Include="Assets\Scripts\UI\AutomaticVerticalSize.cs" />
+     <Compile Include="Assets\Scripts\UI\TileInspector.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
