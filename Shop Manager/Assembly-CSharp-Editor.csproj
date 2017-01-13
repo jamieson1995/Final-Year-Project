@@ -47,6 +47,8 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\UI\Editor\AutomaticHorizontalSizeEditor.cs" />
      <Compile Include="Assets\Scripts\UI\Editor\AutomaticVerticalSizeEditor.cs" />
+     <None Include="Assets\Scripts\Utilities\PriorityQueue\GITHUB PAGE.txt" />
+     <None Include="Assets\Scripts\Utilities\PriorityQueue\LICENSE.txt" />
  <Reference Include="UnityEditor.Advertisements">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/Editor/UnityEditor.Advertisements.dll</HintPath>
  </Reference>

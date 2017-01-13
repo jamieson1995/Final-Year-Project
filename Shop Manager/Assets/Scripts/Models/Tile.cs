@@ -15,6 +15,19 @@ public class Tile {
 
 	public Furniture m_furniture { get; protected set; }
 
+	public float m_movementCost
+	{
+		get
+		{
+			if(m_furniture == null)
+				//If there is no furniture, the movement must be 1.
+				return 1;
+
+			//If there is furniture, go find the movement cost for the furniture and use that value.
+			return m_furniture.m_movementCost;
+		}
+	}
+
 
 	public Tile(World _world, int _x, int _y)
 	{
@@ -141,6 +154,21 @@ public class Tile {
 		}
 
 		return neighboursFurn;
+	}
+
+	public ENTERABILITY IsEnterable ()
+	{
+		//Returns true if you can enter this tile RIGHT NOW
+		if ( m_movementCost == 0 )
+		{
+			return ENTERABILITY.Never;
+		}
+		if ( m_furniture != null && m_furniture.m_isEnterable != null )
+		{
+			return m_furniture.m_isEnterable(m_furniture);
+		}
+
+		return ENTERABILITY.Yes;
 	}
 
 }

@@ -10,6 +10,9 @@ public class Furniture {
 
 	public string m_furnType {get; protected set;} //This represents the item inside the category of furniture, i.e. wooden/automatic/doublewide etc.
 
+	public float m_movementCost { get; protected set; } //This is a multiplier. So a value of '2' here means it takes 2 times as long to walk through this tile.
+														//SPECIAL: If this is 0, it means the furniture is impassible (e.g. a wall)
+
 	public int Width { get; protected set; }
 
 	public int Height { get; protected set; }
@@ -35,6 +38,7 @@ public class Furniture {
 	{
 		this.m_baseFurnType = _other.m_baseFurnType;
 		this.m_furnType = _other.m_furnType;
+		this.m_movementCost = _other.m_movementCost;
 		this.Width = _other.Width;
 		this.Height = _other.Height;
 		this.m_linksToNeighbour = _other.m_linksToNeighbour;
@@ -50,6 +54,8 @@ public class Furniture {
 		{
 			this.funcPositionValidation = (Func<Tile, bool>)_other.funcPositionValidation.Clone();
 		}
+
+		this.m_isEnterable = _other.m_isEnterable;
 	}
 
 	//When placing furniture, the actual furniture isn't being placed, a cloned version of the default furniture is. Therefore, a temp furniture needs to be cloned from the
@@ -59,10 +65,11 @@ public class Furniture {
 		return new Furniture(this);
 	}
 
-	public Furniture ( string _furnType, string _baseFurnType, int _width, int _height, bool _linksToNeighbour, bool _draggable )
+	public Furniture ( string _furnType, string _baseFurnType, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable )
 	{
 		this.m_baseFurnType = _baseFurnType;
 		this.m_furnType = _furnType;
+		this.m_movementCost = _movementCost;
 		this.Width = _width;
 		this.Height = _height;
 		this.m_linksToNeighbour = _linksToNeighbour;

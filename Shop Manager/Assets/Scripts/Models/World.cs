@@ -5,9 +5,14 @@ using System;
 public class World {
 
 	Tile[,] m_tiles;
+
+	public List<Character> m_characters { get; protected set; } //List of all characters in the world.
+
 	public int m_width  {get; protected set;}
 
 	public int m_height {get; protected set;}
+
+	public Path_TileGraph m_tileGraph;
 
 	public List<Furniture> m_furnitures { get; protected set; }
 
@@ -16,6 +21,7 @@ public class World {
 	public Dictionary<string, Furniture> m_furniturePrototypes { get; protected set; }
 
 	public Action<Furniture> cbFurnitureCreated;
+	public Action<Character> cbCharacterCreated;
 
 	public World (int _width = 50, int _height = 50){
 		this.m_width = _width;
@@ -31,12 +37,17 @@ public class World {
 			}
 		}
 
+
+
 		Debug.Log("World created with " + m_width * m_height + " tiles.");
 
 		CreateFurniturePrototypes ();
 
 		m_furnitures = new List<Furniture> ();
 		m_furnitureInMap = new Dictionary<string, List<Furniture> > ();
+		m_characters = new List<Character> ();
+
+		CreateCharacter( GetTileAt( m_width/2, m_height/2 ) );
 	}
 
 	//Returns a Tile at a certain coordinate
@@ -60,6 +71,19 @@ public class World {
 		}
 	}
 
+	public Character CreateCharacter ( Tile _tile )
+	{
+		Character c = new Character ( _tile );	
+		if ( cbCharacterCreated != null )
+		{
+			cbCharacterCreated(c);
+		}
+
+		m_characters.Add(c);
+
+		return c;
+	}
+
 	void CreateFurniturePrototypes ()
 	{
 
@@ -69,6 +93,7 @@ public class World {
 			new Furniture (
 				"Plain",
 				"Wall",
+				0, 		//Impassable
 				1, 		// Width
 				1,  	// Height
 				true,   // Links to neighbour
@@ -80,6 +105,7 @@ public class World {
 			new Furniture (
 				"Sliding",
 				"Door",
+				1, 		//Pathfinding Cost
 				1, 		// Width
 				1,  	// Height
 				false, 	// Links to neighbour
@@ -127,6 +153,7 @@ public class World {
 		if ( cbFurnitureCreated != null )
 		{
 			cbFurnitureCreated(furn);
+			InvalidateTileGraph();
 		}
 
 		return furn;
@@ -137,6 +164,11 @@ public class World {
 		return m_furniturePrototypes[_furnName].m_baseFurnType;
 	}
 
+	public void InvalidateTileGraph()
+	{
+		m_tileGraph = null;
+	}
+
 	public void RegisterFurnitureCreated ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureCreated += _callbackFunc;
@@ -145,6 +177,16 @@ public class World {
 	public void UnregisterFurnitureCreated ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureCreated -= _callbackFunc;
+	}
+
+	public void RegisterCharacterCreated ( Action<Character> _callbackFunc )
+	{
+		cbCharacterCreated += _callbackFunc;
+	}
+
+	public void UnregisterCharacterCreated ( Action<Character> _callbackFunc )
+	{
+		cbCharacterCreated -= _callbackFunc;
 	}
 	
 }

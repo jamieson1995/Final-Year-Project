@@ -34,6 +34,7 @@ public class MouseController : MonoBehaviour {
 		m_furnSpriteController = GameObject.FindObjectOfType<FurnitureSpriteController> ();
 
 		m_furniturePreview = new GameObject ();
+		m_furniturePreview.name = "Furniture Preview";
 		m_furniturePreview.transform.SetParent ( this.transform );
 		m_furniturePreview.AddComponent<SpriteRenderer> ();
 		m_furniturePreview.SetActive ( false );
