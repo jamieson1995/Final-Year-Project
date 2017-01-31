@@ -183,6 +183,10 @@ public class MouseController : MonoBehaviour {
 						{
 							world.PlaceFurnitureInWorld ( m_buildModeFurnName, t );
 						}
+						else if ( m_mode == "CharacterWalk" )
+						{
+							world.m_characters[0].SetDestination( t );
+						}
 						//Other modes will be implemented once characters and deleting furniture has been developed.
                     }
                 }
@@ -242,4 +246,9 @@ public class MouseController : MonoBehaviour {
 
 
     }
+
+    public void SetCharacterDest ()
+	{
+		m_mode = "CharacterWalk"; //This means that when the user clicks a tile. The character's destination will change.
+	}
 }

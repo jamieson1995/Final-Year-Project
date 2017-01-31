@@ -40,5 +40,21 @@ public class CharacterSpriteController : MonoBehaviour {
 		sr.sprite = characterSprites["StickMan"];
 		sr.sortingLayerName = "Character";
 
+		_char.RegisterOnChangedCallback( OnCharacterMoved );
+
+	}
+
+	void OnCharacterMoved ( Character _char )
+	{
+		//Make sure the Character's graphics are correct.
+
+		if ( characterGameObjectMap.ContainsKey ( _char ) == false )
+		{
+			Debug.LogError("OnCharacterMoved -- Trying to change visuals for a character not in our map!");
+			return;
+		}
+
+		GameObject char_go = characterGameObjectMap[_char];
+		char_go.transform.position = new Vector3(_char.X, _char.Y, 0);
 	}
 }

@@ -56,7 +56,7 @@ public class World {
 		//Need to check to see if the tile that is being asked for is actually within the bounds of the world.
 		if ( _x >= m_width || _x < 0 || _y >= m_height || _y < 0 )
 		{
-			Debug.LogError("Asked for a tile that is outside the world area");
+			//Debug.LogError("Asked for a tile that is outside the world area");
 			return null;
 		}
 
@@ -65,6 +65,10 @@ public class World {
 
 	public void Update ( float _deltaTime )
 	{
+		foreach ( Character c in m_characters )
+		{
+			c.Update(_deltaTime);
+		}
 		foreach ( Furniture f in m_furnitures )
 		{
 			f.Update(_deltaTime);
