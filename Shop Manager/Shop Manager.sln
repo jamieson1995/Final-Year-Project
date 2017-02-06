@@ -1,9 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{1290B1D3-94DE-C7CE-B4F0-4269F7E5F479}") = "Shop Manager", "Assembly-CSharp.csproj", "{9308989A-A766-DB08-68F4-9B481EB28E87}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop Manager", "Assembly-CSharp.csproj", "{9308989A-A766-DB08-68F4-9B481EB28E87}"
 EndProject
-Project("{1290B1D3-94DE-C7CE-B4F0-4269F7E5F479}") = "Shop Manager", "Assembly-CSharp-Editor.csproj", "{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop Manager", "Assembly-CSharp-Editor.csproj", "{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System;
 
-public class Character {
+/// <summary>
+/// A character is an abstract thing. It can either be an employee or a character.
+/// </summary>
+public abstract class Character {
 
 	public float X //Character's X Coordinate
 	{ 
@@ -22,10 +25,12 @@ public class Character {
 	string m_name; //Character's Name
 
 	public Tile m_currTile {get; protected set;}
-	Tile m_destTile;
+	protected Tile m_destTile;
 	Tile m_nextTile; //The next tile in the pathfinding sequence
 	Path_AStar m_pathAStar;
 	float m_movementPercentage;
+
+	Dictionary<string, Stock> m_stock;
 
 	//Tiles per second
 	float m_maxSpeed = 4f; //Character's default speed
@@ -46,9 +51,10 @@ public class Character {
 	public void Update( float _deltaTime )
 	{
 		Update_DoMovement( _deltaTime );
+		Update_DoThink();
 	}
 
-	void Update_DoMovement( float _deltaTime )
+	void Update_DoMovement ( float _deltaTime )
 	{
 		float distToTravel;
 
@@ -112,6 +118,9 @@ public class Character {
 				//This tile has furniture on it, so adjust the current speed according to its movement cost.
 				m_currentSpeed = m_maxSpeed / m_nextTile.m_furniture.m_movementCost;
 			}
+			else
+				m_currentSpeed = m_maxSpeed;
+				
 		}
 
 		// How much distance can be travel this Update?
@@ -137,6 +146,10 @@ public class Character {
 		}
 	}
 
+	protected virtual void Update_DoThink()
+	{
+	}
+
 	public void SetDestination( Tile _tile )
 	{
 		if (m_currTile.IsNeighbour ( _tile, true ) == false )
@@ -145,7 +158,19 @@ public class Character {
 		}
 
 		m_destTile = _tile;
+		m_pathAStar = null;
 		Debug.Log("Dest tile: (" + m_destTile.X + "," + m_destTile.Y + ")");
+	}
+
+	protected bool TryTakeStock ( Stock _stock, Furniture _furn )
+	{
+		if ( _furn.TryTakeStock ( _stock ) )
+		{
+			m_stock.Add ( _stock.m_name, _stock );
+			return true;
+		}
+
+		return false;
 	}
 
 	public void RegisterOnChangedCallback( Action<Character> _callbackFunc )

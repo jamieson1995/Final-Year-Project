@@ -6,6 +6,10 @@ public class Furniture {
 
 	public Tile m_tile { get; protected set; }
 
+	public Tile m_jobTile { get; protected set; }
+
+	public Dictionary<string, Stock> m_stock { get; protected set; }
+
 	public string m_baseFurnType {get; protected set;} //This represents the catergory of furniture, i.e. wall/door/shelf/moveable etc.
 
 	public string m_furnType {get; protected set;} //This represents the item inside the category of furniture, i.e. wooden/automatic/doublewide etc.
@@ -21,6 +25,8 @@ public class Furniture {
 
 	public bool m_draggable { get; protected set; } //This variable determines whether the furniture can be dragged along to be placed down
 													//i.e. walls
+
+	public bool m_used;
 
 	public Action<Furniture> cbOnChanged; //After this action gets activated, whenever it gets called, a given event will trigger, i.e changing the visual of this furniture
 
@@ -92,6 +98,7 @@ public class Furniture {
 
 		Furniture furn = _other.Clone (); 
 		furn.m_tile = _tile;
+		furn.m_jobTile = WorldController.instance.m_world.GetTileAt( _tile.X + (furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
 
 		if ( _tile.PlaceFurniture ( furn ) == false )
 		{
@@ -219,6 +226,23 @@ public class Furniture {
 
 		}
 		return true;
+	}
+
+	public void AddStock(Stock _stock)
+	{
+		m_stock.Add(_stock.m_name, _stock);
+	}
+
+	public bool TryTakeStock ( Stock _stock )
+	{
+		if ( m_stock.ContainsKey ( _stock.m_name ) )
+		{
+			m_stock.Remove( _stock.m_name);
+			return true;
+		}
+
+		Debug.LogError("Tried to remove stock from furniture that didn't have any: Furniture: " + m_furnType + ", Stock: " + _stock.m_name);
+		return false;
 	}
 
 	//When this function is called, the callback will be activated.

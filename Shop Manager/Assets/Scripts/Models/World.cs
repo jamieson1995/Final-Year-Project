@@ -14,10 +14,21 @@ public class World {
 
 	public Path_TileGraph m_tileGraph;
 
+	/// <summary>
+	/// List of all furniture in the world, ordered by first placed.
+	///	Can be used to find out if a specific piece of furniture is in the game.
+	/// </summary>
 	public List<Furniture> m_furnitures { get; protected set; }
 
+	/// <summary>
+	/// Dictionary of all furniture in the world, look up by full name.
+	/// </summary>
 	public Dictionary<string, List<Furniture> > m_furnitureInMap;
 
+	/// <summary>
+	/// Dictionary of all furniture in the game, look up by full name.
+	/// </summary>
+	/// <value>The m furniture prototypes.</value>
 	public Dictionary<string, Furniture> m_furniturePrototypes { get; protected set; }
 
 	public Action<Furniture> cbFurnitureCreated;
@@ -47,7 +58,7 @@ public class World {
 		m_furnitureInMap = new Dictionary<string, List<Furniture> > ();
 		m_characters = new List<Character> ();
 
-		CreateCharacter( GetTileAt( m_width/2, m_height/2 ) );
+		CreateEmployee( GetTileAt( m_width/2, m_height/2 ) );
 	}
 
 	//Returns a Tile at a certain coordinate
@@ -75,17 +86,17 @@ public class World {
 		}
 	}
 
-	public Character CreateCharacter ( Tile _tile )
+	Employee CreateEmployee ( Tile _tile )
 	{
-		Character c = new Character ( _tile );	
+		Employee e = new Employee ( _tile, "Manager" );	
 		if ( cbCharacterCreated != null )
 		{
-			cbCharacterCreated(c);
+			cbCharacterCreated(e);
 		}
 
-		m_characters.Add(c);
+		m_characters.Add(e);
 
-		return c;
+		return e;
 	}
 
 	void CreateFurniturePrototypes ()
@@ -122,6 +133,30 @@ public class World {
 		m_furniturePrototypes [ "Door_Sliding" ].m_updateActions += FurnitureActions.Door_UpdateAction;	
 		
 		m_furniturePrototypes [ "Door_Sliding" ].m_isEnterable = FurnitureActions.Door_IsEnterable;
+
+		m_furniturePrototypes.Add ( "Movable_Stockcage", 
+			new Furniture (
+				"Stockcage",
+				"Movable",
+				5, 		//Pathfinding Cost
+				1, 		// Width
+				1,  	// Height
+				false, 	// Links to neighbour
+				false	// Draggable
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "Other_Checkout", 
+			new Furniture (
+				"Checkout",
+				"Other",
+				5, 		//Pathfinding Cost
+				3, 		// Width
+				1,  	// Height
+				false, 	// Links to neighbour
+				false	// Draggable
+			) 
+		);
 
 	}
 
