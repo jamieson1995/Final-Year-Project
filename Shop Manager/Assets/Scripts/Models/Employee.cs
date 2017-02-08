@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Runtime.CompilerServices;
 
 /// <summary>
 /// An employee is a character that can be given jobs.
@@ -19,9 +18,7 @@ public class Employee : Character {
 
 	Job CreateJob ()
 	{
-		Job j = new Job();
-
-		return j;
+		return new Job();
 	}
 
 	protected override void Update_DoThink ()

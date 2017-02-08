@@ -22,7 +22,7 @@ public class Job {
 	}
 
 	//Create a new job with its state set to the given PrimaryState.
-	public Job ( PrimaryStates _state)
+	public Job ( PrimaryStates _state )
 	{
 		m_furn = new Dictionary<string, Furniture>();
 		m_primaryState = _state;
@@ -52,7 +52,7 @@ public class Job {
 		TidyStock
 	}
 	
-	public enum IdleState
+	public enum IdleStates
 	{
 		Fixed, //Employee cannot move from thier location
 		Moving, //Employee can move around
