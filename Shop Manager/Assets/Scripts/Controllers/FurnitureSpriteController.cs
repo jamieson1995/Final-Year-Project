@@ -13,11 +13,14 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 	void Start ()
 	{
-		m_world = WorldController.instance.m_world;
 		m_furnitureGameObjectMap = new Dictionary<Furniture, GameObject> ();
 		m_furnitureSprites = new Dictionary<string, Sprite> ();
-		m_world.RegisterFurnitureCreated ( OnFurnitureCreated );
+	}
 
+	public void SetUpWorld ()
+	{
+		m_world = WorldController.instance.m_world;
+		m_world.RegisterFurnitureCreated ( OnFurnitureCreated );
 		foreach ( Sprite s in m_sprites )
 		{
 			m_furnitureSprites[s.name] = s;

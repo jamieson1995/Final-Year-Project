@@ -8,7 +8,7 @@ public class Job {
 
 	public float m_maxTime;
 	
-	public Dictionary<string, Furniture > m_furn;
+	public Furniture m_furn;
 
 	public PrimaryStates m_primaryState;
 	
@@ -17,14 +17,12 @@ public class Job {
 	//Create a new job with no given PrimaryState. State of the job will default to ServeOnTill.
 	public Job ()
 	{
-		m_furn = new Dictionary<string, Furniture>();
 		m_primaryState = PrimaryStates.ServeOnTill;
 	}
 
 	//Create a new job with its state set to the given PrimaryState.
 	public Job ( PrimaryStates _state )
 	{
-		m_furn = new Dictionary<string, Furniture>();
 		m_primaryState = _state;
 	}
 
@@ -128,8 +126,8 @@ public class Job {
 
 	public bool SetJobTile ( Furniture _furn )
 	{
-		//Check to see if the furniture in the job's furniture list.
-		if ( m_furn.ContainsValue ( _furn ) )
+		//Check to see if the furniture is the one required for the job.
+		if ( m_furn == _furn )
 		{
 			//Check to see if the job's tile is furniture free 
 			//TODO In the future, furniture should be not able to be placed in a furniture job tile, and also furniture should not be

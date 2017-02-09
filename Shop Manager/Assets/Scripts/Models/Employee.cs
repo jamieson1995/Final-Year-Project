@@ -11,7 +11,7 @@ public class Employee : Character {
 
 	string m_title;
 
-	public Employee ( Tile _tile, string _title ) : base ( _tile )
+	public Employee ( string _name, int _maxCarryWeight, Tile _tile, string _title ) : base ( _name, _maxCarryWeight, _tile )
 	{
 		m_title = _title;
 	}
@@ -34,7 +34,10 @@ public class Employee : Character {
 		if ( m_currTile == m_job.Tile )
 		{
 			//Employee is at the job tile, so needs to use the furniture
-			m_job.SetSecondaryState ( Job.SecondaryStates.Use );
+			if ( m_job.m_secondaryState != Job.SecondaryStates.Idle )
+			{
+				m_job.SetSecondaryState ( Job.SecondaryStates.Use );
+			}	
 		}
 		else
 		{
@@ -52,6 +55,7 @@ public class Employee : Character {
 				GoToJobTile ();
 				break;
 			case  Job.SecondaryStates.Idle:
+				Debug.Log(m_name + " is idle");
 				break;
 		}
 	}
@@ -67,7 +71,15 @@ public class Employee : Character {
 		switch ( m_job.m_primaryState )
 		{
 			case Job.PrimaryStates.ServeOnTill:
-				Debug.Log("Serving on the till!");
+				if ( TryTakeAnyStock ( m_job.m_furn, true ) == false )
+				{
+					//There is no more stock to take on this till.
+					m_job.SetSecondaryState(Job.SecondaryStates.Idle);
+					break;
+				}
+				ScanStockTill(m_stock);
+				m_job.m_furn.TryAddStock( TryGiveStock( m_stock.IDName ) );
+				//Debug.Log("Serving on the till!");
 				break;
 	
 			case Job.PrimaryStates.WorkStockCage:
@@ -94,15 +106,15 @@ public class Employee : Character {
 
 	bool FindJobFurn ( string _furn )
 	{
-		if ( WorldController.instance.m_world.m_furnitureInMap.ContainsKey ( _furn ) )
+		if ( WorldController.instance.m_world.m_furnitureInWorld.ContainsKey ( _furn ) )
 		{
-			foreach ( Furniture furn in WorldController.instance.m_world.m_furnitureInMap[_furn] )
+			foreach ( Furniture furn in WorldController.instance.m_world.m_furnitureInWorld[_furn] )
 			{
 				if ( furn.m_used == true )
 				{
 					continue;
 				}
-				m_job.m_furn.Add ( _furn, furn );
+				m_job.m_furn = furn;
 				if ( m_job.SetJobTile ( furn ) == false )
 				{
 					Debug.LogError ( "Failed to set job tile - _furn -> " + _furn + ", m_job.m_primaryState - > " + m_job.m_primaryState.ToString () );
@@ -119,13 +131,24 @@ public class Employee : Character {
 
 	void GoToJobTile ()
 	{
-		if ( m_job.m_furn.Count == 0 )
+		if ( m_job.m_furn == null )
 		{
 			if ( FindJobFurn ( m_job.m_requiredFurniture ) )
 			{
-				SetDestination(m_job.Tile);
+				SetDestination ( m_job.Tile );
 			}
 		}
+	}
+
+	void ScanStockTill ( Stock _stock )
+	{
+		if ( _stock == null )
+		{
+			Debug.LogError(m_name + " tried to scan a null stock");
+			return;
+		}
+		_stock.m_scanned = true;
+		Debug.Log("BEEP! " + _stock.Name + " was scanned through");
 	}
 	
 }

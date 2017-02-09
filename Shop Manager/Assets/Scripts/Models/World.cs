@@ -4,9 +4,12 @@ using System;
 
 public class World {
 
+	public bool m_worldSetUp { get; protected set; }
+
 	Tile[,] m_tiles;
 
 	public List<Character> m_characters { get; protected set; } //List of all characters in the world.
+	public List<Employee> m_employees { get; protected set; } //List of all employees in the world.
 
 	public int m_width  {get; protected set;}
 
@@ -21,20 +24,34 @@ public class World {
 	public List<Furniture> m_furnitures { get; protected set; }
 
 	/// <summary>
-	/// Dictionary of all furniture in the world, look up by full name.
+	/// Dictionary of all furniture in the world, sorted and grouped by full name.
 	/// </summary>
-	public Dictionary<string, List<Furniture> > m_furnitureInMap;
+	public Dictionary<string, List<Furniture> > m_furnitureInWorld;
 
 	/// <summary>
-	/// Dictionary of all furniture in the game, look up by full name.
+	/// Dictionary of all furniture avaliable in the game, look up by full name.
 	/// </summary>
 	/// <value>The m furniture prototypes.</value>
 	public Dictionary<string, Furniture> m_furniturePrototypes { get; protected set; }
+
+	/// <summary>
+	/// Dictionary of all Stock araliable in the game, look up by full name.
+	/// </summary>
+	public Dictionary<string, Stock> m_stockPrototypes { get; protected set; }
+
+	/// <summary>
+	/// Dictionary of all Stock the shop currently sells, sorted and grouped by name.
+	/// </summary>
+	public Dictionary<string, List<Stock> > m_stockInWorld { get; protected set; } //TODO this should only be avaliable to characters if
+																				   //they have access to the manager's computer with that
+																				   //information on, or possibly any computer in the 
+																				   //store connected to the intranet.
 
 	public Action<Furniture> cbFurnitureCreated;
 	public Action<Character> cbCharacterCreated;
 
 	public World (int _width = 50, int _height = 50){
+
 		this.m_width = _width;
 		this.m_height = _height;
 
@@ -48,15 +65,17 @@ public class World {
 			}
 		}
 
-
+		Debug.Log("World created with " + m_width * m_height + " tiles.");
 
 		Debug.Log("World created with " + m_width * m_height + " tiles.");
 
 		CreateFurniturePrototypes ();
+		CreateStockPrototypes();
 
 		m_furnitures = new List<Furniture> ();
-		m_furnitureInMap = new Dictionary<string, List<Furniture> > ();
+		m_furnitureInWorld = new Dictionary<string, List<Furniture> > ();
 		m_characters = new List<Character> ();
+		m_employees = new List<Employee> ();
 
 		CreateEmployee( GetTileAt( m_width/2, m_height/2 ) );
 	}
@@ -88,13 +107,14 @@ public class World {
 
 	Employee CreateEmployee ( Tile _tile )
 	{
-		Employee e = new Employee ( _tile, "Manager" );	
+		Employee e = new Employee ( "James", 5000, _tile, "Manager" );	
 		if ( cbCharacterCreated != null )
 		{
 			cbCharacterCreated(e);
 		}
 
 		m_characters.Add(e);
+		m_employees.Add(e);
 
 		return e;
 	}
@@ -112,7 +132,8 @@ public class World {
 				1, 		// Width
 				1,  	// Height
 				true,   // Links to neighbour
-				true	//Draggable	
+				true,	//Draggable	
+				0       //Max Carry Weight
 			) 
 		);
 
@@ -124,7 +145,8 @@ public class World {
 				1, 		// Width
 				1,  	// Height
 				false, 	// Links to neighbour
-				false	// Draggable
+				false,	// Draggable
+				0       //Max Carry Weight
 			) 
 		);
 		
@@ -142,7 +164,8 @@ public class World {
 				1, 		// Width
 				1,  	// Height
 				false, 	// Links to neighbour
-				false	// Draggable
+				false,	// Draggable
+				75000   //Max Carry Weight
 			) 
 		);
 
@@ -151,13 +174,41 @@ public class World {
 				"Checkout",
 				"Other",
 				5, 		//Pathfinding Cost
-				3, 		// Width
+				2, 		// Width
 				1,  	// Height
 				false, 	// Links to neighbour
-				false	// Draggable
+				false,	// Draggable
+				10000    //Max Carry Weight
 			) 
 		);
 
+	}
+
+	void CreateStockPrototypes ()
+	{
+		m_stockPrototypes = new Dictionary<string, Stock>();
+
+		m_stockPrototypes.Add("Cola_Pepsi",
+			new Stock(
+				"Cola_Pepsi",    //IDName
+				"Pepsi Cola",    //Name
+				2000, 		     //Weight
+				199, 		     //Price
+				Temperature.Room //Temperature
+			)
+
+		);
+
+		m_stockPrototypes.Add("Cheese_and_Onion_Crisps_Walkers",
+			new Stock(
+				"Cheese_and_Onion_Crisps_Walkers", //IDName
+				"Walkers Cheese and Onion Crisps", //Name
+				25,                                //Weight
+				59,                                //Price
+				Temperature.Room                   //Temperature
+			)
+
+		);
 	}
 
 	public bool IsFurniturePlacementValid ( string _furnitureType, Tile _tile )
@@ -183,11 +234,11 @@ public class World {
 		}
 
 		m_furnitures.Add ( furn );
-		if ( m_furnitureInMap.ContainsKey ( furn.m_baseFurnType + "_" + furn.m_furnType ) == false )
+		if ( m_furnitureInWorld.ContainsKey ( furn.m_baseFurnType + "_" + furn.m_furnType ) == false )
 		{
-			m_furnitureInMap.Add ( furn.m_baseFurnType + "_" + furn.m_furnType, new List<Furniture> () );
+			m_furnitureInWorld.Add ( furn.m_baseFurnType + "_" + furn.m_furnType, new List<Furniture> () );
 		}
-		m_furnitureInMap[furn.m_baseFurnType + "_" + furn.m_furnType].Add(furn);
+		m_furnitureInWorld[furn.m_baseFurnType + "_" + furn.m_furnType].Add(furn);
 
 		if ( cbFurnitureCreated != null )
 		{
@@ -201,6 +252,24 @@ public class World {
 	public string GetBaseFurnTypeWithName ( string _furnName )
 	{
 		return m_furniturePrototypes[_furnName].m_baseFurnType;
+	}
+
+	//Attempts to place a furniture onto a specified tile with specified stock. If it fails this returns null, else it returns THE instance of the furniture
+	//that got placed.
+	public Furniture PlaceFurnitureInWorldWithStock ( string _furnName, Tile _tile, List<Stock> _stock )
+	{
+		Furniture furn = PlaceFurnitureInWorld ( _furnName, _tile );
+
+		foreach ( Stock stock in _stock )
+		{
+			if ( furn.TryAddStock ( stock ) == false )
+			{
+				Debug.LogError("World tried to add stock to furniture but failed: Stock: " + stock.Name + ", Furniture " + furn.m_furnType);
+				continue;
+			}
+		}
+
+		return furn;
 	}
 
 	public void InvalidateTileGraph()

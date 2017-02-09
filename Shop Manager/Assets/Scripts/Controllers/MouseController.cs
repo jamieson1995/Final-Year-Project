@@ -48,6 +48,11 @@ public class MouseController : MonoBehaviour {
 
 	void Update ()
 	{
+		if ( WorldController.instance.m_world == null )
+		{
+			return;
+		}
+
 		m_currFramePos = Camera.main.ScreenToWorldPoint ( Input.mousePosition );
 		m_currFramePos.z = 0;
 
@@ -129,6 +134,11 @@ public class MouseController : MonoBehaviour {
 
 	void UpdateDragging ()
 	{
+
+		if ( WorldController.instance.m_world == null )
+		{
+			return;
+		}
 
 		if ( EventSystem.current.IsPointerOverGameObject () )
 		{
@@ -250,5 +260,11 @@ public class MouseController : MonoBehaviour {
     public void SetCharacterDest ()
 	{
 		m_mode = "CharacterWalk"; //This means that when the user clicks a tile. The character's destination will change.
+	}
+
+	public void AddTill ()
+	{
+		Stock[] stock = { WorldController.instance.m_world.m_stockPrototypes["Cola_Pepsi"], WorldController.instance.m_world.m_stockPrototypes["Cheese_and_Onion_Crisps_Walkers"] };
+		WorldController.instance.m_world.PlaceFurnitureInWorldWithStock("Other_Checkout", WorldController.instance.m_world.GetTileAt(24,27), new List<Stock>(stock) );
 	}
 }

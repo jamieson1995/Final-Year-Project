@@ -8,7 +8,7 @@ public class Furniture {
 
 	public Tile m_jobTile { get; protected set; }
 
-	public Dictionary<string, Stock> m_stock { get; protected set; }
+	public Dictionary<string, List<Stock> > m_stock { get; protected set; }
 
 	public string m_baseFurnType {get; protected set;} //This represents the catergory of furniture, i.e. wall/door/shelf/moveable etc.
 
@@ -28,6 +28,10 @@ public class Furniture {
 
 	public bool m_used;
 
+	public int m_maxCarryWeight { get; protected set; } //This represents the maximum amount of stock that this furniture can carry.
+
+	public int m_weightUsed { get; protected set; } //This represents the weight used, based on the stock currently on the furniture.
+
 	public Action<Furniture> cbOnChanged; //After this action gets activated, whenever it gets called, a given event will trigger, i.e changing the visual of this furniture
 
 	public Func<Furniture, ENTERABILITY> m_isEnterable;
@@ -38,8 +42,33 @@ public class Furniture {
 
 	public Action<Furniture, float> m_updateActions; //This is an action, which when activated, allows this tile to run its Update function
 													 //This means only furniture that need update functions can have them run i.e. doors for opening.
+													
+	public Furniture ( string _furnType, string _baseFurnType, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight )
+	{
+		this.m_baseFurnType = _baseFurnType;
+		this.m_furnType = _furnType;
+		this.m_movementCost = _movementCost;
+		this.Width = _width;
+		this.Height = _height;
+		this.m_linksToNeighbour = _linksToNeighbour;
+		this.m_draggable = _draggable;
+		this.m_maxCarryWeight = _maxCarryWeight;
 
-	//Used in conjuction with the virtual clone function.
+		this.funcPositionValidation = this.DEFAULT_IsValidPosition;
+
+		m_furnParameters = new Dictionary<string, float> ();
+
+		m_stock = new Dictionary<string, List<Stock>>();
+	}
+
+	//When placing furniture, the actual furniture isn't being placed, a cloned version of the default furniture is. 
+	//Therefore, a temp furniture needs to be cloned from the original and that is what gets placed.
+	virtual public Furniture Clone ()
+	{
+		return new Furniture(this);
+	}
+
+	//Used in conjuction with the virtual Clone function.
 	protected Furniture ( Furniture _other )
 	{
 		this.m_baseFurnType = _other.m_baseFurnType;
@@ -49,6 +78,7 @@ public class Furniture {
 		this.Height = _other.Height;
 		this.m_linksToNeighbour = _other.m_linksToNeighbour;
 		this.m_draggable = _other.m_draggable;
+		this.m_maxCarryWeight = _other.m_maxCarryWeight;
 
 		m_furnParameters = new Dictionary<string, float> ( _other.m_furnParameters );
 		if ( _other.m_updateActions != null )
@@ -62,29 +92,10 @@ public class Furniture {
 		}
 
 		this.m_isEnterable = _other.m_isEnterable;
+
+		this.m_stock = _other.m_stock;
 	}
 
-	//When placing furniture, the actual furniture isn't being placed, a cloned version of the default furniture is. Therefore, a temp furniture needs to be cloned from the
-	//original and that is what gets placed.
-	virtual public Furniture Clone ()
-	{
-		return new Furniture(this);
-	}
-
-	public Furniture ( string _furnType, string _baseFurnType, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable )
-	{
-		this.m_baseFurnType = _baseFurnType;
-		this.m_furnType = _furnType;
-		this.m_movementCost = _movementCost;
-		this.Width = _width;
-		this.Height = _height;
-		this.m_linksToNeighbour = _linksToNeighbour;
-		this.m_draggable = _draggable;
-
-		this.funcPositionValidation = this.DEFAULT_IsValidPosition;
-
-		m_furnParameters = new Dictionary<string, float> ();
-	}
 
 	//Attempts to place a certain furniture onto a given tile, if successful, a copy of that furniture is returned.
 	static public Furniture PlaceInstanceOfFurniture ( Furniture _other, Tile _tile )
@@ -228,20 +239,46 @@ public class Furniture {
 		return true;
 	}
 
-	public void AddStock(Stock _stock)
+	public bool TryAddStock ( Stock _stock )
 	{
-		m_stock.Add(_stock.m_name, _stock);
+		if ( _stock == null )
+		{
+			Debug.LogError("Trying to add null stock to furniture: Furniture: " + m_furnType);
+			return false;
+		}
+		if ( m_weightUsed + _stock.Weight > m_maxCarryWeight )
+		{
+			Debug.LogWarning ( "Tried to add stock to furniture but it was too heavy: Stock: " + _stock.Name + ", Furniture " + m_furnType );
+			return false;
+		}
+
+		if ( m_stock.ContainsKey ( _stock.IDName ) == false)
+		{
+			m_stock.Add(_stock.IDName, new List<Stock>() );
+		}
+
+		m_stock[_stock.IDName].Add(_stock);
+
+		m_weightUsed += _stock.Weight;
+
+		return true;
 	}
 
-	public bool TryTakeStock ( Stock _stock )
+	public bool TryGiveStock ( string _stock )
 	{
-		if ( m_stock.ContainsKey ( _stock.m_name ) )
+		if ( m_stock.ContainsKey ( _stock ) )
 		{
-			m_stock.Remove( _stock.m_name);
+			Stock stock = m_stock [ _stock ] [ 0 ];
+			m_stock [ _stock ].Remove ( stock );
+			if ( m_stock [ _stock ].Count == 0 )
+			{
+				m_stock.Remove(_stock);
+			}
+			m_weightUsed -= WorldController.instance.m_world.m_stockPrototypes[_stock].Weight;
 			return true;
 		}
 
-		Debug.LogError("Tried to remove stock from furniture that didn't have any: Furniture: " + m_furnType + ", Stock: " + _stock.m_name);
+		Debug.LogError("Tried to remove stock from furniture that didn't have any: Furniture: " + m_furnType + ", Stock: " + _stock);
 		return false;
 	}
 

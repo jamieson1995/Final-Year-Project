@@ -22,29 +22,29 @@ public abstract class Character {
 		}
 	}
 
-	string m_name; //Character's Name
+	protected string m_name; //Character's Name
 
 	public Tile m_currTile {get; protected set;}
 	protected Tile m_destTile;
-	Tile m_nextTile; //The next tile in the pathfinding sequence
-	Path_AStar m_pathAStar;
-	float m_movementPercentage;
+	protected Tile m_nextTile; //The next tile in the pathfinding sequence
+	protected Path_AStar m_pathAStar;
+	protected float m_movementPercentage;
 
-	Dictionary<string, Stock> m_stock;
+	protected Stock m_stock;
 
 	//Tiles per second
-	float m_maxSpeed = 4f; //Character's default speed
+	protected float m_maxSpeed = 4f; //Character's default speed
 	public float m_currentSpeed;
-
-	int m_maximumCarryWeight; //The maximum weight of objects the character can carry. Can be stock or other objects.
 
 	Action<Character> cbCharacterChanged;
 
 	//Spawns a character on a designated tile.
-	public Character ( Tile _tile )
+	public Character ( string _name, int _maxCarryWeight, Tile _tile )
 	{
 		m_currTile = m_destTile = m_nextTile = _tile; //Set all three tile variables to tile the character will spawn on.
 		m_currentSpeed = m_maxSpeed;
+
+		m_name = _name;
 		//TODO: Add default values here such as stock carried or jobs assigned.
 	}
 
@@ -162,15 +162,72 @@ public abstract class Character {
 		Debug.Log("Dest tile: (" + m_destTile.X + "," + m_destTile.Y + ")");
 	}
 
+	/// <summary>
+	/// the character tries to pick up any piece of stock from the specified piece of furniture.
+	/// </summary>
+	protected bool TryTakeAnyStock ( Furniture _furn, bool _scannedMatters )
+	{
+		foreach ( var stockList in _furn.m_stock )
+		{
+			foreach ( Stock stock in _furn.m_stock[stockList.Key] )
+			{
+				if ( _scannedMatters == true )
+				{
+					if ( stock.m_scanned == true )
+					{
+						continue;
+					}
+				}
+				if ( TryTakeStock ( stock, _furn ) == false )
+				{
+					continue;
+				}
+				else
+				{
+					Debug.Log("Successfully picked up: " + stock.Name);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// The character tries to pick up the specified piece of stock from the specified piece of furniture.
+	/// </summary
 	protected bool TryTakeStock ( Stock _stock, Furniture _furn )
 	{
-		if ( _furn.TryTakeStock ( _stock ) )
+
+		if ( m_stock != null)
 		{
-			m_stock.Add ( _stock.m_name, _stock );
+			Debug.LogWarning("Tried to pick up stock but already carrying stock: Character: " + m_name + ", AttemptedStock: " + _stock.IDName);
+			return false;
+		}
+
+		if ( _furn.TryGiveStock ( _stock.IDName ) )
+		{
+			m_stock = _stock;
+
 			return true;
 		}
 
 		return false;
+	}
+
+	protected Stock TryGiveStock ( string _stock )
+	{
+		if ( m_stock.IDName != _stock )
+		{
+			Debug.LogWarning ( "Character tried to give stock they don't possess: Character: " + m_name + ", Stock: " + _stock );
+			return null;
+		}
+
+		Stock stock = m_stock;
+
+		m_stock = null;
+
+		return stock;
 	}
 
 	public void RegisterOnChangedCallback( Action<Character> _callbackFunc )

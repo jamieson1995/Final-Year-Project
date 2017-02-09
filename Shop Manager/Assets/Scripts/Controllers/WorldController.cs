@@ -13,6 +13,12 @@ public class WorldController : MonoBehaviour {
 
 	Dictionary<Tile, GameObject> tileGameObjectMap; //This is needed to track which tile is related to which GameObject.
 
+	public GameObject m_createWorldButton;
+	public GameObject m_gameUI;
+
+	public FurnitureSpriteController FSC;
+	public CharacterSpriteController CSC;
+
 	void Awake(){
 
 		if (instance == null){
@@ -21,6 +27,35 @@ public class WorldController : MonoBehaviour {
 		else
 			Debug.Log("Second World Controller tried to be created. Cannot have more than one World Controller.");
 
+		
+	}
+
+	void Update ()
+	{
+		if ( m_world == null )
+		{
+			return;
+		}
+		m_world.Update(Time.deltaTime); //TODO Speed controls?
+	}
+
+	public Tile GetTileAtWorldCoord (Vector3 _coord, bool _canBeOutOfBounds = false)
+    {
+        int x = Mathf.FloorToInt (_coord.x + 0.5f);
+        int y = Mathf.FloorToInt (_coord.y + 0.5f);
+        if (_canBeOutOfBounds == false)
+        {
+            if (x < 0 || x > m_world.m_width || y < 0 || y > m_world.m_height)
+            {
+          	  return null;
+            }
+        }
+
+        return m_world.GetTileAt(x,y);
+    }
+
+    public void SetUpWorld()
+	{
 		m_world = new World();
 
 		//Instantiate our dictionary that tracks which GameObject is rendering which tile data.
@@ -47,26 +82,12 @@ public class WorldController : MonoBehaviour {
 		}
 		//Center the camera in the middle of the world.
 		Camera.main.transform.position = new Vector3( m_world.m_width/2, m_world.m_height/2, Camera.main.transform.position.z );
+
+		m_createWorldButton.SetActive(false);
+		m_gameUI.SetActive(true);
+
+		FSC.SetUpWorld();
+		CSC.SetUpWorld();
 	}
-
-	void Update()
-	{
-		m_world.Update(Time.deltaTime); //TODO Speed controls?
-	}
-
-	public Tile GetTileAtWorldCoord (Vector3 _coord, bool _canBeOutOfBounds = false)
-    {
-        int x = Mathf.FloorToInt (_coord.x + 0.5f);
-        int y = Mathf.FloorToInt (_coord.y + 0.5f);
-        if (_canBeOutOfBounds == false)
-        {
-            if (x < 0 || x > m_world.m_width || y < 0 || y > m_world.m_height)
-            {
-          	  return null;
-            }
-        }
-
-        return m_world.GetTileAt(x,y);
-    }
 
 }

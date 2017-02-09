@@ -12,11 +12,14 @@ public class CharacterSpriteController : MonoBehaviour {
 
 	void Start ()
 	{
-		m_world = WorldController.instance.m_world;
 		characterGameObjectMap = new Dictionary<Character, GameObject>();
 		characterSprites = new Dictionary<string, Sprite>();
-		m_world.RegisterCharacterCreated(OnCharacterCreated);
+	}
 
+	public void SetUpWorld()
+	{
+		m_world = WorldController.instance.m_world;
+		m_world.RegisterCharacterCreated(OnCharacterCreated);
 		foreach ( Sprite s in m_sprites )
 		{
 			characterSprites[s.name] = s;
