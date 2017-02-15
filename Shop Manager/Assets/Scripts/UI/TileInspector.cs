@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 public class TileInspector : MonoBehaviour {
 
@@ -8,7 +7,7 @@ public class TileInspector : MonoBehaviour {
 	public GameObject m_mouseModeGO;
 	Text m_furnitureTypeGOText;
 	Text m_mouseModeGOText;
-	MouseController m_mouseController;
+	InputController m_inputController;
 
 	void Start ()
 	{
@@ -28,31 +27,36 @@ public class TileInspector : MonoBehaviour {
 			return;
 		}
 
-		m_mouseController = GameObject.FindObjectOfType<MouseController> ();
+		m_inputController = GameObject.FindObjectOfType<InputController> ();
 
-		if ( m_mouseController == null )
+		if ( m_inputController == null )
 		{
-			Debug.LogError("We don't have an instance of mouse controller");
+			Debug.LogError("We don't have an instance of input controller");
 		}
 	}
 
 	void Update ()
 	{
-		Tile t = m_mouseController.GetTileUnderMouse ();
+		Tile t = m_inputController.GetTileUnderMouse ();
 
 		string s = "NULL";
 
-		if ( t.m_furniture != null )
+		if ( t != null && t.m_furniture != null )
 		{
-			s = t.m_furniture.m_furnType.ToString ();
+			s = t.m_furniture.m_name;
+		}
+
+		if ( t == null )
+		{
+			s = "N/A";
 		}
 
 		m_furnitureTypeGOText.text = "Furniture: " + s;
 		s = "NULL";
 
-		if ( m_mouseController.m_mode != null )
+		if ( m_inputController.m_mode != null )
 		{
-			s = m_mouseController.m_mode.ToString ();
+			s = m_inputController.m_mode.ToString ();
 			m_mouseModeGOText.text = "Mouse Mode: " + s;
 		}
 

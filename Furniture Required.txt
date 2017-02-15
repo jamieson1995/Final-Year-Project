@@ -1,0 +1,11 @@
+Checkout 3x1 DONE
+Wall 1x1 DONE
+Door 1x1 (3x1) DONE
+Stockcage 1x1 DONE
+Trolley 2x1 DONE
+BackShelf 1x1 DONE
+FrontShelf 1x1 DONE 
+Fridge 1x1 DONE
+BigFridge 2x1 DONE
+Freezer 1x1 DONE
+BigFreezer 2x1 DONE

@@ -69,22 +69,22 @@ public class Job {
 			switch ( m_primaryState )
 			{
 			case PrimaryStates.ServeOnTill:
-				return "Other_Checkout";
+				return "Checkout";
 
 			case Job.PrimaryStates.WorkStockCage:
-				return "Movable_Stockcage";
+				return "Stockcage";
 	
 			case Job.PrimaryStates.EmptyStockCage:
-					return "Movable_Stockcage";
+					return "Stockcage";
 	
 			case Job.PrimaryStates.WorkBackStock:
-				return "Back_StockShelf";
+				return "StockShelf";
 	
 			case Job.PrimaryStates.FaceUp:
-				return "Front_StockShelf";
+				return "StockShelf";
 	
 			case Job.PrimaryStates.CountTillMoney:
-				return "Other_Checkout";
+				return "Checkout";
 			}
 
 			return null;

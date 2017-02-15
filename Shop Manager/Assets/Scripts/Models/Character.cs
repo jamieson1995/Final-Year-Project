@@ -22,7 +22,7 @@ public abstract class Character {
 		}
 	}
 
-	protected string m_name; //Character's Name
+	public string m_name { get; protected set; } //Character's Name
 
 	public Tile m_currTile {get; protected set;}
 	protected Tile m_destTile;
@@ -152,14 +152,9 @@ public abstract class Character {
 
 	public void SetDestination( Tile _tile )
 	{
-		if (m_currTile.IsNeighbour ( _tile, true ) == false )
-		{
-			Debug.Log("Character::SetDestination -- Our destination tile isn't actually our neighbour.");
-		}
-
 		m_destTile = _tile;
 		m_pathAStar = null;
-		Debug.Log("Dest tile: (" + m_destTile.X + "," + m_destTile.Y + ")");
+		//Debug.Log("Dest tile: (" + m_destTile.X + "," + m_destTile.Y + ")");
 	}
 
 	/// <summary>

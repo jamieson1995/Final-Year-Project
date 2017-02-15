@@ -10,9 +10,7 @@ public class Furniture {
 
 	public Dictionary<string, List<Stock> > m_stock { get; protected set; }
 
-	public string m_baseFurnType {get; protected set;} //This represents the catergory of furniture, i.e. wall/door/shelf/moveable etc.
-
-	public string m_furnType {get; protected set;} //This represents the item inside the category of furniture, i.e. wooden/automatic/doublewide etc.
+	public string m_name {get; protected set;} 
 
 	public float m_movementCost { get; protected set; } //This is a multiplier. So a value of '2' here means it takes 2 times as long to walk through this tile.
 														//SPECIAL: If this is 0, it means the furniture is impassible (e.g. a wall)
@@ -26,6 +24,11 @@ public class Furniture {
 	public bool m_draggable { get; protected set; } //This variable determines whether the furniture can be dragged along to be placed down
 													//i.e. walls
 
+	public int m_rotation { get; protected set; } //1 - Default - South Facing
+												  //2 - East Facing
+												  //3 - North Facing
+												  //4 - West Facing
+
 	public bool m_used;
 
 	public int m_maxCarryWeight { get; protected set; } //This represents the maximum amount of stock that this furniture can carry.
@@ -36,17 +39,16 @@ public class Furniture {
 
 	public Func<Furniture, ENTERABILITY> m_isEnterable;
 
-	Func<Tile, bool> funcPositionValidation; //This runs a function and checks the given tile to see if the placement of the furniture is valid, it returns a bool.
+	Func<Tile, int, bool> funcPositionValidation; //This runs a function and checks the given tile to see if the placement of the furniture is valid, it returns a bool.
 
 	public Dictionary<string, float> m_furnParameters;//This is used in conjuction with the updateActions action, so that parameters can be used.
 
 	public Action<Furniture, float> m_updateActions; //This is an action, which when activated, allows this tile to run its Update function
 													 //This means only furniture that need update functions can have them run i.e. doors for opening.
 													
-	public Furniture ( string _furnType, string _baseFurnType, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight )
+	public Furniture ( string _name, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight )
 	{
-		this.m_baseFurnType = _baseFurnType;
-		this.m_furnType = _furnType;
+		this.m_name = _name;
 		this.m_movementCost = _movementCost;
 		this.Width = _width;
 		this.Height = _height;
@@ -54,7 +56,7 @@ public class Furniture {
 		this.m_draggable = _draggable;
 		this.m_maxCarryWeight = _maxCarryWeight;
 
-		this.funcPositionValidation = this.DEFAULT_IsValidPosition;
+		//this.funcPositionValidation = this.DEFAULT_IsValidPosition;
 
 		m_furnParameters = new Dictionary<string, float> ();
 
@@ -71,8 +73,7 @@ public class Furniture {
 	//Used in conjuction with the virtual Clone function.
 	protected Furniture ( Furniture _other )
 	{
-		this.m_baseFurnType = _other.m_baseFurnType;
-		this.m_furnType = _other.m_furnType;
+		this.m_name = _other.m_name;
 		this.m_movementCost = _other.m_movementCost;
 		this.Width = _other.Width;
 		this.Height = _other.Height;
@@ -86,10 +87,10 @@ public class Furniture {
 			this.m_updateActions = (Action<Furniture, float>)_other.m_updateActions.Clone ();
 		}
 
-		if ( _other.funcPositionValidation != null )
-		{
-			this.funcPositionValidation = (Func<Tile, bool>)_other.funcPositionValidation.Clone();
-		}
+		//if ( _other.funcPositionValidation != null )
+		//{
+		//	this.funcPositionValidation = (Func<Tile, int, bool>)_other.funcPositionValidation.Clone();
+		//}
 
 		this.m_isEnterable = _other.m_isEnterable;
 
@@ -98,20 +99,39 @@ public class Furniture {
 
 
 	//Attempts to place a certain furniture onto a given tile, if successful, a copy of that furniture is returned.
-	static public Furniture PlaceInstanceOfFurniture ( Furniture _other, Tile _tile )
+	static public Furniture PlaceInstanceOfFurniture ( Furniture _other, Tile _tile, int _direction = 1 )
 	{
 
-		if ( _other.funcPositionValidation ( _tile ) == false )
+		Furniture furn = _other.Clone (); 
+
+		//if ( furn.funcPositionValidation ( _tile, _direction ) == false )
+		if ( WorldController.instance.m_world.PositionCheck(_tile, _other, _direction) == false ) 
 		{
-			Debug.LogError( "PlaceInstance -- Position validity function returned FALSE" );
+			Debug.LogError ( "PlaceInstance -- Position validity function returned FALSE" );
 			return null;
 		}
 
-		Furniture furn = _other.Clone (); 
-		furn.m_tile = _tile;
-		furn.m_jobTile = WorldController.instance.m_world.GetTileAt( _tile.X + (furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
+		furn.RotateFurniture(_direction);
 
-		if ( _tile.PlaceFurniture ( furn ) == false )
+		furn.m_tile = _tile;
+		if ( furn.m_rotation == 1 )
+		{
+			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
+		}
+		else if ( furn.m_rotation == 2 )
+		{
+			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) + 1, _tile.Y + ( furn.Height / 2 ) );
+		}
+		else if ( furn.m_rotation == 3 )
+		{
+			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) + 1 );
+		}
+		else if ( furn.m_rotation == 4 )
+		{
+			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) - 1, _tile.Y + ( furn.Height / 2 ) );
+		}
+
+		if ( _tile.PlaceFurniture ( furn, _direction) == false )
 		{
 			//For some reason, we were unable to place our furniture in this tile.
 			//Probably is was already occupied.
@@ -122,55 +142,29 @@ public class Furniture {
 		{
 			Tile[] tiles = _tile.GetNeighbours ( false );
 
-			if ( tiles[ 0 ] != null && tiles [ 0 ].m_furniture != null )
+			if ( tiles[ 0 ] != null && tiles [ 0 ].m_furniture != null && tiles [ 0 ].m_furniture.m_linksToNeighbour)
 			{
 				//We have a northern neighbour that links with us. So tell it to change its visuals
 				tiles[0].m_furniture.cbOnChanged(tiles[0].m_furniture);
 			}
-			if ( tiles[1] != null && tiles[1].m_furniture != null )
+			if ( tiles[1] != null && tiles[1].m_furniture != null && tiles [ 1 ].m_furniture.m_linksToNeighbour)
 			{
-				//We have a northern neighbour that links with us. So tell it to change its visuals
+				//We have a eastern neighbour that links with us. So tell it to change its visuals
 				tiles[1].m_furniture.cbOnChanged(tiles[1].m_furniture);
 			}
-			if ( tiles[2] != null && tiles[2].m_furniture != null )
+			if ( tiles[2] != null && tiles[2].m_furniture != null && tiles [ 2 ].m_furniture.m_linksToNeighbour)
 			{
-				//We have a northern neighbour that links with us. So tell it to change its visuals
+				//We have a southern neighbour that links with us. So tell it to change its visuals
 				tiles[2].m_furniture.cbOnChanged(tiles[2].m_furniture);
 			}
-			if ( tiles[3] != null && tiles[3].m_furniture != null )
+			if ( tiles[3] != null && tiles[3].m_furniture != null && tiles [ 3 ].m_furniture.m_linksToNeighbour)
 			{
-				//We have a northern neighbour that links with us. So tell it to change its visuals
+				//We have a western neighbour that links with us. So tell it to change its visuals
 				tiles[3].m_furniture.cbOnChanged(tiles[3].m_furniture);
 			}
 		}
 
 		return furn;
-	}
-
-	public void UpdateNeighbours ()
-	{
-		Tile[] tiles = m_tile.GetNeighbours ( false );
-
-		if ( tiles [ 0 ] != null && tiles [ 0 ].m_furniture != null && tiles [ 0 ].m_furniture.cbOnChanged != null )
-		{
-			//We have a northern neighbour that links with us. So tell it to change its visuals
-			tiles [ 0 ].m_furniture.cbOnChanged ( tiles [ 0 ].m_furniture );
-		}
-		if ( tiles [ 1 ] != null && tiles [ 1 ].m_furniture != null && tiles [ 1 ].m_furniture.cbOnChanged != null )
-		{
-			//We have a northern neighbour that links with us. So tell it to change its visuals
-			tiles [ 1 ].m_furniture.cbOnChanged ( tiles [ 1 ].m_furniture );
-		}
-		if ( tiles [ 2 ] != null && tiles [ 2 ].m_furniture != null && tiles [ 2 ].m_furniture.cbOnChanged != null )
-		{
-			//We have a northern neighbour that links with us. So tell it to change its visuals
-			tiles [ 2 ].m_furniture.cbOnChanged ( tiles [ 2 ].m_furniture );
-		}
-		if ( tiles [ 3 ] != null && tiles [ 3 ].m_furniture != null && tiles [ 3 ].m_furniture.cbOnChanged != null )
-		{
-			//We have a northern neighbour that links with us. So tell it to change its visuals
-			tiles [ 3 ].m_furniture.cbOnChanged ( tiles [ 3 ].m_furniture );
-		}
 	}
 
 	public void Update ( float _deltaTime )
@@ -181,74 +175,16 @@ public class Furniture {
 		}
 	}
 
-	public bool IsValidPosition ( Tile _tile )
-	{
-		return funcPositionValidation(_tile);
-	}
-
-	protected bool DEFAULT_IsValidPosition ( Tile _tile )
-	{
-		if ( _tile == null )
-		{
-			return false;
-		}
-
-		//This is for if the furniture is more than 1X1, and is used to check all the tiles for validity.
-		for ( int x_off = _tile.X; x_off < ( _tile.X + Width ); x_off++ )
-		{
-			for ( int y_off = _tile.Y; y_off < ( _tile.Y + Height ); y_off++ )
-			{
-				Tile t2 = WorldController.instance.m_world.GetTileAt ( x_off, y_off );
-				//Make sure tile doesn't already have furniture
-				if ( t2.m_furniture != null )
-				{
-					return false;
-				}
-			}
-		}
-
-		//This is used so that a door must be placed between two walls.
-		if ( m_baseFurnType == "Door" )
-		{
-			Furniture[] neighboursFurn = _tile.GetNeighboursFurniture ( false );
-
-			if ( neighboursFurn [ 0 ] == null || neighboursFurn [ 0 ].m_baseFurnType != "Wall" )
-			{
-
-				if ( neighboursFurn [ 1 ] == null || neighboursFurn [ 1 ].m_baseFurnType != "Wall" )
-				{
-					return false;
-				}
-				else
-				{
-					if ( neighboursFurn [ 3 ] == null || neighboursFurn [ 3 ].m_baseFurnType != "Wall" )
-					{
-						return false;
-					}
-				}
-			}
-			else
-			{
-				if ( neighboursFurn [ 2 ] == null || neighboursFurn [ 2 ].m_baseFurnType != "Wall" )
-				{
-					return false;
-				}
-			}
-
-		}
-		return true;
-	}
-
 	public bool TryAddStock ( Stock _stock )
 	{
 		if ( _stock == null )
 		{
-			Debug.LogError("Trying to add null stock to furniture: Furniture: " + m_furnType);
+			Debug.LogError("Trying to add null stock to furniture: Furniture: " + m_name);
 			return false;
 		}
 		if ( m_weightUsed + _stock.Weight > m_maxCarryWeight )
 		{
-			Debug.LogWarning ( "Tried to add stock to furniture but it was too heavy: Stock: " + _stock.Name + ", Furniture " + m_furnType );
+			Debug.LogWarning ( "Tried to add stock to furniture but it was too heavy: Stock: " + _stock.Name + ", Furniture " + m_name );
 			return false;
 		}
 
@@ -278,9 +214,34 @@ public class Furniture {
 			return true;
 		}
 
-		Debug.LogError("Tried to remove stock from furniture that didn't have any: Furniture: " + m_furnType + ", Stock: " + _stock);
+		Debug.LogError("Tried to remove stock from furniture that didn't have any: Furniture: " + m_name + ", Stock: " + _stock);
 		return false;
 	}
+
+	/// <summary>
+	/// Sets a furniture's rotation to the specifed direction   
+	/// <para> 1 - Default - South Facing </para>
+	/// <para> 2 - East Facing </para>
+	/// <para> 3 - North Facing </para>
+	/// <para> 4 - west Facing </para>
+	/// </summary>
+	public void RotateFurniture ( int _direction = 1 )
+	{
+		World world = WorldController.instance.m_world;
+		this.m_rotation = _direction;
+
+		if ( _direction == 1 || _direction == 3 )
+		{
+			this.Width = world.m_furniturePrototypes [ this.m_name ].Width;
+			this.Height = world.m_furniturePrototypes [ this.m_name ].Height;
+		}
+		else
+		{
+			this.Width = world.m_furniturePrototypes [ this.m_name ].Height;
+			this.Height = world.m_furniturePrototypes [ this.m_name ].Width;
+		}
+	}
+
 
 	//When this function is called, the callback will be activated.
 	public void RegisterOnChangedCallback( Action<Furniture> _callback )

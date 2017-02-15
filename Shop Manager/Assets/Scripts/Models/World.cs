@@ -47,6 +47,15 @@ public class World {
 																				   //information on, or possibly any computer in the 
 																				   //store connected to the intranet.
 
+
+	/// <summary>
+	/// All character's that are using a piece of furniture, look up by used furniture.
+	/// </summary>
+	public Dictionary<Furniture, Character> m_characterFurniture; //This stores each character and which furniture they are currently using.
+																  //If a character is not in this dictionary, its means they aren't using a piece of
+																  //furniture.
+																												
+
 	public Action<Furniture> cbFurnitureCreated;
 	public Action<Character> cbCharacterCreated;
 
@@ -65,10 +74,6 @@ public class World {
 			}
 		}
 
-		Debug.Log("World created with " + m_width * m_height + " tiles.");
-
-		Debug.Log("World created with " + m_width * m_height + " tiles.");
-
 		CreateFurniturePrototypes ();
 		CreateStockPrototypes();
 
@@ -76,9 +81,8 @@ public class World {
 		m_furnitureInWorld = new Dictionary<string, List<Furniture> > ();
 		m_characters = new List<Character> ();
 		m_employees = new List<Employee> ();
-
-		CreateEmployee( GetTileAt( m_width/2, m_height/2 ) );
-	}
+		m_characterFurniture = new Dictionary<Furniture, Character>();
+		}
 
 	//Returns a Tile at a certain coordinate
 	public Tile GetTileAt ( int _x, int _y )
@@ -105,9 +109,9 @@ public class World {
 		}
 	}
 
-	Employee CreateEmployee ( Tile _tile )
+	public Employee CreateEmployee ( string _name, int _maxCarryWeight, Tile _tile, string _title )
 	{
-		Employee e = new Employee ( "James", 5000, _tile, "Manager" );	
+		Employee e = new Employee ( _name, _maxCarryWeight, _tile, _title );	
 		if ( cbCharacterCreated != null )
 		{
 			cbCharacterCreated(e);
@@ -124,10 +128,9 @@ public class World {
 
 		m_furniturePrototypes = new Dictionary<string, Furniture> ();
 
-		m_furniturePrototypes.Add ( "Wall_Plain", 
+		m_furniturePrototypes.Add ( "Wall", 
 			new Furniture (
-				"Plain",
-				"Wall",
+				"Wall",	//Name
 				0, 		//Impassable
 				1, 		// Width
 				1,  	// Height
@@ -137,10 +140,9 @@ public class World {
 			) 
 		);
 
-		m_furniturePrototypes.Add ( "Door_Sliding", 
+		m_furniturePrototypes.Add ( "Door", 
 			new Furniture (
-				"Sliding",
-				"Door",
+				"Door", //Name
 				1, 		//Pathfinding Cost
 				1, 		// Width
 				1,  	// Height
@@ -150,35 +152,117 @@ public class World {
 			) 
 		);
 		
-		m_furniturePrototypes [ "Door_Sliding" ].m_furnParameters [ "m_openness" ] = 0;
-		m_furniturePrototypes [ "Door_Sliding" ].m_furnParameters [ "m_isOpening" ] = 0;
-		m_furniturePrototypes [ "Door_Sliding" ].m_updateActions += FurnitureActions.Door_UpdateAction;	
+		m_furniturePrototypes [ "Door" ].m_furnParameters [ "m_openness" ] = 0;
+		m_furniturePrototypes [ "Door" ].m_furnParameters [ "m_isOpening" ] = 0;
+		m_furniturePrototypes [ "Door" ].m_updateActions += FurnitureActions.Door_UpdateAction;	
 		
-		m_furniturePrototypes [ "Door_Sliding" ].m_isEnterable = FurnitureActions.Door_IsEnterable;
+		m_furniturePrototypes [ "Door" ].m_isEnterable = FurnitureActions.Door_IsEnterable;
 
-		m_furniturePrototypes.Add ( "Movable_Stockcage", 
+		m_furniturePrototypes.Add ( "Stockcage", 
 			new Furniture (
-				"Stockcage",
-				"Movable",
-				5, 		//Pathfinding Cost
-				1, 		// Width
-				1,  	// Height
-				false, 	// Links to neighbour
-				false,	// Draggable
-				75000   //Max Carry Weight
+				"Stockcage", // Name
+				5, 			 // Pathfinding Cost
+				1, 			 // Width
+				1,  		 // Height
+				false, 		 // Links to neighbour
+				false,		 // Draggable
+				75000   	 // Max Carry Weight
 			) 
 		);
 
-		m_furniturePrototypes.Add ( "Other_Checkout", 
+		m_furniturePrototypes.Add ( "Checkout", 
 			new Furniture (
-				"Checkout",
-				"Other",
-				5, 		//Pathfinding Cost
-				2, 		// Width
-				1,  	// Height
-				false, 	// Links to neighbour
-				false,	// Draggable
-				10000    //Max Carry Weight
+				"Checkout",		//Name
+				5, 				//Pathfinding Cost
+				3, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				10000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "Trolley", 
+			new Furniture (
+				"Trolley",		//Name
+				20, 			//Pathfinding Cost
+				2, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				20000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "BackShelf", 
+			new Furniture (
+				"BackShelf",	//Name
+				0, 		    	//Pathfinding Cost
+				1, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				100000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "FrontShelf", 
+			new Furniture (
+				"FrontShelf",	//Name
+				0, 		    	//Pathfinding Cost
+				1, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				100000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "Fridge", 
+			new Furniture (
+				"Fridge",	    //Name
+				0, 		    	//Pathfinding Cost
+				1, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				75000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "BigFridge", 
+			new Furniture (
+				"BigFridge",	//Name
+				0, 		    	//Pathfinding Cost
+				2, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				150000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "Freezer", 
+			new Furniture (
+				"Freezer",	//Name
+				0, 		    	//Pathfinding Cost
+				1, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				75000    		//Max Carry Weight
+			) 
+		);
+
+		m_furniturePrototypes.Add ( "BigFreezer", 
+			new Furniture (
+				"BigFreezer",	//Name
+				0, 		    	//Pathfinding Cost
+				2, 				// Width
+				1,  			// Height
+				false, 			// Links to neighbour
+				false,			// Draggable
+				150000    		//Max Carry Weight
 			) 
 		);
 
@@ -211,14 +295,9 @@ public class World {
 		);
 	}
 
-	public bool IsFurniturePlacementValid ( string _furnitureType, Tile _tile )
-	{
-		return m_furniturePrototypes[_furnitureType].IsValidPosition(_tile);
-	}
-
 	//Attempts to place a furniture onto a specified tile. If it fails this returns null, else it returns THE instance of the furniture
 	//that got placed.
-	public Furniture PlaceFurnitureInWorld ( string _furnName, Tile _tile )
+	public Furniture PlaceFurnitureInWorld ( string _furnName, Tile _tile, int _direction = 1 )
 	{
 		if ( m_furniturePrototypes.ContainsKey ( _furnName ) == false )
 		{
@@ -226,7 +305,7 @@ public class World {
 			return null;
 		}
 
-		Furniture furn = Furniture.PlaceInstanceOfFurniture ( m_furniturePrototypes [ _furnName ], _tile );
+		Furniture furn = Furniture.PlaceInstanceOfFurniture ( m_furniturePrototypes [ _furnName ], _tile, _direction );
 
 		if ( furn == null )
 		{
@@ -234,11 +313,11 @@ public class World {
 		}
 
 		m_furnitures.Add ( furn );
-		if ( m_furnitureInWorld.ContainsKey ( furn.m_baseFurnType + "_" + furn.m_furnType ) == false )
+		if ( m_furnitureInWorld.ContainsKey ( furn.m_name ) == false )
 		{
-			m_furnitureInWorld.Add ( furn.m_baseFurnType + "_" + furn.m_furnType, new List<Furniture> () );
+			m_furnitureInWorld.Add ( furn.m_name, new List<Furniture> () );
 		}
-		m_furnitureInWorld[furn.m_baseFurnType + "_" + furn.m_furnType].Add(furn);
+		m_furnitureInWorld[furn.m_name].Add(furn);
 
 		if ( cbFurnitureCreated != null )
 		{
@@ -247,11 +326,6 @@ public class World {
 		}
 
 		return furn;
-	}
-
-	public string GetBaseFurnTypeWithName ( string _furnName )
-	{
-		return m_furniturePrototypes[_furnName].m_baseFurnType;
 	}
 
 	//Attempts to place a furniture onto a specified tile with specified stock. If it fails this returns null, else it returns THE instance of the furniture
@@ -264,12 +338,68 @@ public class World {
 		{
 			if ( furn.TryAddStock ( stock ) == false )
 			{
-				Debug.LogError("World tried to add stock to furniture but failed: Stock: " + stock.Name + ", Furniture " + furn.m_furnType);
+				Debug.LogError("World tried to add stock to furniture but failed: Stock: " + stock.Name + ", Furniture " + furn.m_name);
 				continue;
 			}
 		}
 
 		return furn;
+	}
+
+	public bool PositionCheck ( Tile _tile, Furniture _furn, int _direction )
+	{
+		if ( _tile == null )
+		{
+			return false;
+		}
+
+		Furniture furn = _furn.Clone();
+		furn.RotateFurniture(_direction);
+
+		//This is for if the furniture is more than 1X1, and is used to check all the tiles for validity.
+		for ( int x_off = _tile.X; x_off < ( _tile.X + furn.Width ); x_off++ )
+		{
+			for ( int y_off = _tile.Y; y_off < ( _tile.Y + furn.Height ); y_off++ )
+			{
+				Tile t2 = WorldController.instance.m_world.GetTileAt ( x_off, y_off );
+				//Make sure tile doesn't already have furniture
+				if ( t2.m_furniture != null )
+				{
+					return false;
+				}
+			}
+		}
+
+		//This is used so that a door must be placed between two walls.
+		if ( furn.m_name == "Door" )
+		{
+			Furniture[] neighboursFurn = _tile.GetNeighboursFurniture ( false );
+
+			if ( neighboursFurn [ 0 ] == null || neighboursFurn [ 0 ].m_name != "Wall" )
+			{
+
+				if ( neighboursFurn [ 1 ] == null || neighboursFurn [ 1 ].m_name != "Wall" )
+				{
+					return false;
+				}
+				else
+				{
+					if ( neighboursFurn [ 3 ] == null || neighboursFurn [ 3 ].m_name != "Wall" )
+					{
+						return false;
+					}
+				}
+			}
+			else
+			{
+				if ( neighboursFurn [ 2 ] == null || neighboursFurn [ 2 ].m_name != "Wall" )
+				{
+					return false;
+				}
+			}
+
+		}
+		return true;
 	}
 
 	public void InvalidateTileGraph()

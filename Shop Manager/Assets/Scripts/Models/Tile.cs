@@ -38,14 +38,14 @@ public class Tile {
 
 
 	//Tries to place a piece of furniture on this tile. If successful it will return true, and the furniture gets placed. If it cannot be placed, this returns false.
-	public bool PlaceFurniture ( Furniture _furn )
+	public bool PlaceFurniture ( Furniture _furn, int _direction )
 	{
 		if ( _furn == null )
 		{
 			Debug.Log ( "Trying to place nothing" );
 		}
 
-		if ( _furn.IsValidPosition ( this ) == false )
+		if ( m_world.PositionCheck(this, _furn, _direction) == false )
 		{
 			Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
 			return false;

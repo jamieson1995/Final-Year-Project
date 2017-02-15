@@ -48,7 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Controllers\CharacterSpriteController.cs" />
      <Compile Include="Assets\Scripts\Controllers\FurnitureSpriteController.cs" />
-     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\InputController.cs" />
      <Compile Include="Assets\Scripts\Controllers\WorldController.cs" />
      <Compile Include="Assets\Scripts\Models\Character.cs" />
      <Compile Include="Assets\Scripts\Models\Employee.cs" />
@@ -64,6 +64,7 @@
      <Compile Include="Assets\Scripts\Pathfinding\Path_TileGraph.cs" />
      <Compile Include="Assets\Scripts\UI\AutomaticHorizontalSize.cs" />
      <Compile Include="Assets\Scripts\UI\AutomaticVerticalSize.cs" />
+     <Compile Include="Assets\Scripts\UI\SelectDisplay.cs" />
      <Compile Include="Assets\Scripts\UI\TileInspector.cs" />
      <Compile Include="Assets\Scripts\Utilities\PriorityQueue\FastPriorityQueue.cs" />
      <Compile Include="Assets\Scripts\Utilities\PriorityQueue\FastPriorityQueueNode.cs" />

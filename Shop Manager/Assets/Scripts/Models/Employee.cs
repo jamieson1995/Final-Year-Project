@@ -135,6 +135,9 @@ public class Employee : Character {
 		{
 			if ( FindJobFurn ( m_job.m_requiredFurniture ) )
 			{
+				World m_world = WorldController.instance.m_world;
+				m_job.m_furn.m_used = true;
+				m_world.m_characterFurniture.Add(m_job.m_furn, this);
 				SetDestination ( m_job.Tile );
 			}
 		}

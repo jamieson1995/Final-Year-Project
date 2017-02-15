@@ -31,26 +31,30 @@ public class FurnitureSpriteController : MonoBehaviour {
 	{
 		GameObject furn_go = new GameObject ();
 
-		if ( _furn.m_baseFurnType == "Door" )
+		if ( _furn.m_name == "Door" )
 		{
 			Tile northTile = m_world.GetTileAt ( _furn.m_tile.X, _furn.m_tile.Y + 1 );
 			Tile southTile = m_world.GetTileAt ( _furn.m_tile.X, _furn.m_tile.Y - 1 );
 			if ( northTile != null && southTile != null &&
 			     northTile.m_furniture != null && southTile.m_furniture != null &&
-			     northTile.m_furniture.m_baseFurnType == "Wall" && southTile.m_furniture.m_baseFurnType == "Wall" )
+			     northTile.m_furniture.m_name == "Wall" && southTile.m_furniture.m_name == "Wall" )
 			{
 				furn_go.transform.rotation = Quaternion.Euler ( 0, 0, 90 );
 			}
 		}
 
-		m_furnitureGameObjectMap.Add(_furn, furn_go);
+		m_furnitureGameObjectMap.Add ( _furn, furn_go );
 
-		furn_go.name = _furn.m_furnType + "(" + _furn.m_tile.X + "_" + _furn.m_tile.Y + ")";
-		furn_go.transform.position = new Vector3 (_furn.m_tile.X + ( (_furn.Width - 1) ) / 2f , _furn.m_tile.Y + ( ( _furn.Height - 1) / 2f ), 0);
+		furn_go.name = _furn.m_name + "(" + _furn.m_tile.X + "_" + _furn.m_tile.Y + ")";
+		furn_go.transform.position = new Vector3 ( _furn.m_tile.X + ( ( _furn.Width - 1 ) ) / 2f, _furn.m_tile.Y + ( ( _furn.Height - 1 ) / 2f ), 0 );
+		if ( _furn.m_name != "Door" )
+		{
+			furn_go.transform.rotation = Quaternion.Euler ( 0, 0, ( _furn.m_rotation * 90 ) - 90 );
+		}
 		furn_go.transform.SetParent(this.transform, true);
 		SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
 		sr.sprite = GetSpriteForFurniture( _furn );
-		if (_furn.m_baseFurnType == "Door" )
+		if (_furn.m_name == "Door" )
 		{
 			sr.sortingLayerName = "Furniture - Door";
 		}
@@ -78,36 +82,27 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 	public Sprite GetSpriteForFurniture ( Furniture _furn )
 	{
-		string spriteName = _furn.m_baseFurnType + "_" + _furn.m_furnType;
+		string spriteName = _furn.m_name;
 
 		if ( _furn.m_linksToNeighbour == false )
 		{
-			if ( _furn.m_baseFurnType == "Door" )
+			if ( _furn.m_name == "Door" )
 			{
 				
 				if ( _furn.m_furnParameters [ "m_openness" ] < 0.1f )
 				{
-					if ( _furn.m_furnType == "Sliding" )
-					{
-						//Door is closed
-						spriteName += "_EW_1";
-					}
+					//Door is closed
+					spriteName += "_EW_1";
 				}
 				else if ( _furn.m_furnParameters [ "m_openness" ] < 0.5f )
 				{
-					if ( _furn.m_furnType == "Sliding" )
-					{
-						//Door is half open
-						spriteName += "_EW_2";
-					}
+					//Door is half open
+					spriteName += "_EW_2";
 				}
 				else
 				{
-					if ( _furn.m_furnType == "Sliding" )
-					{
-						//Door is  open
-						spriteName += "_EW_3";
-					}
+					//Door is  open
+					spriteName += "_EW_3";
 				}
 			}
 
@@ -116,7 +111,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 			if ( m_furnitureSprites [ spriteName + "_" ] != null )
 				return m_furnitureSprites [ spriteName ];
 
-			Debug.LogError ( "GetSpriteForFurniture(Furniture) -- No sprite with name: " + _furn.m_furnType );
+			Debug.LogError ( "GetSpriteForFurniture(Furniture) -- No sprite with name: " + _furn.m_name );
 		}
 
 		spriteName += "_";
@@ -129,14 +124,14 @@ public class FurnitureSpriteController : MonoBehaviour {
 		Tile t;
 		//Check North
 		t = m_world.GetTileAt ( x, y + 1 );
-		if ( t != null && t.m_furniture != null && t.m_furniture.m_baseFurnType == _furn.m_baseFurnType )
+		if ( t != null && t.m_furniture != null && t.m_furniture.m_name == _furn.m_name )
 		{
 
 			spriteName += "N";
 		}
 		//Check East
 		t = m_world.GetTileAt ( x + 1, y );
-		if ( t != null && t.m_furniture != null && t.m_furniture.m_baseFurnType == _furn.m_baseFurnType )
+		if ( t != null && t.m_furniture != null && t.m_furniture.m_name == _furn.m_name )
 		{
 
 			spriteName += "E";
@@ -144,7 +139,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		}
 		//Check South
 		t = m_world.GetTileAt ( x, y - 1 );
-		if ( t != null && t.m_furniture != null && t.m_furniture.m_baseFurnType == _furn.m_baseFurnType )
+		if ( t != null && t.m_furniture != null && t.m_furniture.m_name == _furn.m_name )
 		{
 
 
@@ -154,7 +149,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		}
 		//Check West
 		t = m_world.GetTileAt ( x - 1, y );
-		if ( t != null && t.m_furniture != null && t.m_furniture.m_baseFurnType == _furn.m_baseFurnType )
+		if ( t != null && t.m_furniture != null && t.m_furniture.m_name == _furn.m_name )
 		{
 
 			spriteName += "W";
