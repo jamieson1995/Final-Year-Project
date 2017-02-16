@@ -4,7 +4,37 @@ using System.Collections.Generic;
 
 public class Furniture {
 
-	public Tile m_tile { get; protected set; }
+	public float X
+	{
+		get
+		{
+			if ( m_movable == true )
+			{
+				return Mathf.Lerp ( m_furnParameters [ "m_currTile.X" ], m_furnParameters [ "m_destTile.X" ], m_furnParameters [ "m_movementPercentage" ] );
+			}
+			else
+			{
+				return m_tile.X;
+			}
+		}
+	}
+
+	public float Y
+	{
+		get
+		{
+			if ( m_movable == true )
+			{
+				return Mathf.Lerp ( m_furnParameters [ "m_currTile.Y" ], m_furnParameters [ "m_destTile.Y" ], m_furnParameters [ "m_movementPercentage" ] );
+			}
+			else
+			{
+				return m_tile.Y;
+			}
+		}
+	}
+
+	public Tile m_tile;
 
 	public Tile m_jobTile { get; protected set; }
 
@@ -23,13 +53,17 @@ public class Furniture {
 
 	public bool m_draggable { get; protected set; } //This variable determines whether the furniture can be dragged along to be placed down
 													//i.e. walls
+												
+	public bool m_movable { get; protected set; }
 
 	public int m_rotation { get; protected set; } //1 - Default - South Facing
 												  //2 - East Facing
 												  //3 - North Facing
 												  //4 - West Facing
 
-	public bool m_used;
+	public bool m_moving;
+
+	public bool m_manned;
 
 	public int m_maxCarryWeight { get; protected set; } //This represents the maximum amount of stock that this furniture can carry.
 
@@ -41,12 +75,18 @@ public class Furniture {
 
 	Func<Tile, int, bool> funcPositionValidation; //This runs a function and checks the given tile to see if the placement of the furniture is valid, it returns a bool.
 
-	public Dictionary<string, float> m_furnParameters;//This is used in conjuction with the updateActions action, so that parameters can be used.
+	public Dictionary<string, float> m_furnParameters; //This is used in conjuction with the updateActions action, so that parameters can be used.
 
 	public Action<Furniture, float> m_updateActions; //This is an action, which when activated, allows this tile to run its Update function
 													 //This means only furniture that need update functions can have them run i.e. doors for opening.
-													
-	public Furniture ( string _name, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight )
+
+
+	public Furniture ()
+	{
+
+	}
+								
+	public Furniture ( string _name, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight, bool _movable)
 	{
 		this.m_name = _name;
 		this.m_movementCost = _movementCost;
@@ -55,8 +95,7 @@ public class Furniture {
 		this.m_linksToNeighbour = _linksToNeighbour;
 		this.m_draggable = _draggable;
 		this.m_maxCarryWeight = _maxCarryWeight;
-
-		//this.funcPositionValidation = this.DEFAULT_IsValidPosition;
+		this.m_movable = _movable;
 
 		m_furnParameters = new Dictionary<string, float> ();
 
@@ -65,7 +104,7 @@ public class Furniture {
 
 	//When placing furniture, the actual furniture isn't being placed, a cloned version of the default furniture is. 
 	//Therefore, a temp furniture needs to be cloned from the original and that is what gets placed.
-	virtual public Furniture Clone ()
+	public Furniture Clone ()
 	{
 		return new Furniture(this);
 	}
@@ -80,6 +119,7 @@ public class Furniture {
 		this.m_linksToNeighbour = _other.m_linksToNeighbour;
 		this.m_draggable = _other.m_draggable;
 		this.m_maxCarryWeight = _other.m_maxCarryWeight;
+		this.m_movable = _other.m_movable;
 
 		m_furnParameters = new Dictionary<string, float> ( _other.m_furnParameters );
 		if ( _other.m_updateActions != null )
@@ -87,14 +127,8 @@ public class Furniture {
 			this.m_updateActions = (Action<Furniture, float>)_other.m_updateActions.Clone ();
 		}
 
-		//if ( _other.funcPositionValidation != null )
-		//{
-		//	this.funcPositionValidation = (Func<Tile, int, bool>)_other.funcPositionValidation.Clone();
-		//}
-
 		this.m_isEnterable = _other.m_isEnterable;
-
-		this.m_stock = _other.m_stock;
+		m_stock = new Dictionary<string, List<Stock>>();
 	}
 
 
@@ -242,6 +276,182 @@ public class Furniture {
 		}
 	}
 
+	public bool MoveFurniture ( Tile _fromTile, string _direction )
+	{
+		if ( m_movable == false )
+		{
+			//Cannot move this furniture!
+			return false;
+		}
+
+		if ( _direction == "Forwards" )
+		{
+			if ( m_tile.X == _fromTile.X + 1 )
+			{
+				if ( m_tile.Y == _fromTile.Y + 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y + 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						return true;
+					}
+
+				}
+				else if ( m_tile.Y == _fromTile.Y - 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y - 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+				else if ( m_tile.Y == _fromTile.Y )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y );
+					//if ( m_tile.m_world.MoveFurniture ( this, m_tile, m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y ) ) )
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+			}
+			else if ( m_tile.X == _fromTile.X - 1 )
+			{
+				if ( m_tile.Y == _fromTile.Y + 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y + 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+				else if ( m_tile.Y == _fromTile.Y - 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y - 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+				else if ( m_tile.Y == _fromTile.Y )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+			}
+			else if ( m_tile.X == _fromTile.X )
+			{
+				if ( m_tile.Y == _fromTile.Y + 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X, m_tile.Y + 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+				else if ( m_tile.Y == _fromTile.Y - 1 )
+				{
+					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X, m_tile.Y - 1 );
+					if ( nextTile.m_furniture != null )
+					{	
+						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+						return false;
+					}
+					else
+					{
+						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+						return true;
+					}
+
+				}
+			}
+		}
+		else
+		{
+			Tile nextTile = _fromTile;
+			if ( nextTile.m_furniture != null )
+			{	
+				Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+				return false;
+			}
+			else
+			{
+				m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
+				m_furnParameters [ "m_destTile.X" ] = nextTile.X;
+				m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
+				return true;
+			}
+		}
+
+		return true;
+	}
 
 	//When this function is called, the callback will be activated.
 	public void RegisterOnChangedCallback( Action<Furniture> _callback )

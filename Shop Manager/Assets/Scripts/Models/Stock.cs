@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Temperature { Freezing, Chilled, Room }
+public enum Temperature { Frozen, Chilled, Room }
 
 /// <summary>
 /// All stock in the game will be instancing of this class.
@@ -25,7 +25,42 @@ public class Stock {
 
 	public Temperature Temperature { get; protected set; }
 
-	public bool m_scanned;												  
+	public bool m_scanned;	
+
+	//This takes the price of this stock, and tranfers the value into a nice to read string. If the value is less than 100, the price is shown
+	//in pence instead of pounds, but is still formatted to fit the same space.
+	public string StringPrice
+	{
+		get
+		{
+			string priceToString = "";
+			if ( Price < 100 )
+			{
+				if ( Price < 10 )
+				{
+					priceToString = "      " + Price.ToString () + "p";
+				}
+				else
+				{
+					priceToString = "    " + Price.ToString () + "p";
+				}
+			}
+			else if ( Price % 100 == 0 )
+			{
+				priceToString = "£" + ( (float)Price / 100 ).ToString () + ".00";
+			}
+			else if ( Price % 10 == 0 )
+			{
+				priceToString = "£" + ( (float)Price / 100 ).ToString () + "0";
+			}
+			else
+			{
+				priceToString = "£" + ( (float)Price / 100 ).ToString ();
+			}
+			return priceToString;
+		}
+
+	}											  
 
 	//This constructor is only used when the prototypes are created.
 	public Stock(string _IDName, string _name, int _weight, int _price, Temperature _temperature)

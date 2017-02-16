@@ -18,7 +18,16 @@ public class Employee : Character {
 
 	Job CreateJob ()
 	{
-		return new Job();
+		World world = WorldController.instance.m_world;
+
+		if ( ( world.m_numberOfMannedTills == 0 ) || ( world.m_customersInQueue / world.m_numberOfMannedTills ) > 3 )
+		{
+			return new Job ( Job.PrimaryStates.ServeOnTill );
+		}
+		else
+		{
+			return new Job ( Job.PrimaryStates.WorkStockCage );
+		}
 	}
 
 	protected override void Update_DoThink ()
@@ -83,7 +92,9 @@ public class Employee : Character {
 				break;
 	
 			case Job.PrimaryStates.WorkStockCage:
-	
+
+				
+
 				break;
 	
 			case Job.PrimaryStates.EmptyStockCage:
@@ -110,7 +121,7 @@ public class Employee : Character {
 		{
 			foreach ( Furniture furn in WorldController.instance.m_world.m_furnitureInWorld[_furn] )
 			{
-				if ( furn.m_used == true )
+				if ( furn.m_manned == true )
 				{
 					continue;
 				}
@@ -136,7 +147,8 @@ public class Employee : Character {
 			if ( FindJobFurn ( m_job.m_requiredFurniture ) )
 			{
 				World m_world = WorldController.instance.m_world;
-				m_job.m_furn.m_used = true;
+				m_job.m_furn.m_manned = true;
+				m_world.m_numberOfMannedTills++;
 				m_world.m_characterFurniture.Add(m_job.m_furn, this);
 				SetDestination ( m_job.Tile );
 			}

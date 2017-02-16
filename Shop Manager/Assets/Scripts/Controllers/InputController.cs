@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InputController : MonoBehaviour {
 
@@ -77,7 +78,7 @@ public class InputController : MonoBehaviour {
 		if ( m_mode == "Furniture" && m_buildModeFurnName != null && m_buildModeFurnName != "" )
 		{
 			//Show transparent preview of the furniture that is colour-coded based on
-			// whether or not you can actually build the furniture here.
+			//whether or not you can actually build the furniture here.
 			//ShowFurnitureSpriteAtTile ( m_buildModeFurnName, GetTileUnderMouse () );
 			if ( m_buildModeFurnName == "Door" )
 			{
@@ -208,6 +209,7 @@ public class InputController : MonoBehaviour {
 					Tile t = world.GetTileAt ( x, y );
 					if ( t != null )
 					{
+						Debug.Log("Tile clicked: (" + t.X + ", " + t.Y + ")");
 						switch ( m_mode )
 						{
 							case "Furniture":
@@ -222,8 +224,8 @@ public class InputController : MonoBehaviour {
 								{
 									//A tile with some furniture was clicked.
 									m_selectedFurn = t.m_furniture;
-									m_selectDisplay.SetActive(true);
-									m_selectDisplayScript.SetUpSelectionDisplay();
+									m_selectDisplay.SetActive ( true );
+									m_selectDisplayScript.SetUpSelectionDisplay ();
 									Debug.Log("A tile with some furniture was clicked: Furniture: " + t.m_furniture.m_name);
 								}
 								break;
@@ -301,11 +303,11 @@ public class InputController : MonoBehaviour {
 		m_mode = "CharacterWalk"; //This means that when the user clicks a tile. The character's destination will change.
 	}
 
-	public void ViewStock()
+	public void ViewStock ()
 	{
 		//This will cause the activeness of the StockDisplay to switch.
 		//If it is true, it will become false.
 		//If it is false, it will become true.
-		m_stockDisplay.SetActive(!m_stockDisplay.activeSelf);
+		m_stockDisplay.SetActive ( !m_stockDisplay.activeSelf );
 	}
 }

@@ -7,11 +7,17 @@ public class SelectDisplay : MonoBehaviour {
 
 	public GameObject m_furnitureNameGO;
 	public GameObject m_furnitureMannedGO;
-	public GameObject m_stockDisplayGO;
+	public GameObject m_furnitureNumberOfItemsGO;
 	Text m_furnitureNameGOText;
 	Text m_furnitureMannedGOText;
+	Text m_furnitureNumberOfItemsGOText;
 	public Text m_stockDisplayGONameText;
-	public Text m_stockDisplayGOScannedText;
+
+	public Scrollbar m_stockScrollBar;
+
+	string m_previousStockText;
+
+	public Button m_viewStockButton;
 
 	InputController m_inputController;
 
@@ -39,6 +45,14 @@ public class SelectDisplay : MonoBehaviour {
 			m_furnitureMannedGO.SetActive ( false );
 			return;
 		}
+
+		m_furnitureNumberOfItemsGOText = m_furnitureNumberOfItemsGO.GetComponent<Text> ();
+		if ( m_furnitureNumberOfItemsGOText == null )
+		{
+			Debug.LogError ( "m_furnitureMannedGO doesn't have a Text component" );
+			m_furnitureNumberOfItemsGO.SetActive ( false );
+			return;
+		}
 	}
 
 	void Update ()
@@ -63,29 +77,47 @@ public class SelectDisplay : MonoBehaviour {
 		{
 			if ( m_inputController.m_selectedFurn != null )
 			{
+
 				m_stockDisplayGONameText.text = "";
 				foreach ( var stockList in m_inputController.m_selectedFurn.m_stock )
 				{
 					foreach ( Stock stock in m_inputController.m_selectedFurn.m_stock[stockList.Key] )
 					{
-						m_stockDisplayGONameText.text += stock.Name + "\n \n";
-					}
-				}
+						string priceToString = "";
 
-				m_stockDisplayGOScannedText.text = "";
-				foreach ( var stockList in m_inputController.m_selectedFurn.m_stock )
-				{
-					foreach ( Stock stock in m_inputController.m_selectedFurn.m_stock[stockList.Key] )
-					{
-						m_stockDisplayGOScannedText.text += stock.m_scanned.ToString() + "\n \n";
+						m_stockDisplayGONameText.text += stock.StringPrice + "         " + stock.Name + "\n \n";
 					}
 				}
+				if ( m_previousStockText != m_stockDisplayGONameText.text )
+				{
+					m_stockScrollBar.value = 0.5f;
+				}
+				m_previousStockText = m_stockDisplayGONameText.text;
 			}
 		}
 	}
 
-	public void SetUpSelectionDisplay()
+	public void SetUpSelectionDisplay ()
 	{
 		m_furnitureNameGOText.text = "Name: " + m_inputController.m_selectedFurn.m_name;
+		int count = 0;
+		foreach ( var stockList in m_inputController.m_selectedFurn.m_stock )
+		{
+			foreach ( Stock stock in m_inputController.m_selectedFurn.m_stock[stockList.Key] )
+			{
+				count++;
+			}
+		}
+
+		m_furnitureNumberOfItemsGOText.text = "Number of Items: " + count;
+		if ( count == 0 )
+		{
+			m_viewStockButton.interactable = false;
+			m_inputController.m_stockDisplay.SetActive(false);
+		}
+		else
+		{
+			m_viewStockButton.interactable = true;
+		}
 	}
 }

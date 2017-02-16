@@ -36,6 +36,9 @@ public abstract class Character {
 	protected float m_maxSpeed = 4f; //Character's default speed
 	public float m_currentSpeed;
 
+	Furniture m_pushingFurniture;
+	Furniture m_pullingFurniture;
+
 	Action<Character> cbCharacterChanged;
 
 	//Spawns a character on a designated tile.
@@ -93,9 +96,9 @@ public abstract class Character {
 
 		//Calculates the distance from point A to point B
 		distToTravel = Mathf.Sqrt (
-			                     Mathf.Pow ( m_currTile.X - m_nextTile.X, 2 ) +
-			                     Mathf.Pow ( m_currTile.Y - m_nextTile.Y, 2 )
-		                     );
+			Mathf.Pow ( m_currTile.X - m_nextTile.X, 2 ) +
+			Mathf.Pow ( m_currTile.Y - m_nextTile.Y, 2 )
+		);
 
 		if ( m_nextTile.IsEnterable () == ENTERABILITY.Never )
 		{
@@ -113,15 +116,70 @@ public abstract class Character {
 		{
 			//The tile is enterable.	
 
-			if ( m_nextTile.m_furniture != null  )
+			if ( m_nextTile.m_furniture != null && m_nextTile.m_furniture.m_movable == true )
 			{
-				//This tile has furniture on it, so adjust the current speed according to its movement cost.
-				m_currentSpeed = m_maxSpeed / m_nextTile.m_furniture.m_movementCost;
-			}
-			else
+				//This tile is enterable, but has furniture on it
+				//However, the furniture can be moved, so move it.
+				m_pushingFurniture = m_nextTile.m_furniture;
+				if ( m_pushingFurniture.m_moving == false && m_pushingFurniture.MoveFurniture ( m_currTile, "Forwards" ) == false )
+				{
+					m_pushingFurniture = null; //Can't push furniture, so stop trying.
+					Debug.LogError ( "Failed to push furniture: " + m_nextTile.m_furniture.m_name );
+					m_pathAStar = null;
+				}
+				else
+				{
+					m_currentSpeed = m_maxSpeed / m_pushingFurniture.m_movementCost;
+					m_pushingFurniture.m_furnParameters [ "m_speed" ] = m_currentSpeed;
+					m_pushingFurniture.m_furnParameters [ "m_movementPercentage" ] = 0;
+					m_pathAStar = null;
+					m_pushingFurniture.m_moving = true;
+				}
+
+				if ( m_pushingFurniture == null )
+				{
+					//There is a piece of furniture in the next tile, but it cannot be pushed.
+					//We should try pulling it instead
+					m_pullingFurniture = m_nextTile.m_furniture;
+					if ( m_pullingFurniture.m_moving == false && m_pullingFurniture.MoveFurniture ( m_currTile, "Backwards" ) == false )
+					{
+						m_pushingFurniture = null; //Can't push furniture, so stop trying.
+						Debug.LogError ( "Failed to pull furniture: " + m_nextTile.m_furniture.m_name );
+						m_pathAStar = null;
+					}
+					else
+					{
+						m_currentSpeed = m_maxSpeed / m_pullingFurniture.m_movementCost;
+						m_pullingFurniture.m_furnParameters [ "m_speed" ] = m_currentSpeed;
+						m_pullingFurniture.m_furnParameters [ "m_movementPercentage" ] = 0;
+						m_pathAStar = null;
+						m_pullingFurniture.m_moving = true;
+					}
+					if ( m_pullingFurniture == null )
+					{
+						//We have tried pushing and pulling this piece of furniture but couldn't 
+						//therefore it cannot be moved from this position
+						Debug.LogError ( "Failed to push AND pull furniture: " + m_nextTile.m_furniture.m_name );
+						return;
+					}
+				}
+			}		
+
+			if ( ( m_pushingFurniture != null &&
+				   m_pushingFurniture.m_furnParameters [ "m_currTile.X" ] == m_pushingFurniture.m_furnParameters [ "m_destTile.X" ] &&
+				   m_pushingFurniture.m_furnParameters [ "m_currTile.Y" ] == m_pushingFurniture.m_furnParameters [ "m_destTile.Y" ] ) ||
+			     ( m_pullingFurniture != null &&
+				   m_pullingFurniture.m_furnParameters [ "m_currTile.X" ] == m_pullingFurniture.m_furnParameters [ "m_destTile.X" ] &&
+				   m_pullingFurniture.m_furnParameters [ "m_currTile.Y" ] == m_pullingFurniture.m_furnParameters [ "m_destTile.Y" ] ) )
+			{
+				//We are pushing or pulling a piece of furniture, but it has reached its destination. So stop pushing or pulling it, and walk at full speed.
+				m_pushingFurniture = null;
+				m_pullingFurniture = null;
 				m_currentSpeed = m_maxSpeed;
-				
+			}
 		}
+
+
 
 		// How much distance can be travel this Update?
 		float distThisFrame = m_currentSpeed / m_nextTile.m_movementCost * _deltaTime;
@@ -154,7 +212,6 @@ public abstract class Character {
 	{
 		m_destTile = _tile;
 		m_pathAStar = null;
-		//Debug.Log("Dest tile: (" + m_destTile.X + "," + m_destTile.Y + ")");
 	}
 
 	/// <summary>

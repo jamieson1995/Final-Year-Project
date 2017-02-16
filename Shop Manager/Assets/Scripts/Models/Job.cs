@@ -96,34 +96,6 @@ public class Job {
 		}
 	}
 
-	public void DoJob ()
-	{
-		
-	}
-	
-	void EnterSecState ( SecondaryStates _state )
-	{
-		switch ( _state )
-		{
-			case SecondaryStates.GoTo:
-	
-				break;
-	
-			case SecondaryStates.GoWith:
-	
-				break;
-	
-			case SecondaryStates.Idle:
-	
-				break;
-	
-			case SecondaryStates.Use:
-	
-				break;
-		}
-	
-	}
-
 	public bool SetJobTile ( Furniture _furn )
 	{
 		//Check to see if the furniture is the one required for the job.
@@ -151,6 +123,5 @@ public class Job {
 	public void SetSecondaryState(SecondaryStates _state)
 	{
 		m_secondaryState = _state;
-		EnterSecState(m_secondaryState);
 	}
 }

@@ -21,6 +21,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 	{
 		m_world = WorldController.instance.m_world;
 		m_world.RegisterFurnitureCreated ( OnFurnitureCreated );
+		m_world.RegisterFurnitureMoved( OnFurnitureMoved );
 		foreach ( Sprite s in m_sprites )
 		{
 			m_furnitureSprites[s.name] = s;
@@ -180,5 +181,17 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 		Debug.LogError ( "GetSpriteForFurniture(string) -- No sprite with name: " + _furnName );
 		return null;
+	}
+
+	void OnFurnitureMoved ( Furniture _furn )
+	{
+		if ( m_furnitureGameObjectMap.ContainsKey ( _furn ) == false )
+		{
+			Debug.LogError("OnCharacterMoved -- Trying to change visuals for a furniture not in our map!");
+			return;
+		}
+
+		GameObject furn_go = m_furnitureGameObjectMap[_furn];
+		furn_go.transform.position = new Vector3(_furn.X, _furn.Y, 0);
 	}
 }

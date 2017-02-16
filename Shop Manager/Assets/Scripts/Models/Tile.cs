@@ -38,7 +38,7 @@ public class Tile {
 
 
 	//Tries to place a piece of furniture on this tile. If successful it will return true, and the furniture gets placed. If it cannot be placed, this returns false.
-	public bool PlaceFurniture ( Furniture _furn, int _direction )
+	public bool PlaceFurniture ( Furniture _furn, int _direction = 1)
 	{
 		if ( _furn == null )
 		{
@@ -64,6 +64,11 @@ public class Tile {
 
 
 		return true;
+	}
+
+	public void RemoveFurniture ()
+	{
+		m_furniture = null;
 	}
 
 	//Tells us if two tile are adjacent
