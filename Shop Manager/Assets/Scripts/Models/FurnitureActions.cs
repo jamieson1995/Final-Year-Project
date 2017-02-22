@@ -1,8 +1,13 @@
-﻿using UnityEngine;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using UnityEngine;
 using System.Collections;
 
 
-//This class cannot currently be tested because there are no characters implemented into the game.
 public static class FurnitureActions {
 
 	public static void Door_UpdateAction ( Furniture _furn, float _deltaTime )
@@ -10,7 +15,7 @@ public static class FurnitureActions {
 	if ( _furn.m_furnParameters [ "m_isOpening" ] >= 1 )
 		{
 			_furn.m_furnParameters [ "m_openness" ] += _deltaTime * 4;
-			if ( _furn.m_furnParameters [ "m_openness" ] >= 1 )
+			if ( _furn.m_furnParameters [ "m_openness" ] >= 1 ) 
 			{
 				_furn.m_furnParameters [ "m_isOpening" ] = 0;
 			}
@@ -61,7 +66,7 @@ public static class FurnitureActions {
 				_furn.m_furnParameters[ "m_currTile.X" ] = _furn.m_furnParameters[ "m_destTile.X" ];
 				_furn.m_furnParameters[ "m_currTile.Y" ] = _furn.m_furnParameters[ "m_destTile.Y" ];
 				_furn.m_tile = WorldController.instance.m_world.GetTileAt( (int)_furn.m_furnParameters[ "m_destTile.X" ], (int)_furn.m_furnParameters[ "m_destTile.Y" ] );
-				_furn.m_furnParameters["m_movementPercentage"] = 0;
+				_furn.m_furnParameters["m_movementPercentage"] = 0.0f;
 			}
 				WorldController.instance.m_world.cbFurnitureMoved( _furn );
 		}

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Path_TileGraph{
 
@@ -31,7 +32,7 @@ public class Path_TileGraph{
 		}
 
 		//Now loop through all nodes again
-		//and ctreate edges for neighbours
+		//and create edges for neighbours
 
 		foreach ( Tile t in m_nodes.Keys )
 		{
@@ -45,22 +46,23 @@ public class Path_TileGraph{
 			//If neighbour is walkable, create an edge to the relevant node
 			for ( int i = 0; i < neighbours.Length; i++ )
 			{
-				if ( neighbours [ i ] != null && neighbours [ i ].m_movementCost > 0 )
-				{
-					//This neighbour is walkable, so create an edge.
-
-					//But first, make sure we are not clipping a diagonal, or trying to squeeze unappropiately
-					if ( IsClippingCorner ( t, neighbours[i] ) )
+					if (neighbours [ i ] != null && neighbours [ i ].m_movementCost > 0 )
 					{
-						continue; //Skip to next neighbour without building an edge
+
+						//This neighbour is walkable, so create an edge.
+
+						//But first, mke sure we are not clipping a diagonal, or trying to squeeze unappropiately
+						if ( IsClippingCorner ( t, neighbours [ i ] ) )
+						{
+							continue; //Skip to next neighbour without building an edge
+						}
+
+						Path_Edge<Tile> e = new Path_Edge<Tile> ();
+						e.m_cost = neighbours [ i ].m_movementCost;
+						e.m_node = m_nodes [ neighbours [ i ] ];
+
+						edges.Add ( e );
 					}
-
-					Path_Edge<Tile> e = new Path_Edge<Tile>();
-					e.m_cost = neighbours[i].m_movementCost;
-					e.m_node = m_nodes[neighbours[i] ];
-
-					edges.Add(e);
-				}
 			}
 
 			n.m_edges = edges.ToArray();
@@ -83,11 +85,11 @@ public class Path_TileGraph{
 			}
 
 			if( _currTile.m_world.GetTileAt( _currTile.X - dX, _currTile.Y).m_movementCost == 0 ){
-				//East or West is unwalkable, therefore this would be a clipped movement.
+				//East or West is unwalkable, or has a furniture, therefore this would be a clipped movement.
 				return true;
 			}
-			if( _currTile.m_world.GetTileAt( _currTile.X, _currTile.Y - dY ).m_movementCost == 0 ){
-				//North or South is unwalkable, therefore this would be a clipped movement.
+				if( _currTile.m_world.GetTileAt( _currTile.X, _currTile.Y - dY ).m_movementCost == 0 ){
+				//North or South is unwalkable,or has a furniture, therefore this would be a clipped movement.
 				return true;
 			}
 		}

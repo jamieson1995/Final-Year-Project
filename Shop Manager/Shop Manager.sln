@@ -24,6 +24,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
+		Policies = $0
+		$0.StandardHeader = $1
+		$1.Text = @//////////////////////////////////////////////////////\n//Copyright James Jamieson 2016/2017\n//University Dissertation Project\n//Shop Manager AI Simulation\n//////////////////////////////////////////////////////
+		$1.IncludeInNewFiles = True
 	EndGlobalSection
 EndGlobal

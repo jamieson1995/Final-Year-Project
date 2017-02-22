@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2016/2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using UnityEngine;
 using System.Collections.Generic;
 
 public class WorldController : MonoBehaviour {
@@ -81,20 +87,24 @@ public class WorldController : MonoBehaviour {
 				if ( y == 0 || y == 1 || y == 2 || y == 22 || y == 21 || y == 20 || y == 19 || y == 18 || y == 17 || y == 16 || y == 15 || y == 14 || y == 13 )
 				{
 					sr.sprite = m_concreteFloor;
+					tileData.m_outside = true;
 
 					if ( ( y == 19 || y == 18 || y == 17 || y == 16 || y == 15 ) && ( x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6) )
 					{
 						sr.sprite = m_tiledFloor;
+						tileData.m_outside = false;
 					}
 
 					if ( ( y == 14 || y == 13 || y == 12 ) && (x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8 || x == 9) )
 					{
-							sr.sprite = m_tiledFloor;
+						sr.sprite = m_tiledFloor;
+						tileData.m_outside = false;
 					}
 				}
 				else
 				{
 					sr.sprite = m_tiledFloor;
+					tileData.m_outside = false;
 				}
 
 
@@ -315,7 +325,6 @@ public class WorldController : MonoBehaviour {
 						}
 
 					}
-
 
 					m_world.PlaceFurnitureInWorldWithStock ( "FrontShelf", m_world.GetTileAt ( x, y ), stockToAdd, 2 );
 				}
@@ -1277,7 +1286,11 @@ public class WorldController : MonoBehaviour {
 
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 4, 17 ), stockToAdd );
-		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 2, 16	 ), 2 );
+		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 6, 4), 2 );
+		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 6, 5 ) );
+		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 7, 5 ) );
+		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 3, 5 ) );
+		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 2, 5 ) );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 3 ) );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 19 ) );
 		m_world.CreateEmployee("James", 10000, m_world.GetTileAt ( 1, 1 ), "Manager");

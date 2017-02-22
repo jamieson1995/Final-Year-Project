@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,16 +28,21 @@ public class Employee : Character {
 
 		if ( ( world.m_numberOfMannedTills == 0 ) || ( world.m_customersInQueue / world.m_numberOfMannedTills ) > 3 )
 		{
-			return new Job ( Job.PrimaryStates.ServeOnTill );
+			return new Job ( Job.PrimaryStates.ServeOnCheckout );
 		}
 		else
 		{
-			return new Job ( Job.PrimaryStates.WorkStockCage );
+			return new Job ( Job.PrimaryStates.WorkStockcage );
 		}
 	}
 
 	protected override void Update_DoThink ()
 	{
+		if ( m_ignoreJob == true )
+		{
+			return;
+		}
+
 		if ( m_job == null )
 		{
 			m_job = CreateJob ();
@@ -52,7 +63,6 @@ public class Employee : Character {
 		{
 			//Employee is not at the job tile, so they need to go there.
 			m_job.SetSecondaryState ( Job.SecondaryStates.GoTo );
-			;
 		}
 
 		switch ( m_job.m_secondaryState )
@@ -79,25 +89,22 @@ public class Employee : Character {
 
 		switch ( m_job.m_primaryState )
 		{
-			case Job.PrimaryStates.ServeOnTill:
+			case Job.PrimaryStates.ServeOnCheckout:
 				if ( TryTakeAnyStock ( m_job.m_furn, true ) == false )
 				{
 					//There is no more stock to take on this till.
-					m_job.SetSecondaryState(Job.SecondaryStates.Idle);
+					m_job.SetSecondaryState ( Job.SecondaryStates.Idle );
 					break;
 				}
-				ScanStockTill(m_stock);
-				m_job.m_furn.TryAddStock( TryGiveStock( m_stock.IDName ) );
-				//Debug.Log("Serving on the till!");
+				ScanStockTill ( m_stock );
+				m_job.m_furn.TryAddStock ( TryGiveStock ( m_stock.IDName ) );
 				break;
 	
-			case Job.PrimaryStates.WorkStockCage:
-
-				
+			case Job.PrimaryStates.WorkStockcage:
 
 				break;
 	
-			case Job.PrimaryStates.EmptyStockCage:
+			case Job.PrimaryStates.EmptyStockcage:
 	
 				break;
 	
@@ -109,7 +116,7 @@ public class Employee : Character {
 	
 				break;
 	
-			case Job.PrimaryStates.CountTillMoney:
+			case Job.PrimaryStates.CountCheckoutMoney:
 	
 				break;
 		}
@@ -149,9 +156,13 @@ public class Employee : Character {
 				World m_world = WorldController.instance.m_world;
 				m_job.m_furn.m_manned = true;
 				m_world.m_numberOfMannedTills++;
-				m_world.m_characterFurniture.Add(m_job.m_furn, this);
+				m_world.m_characterFurniture.Add ( m_job.m_furn, this );
 				SetDestination ( m_job.Tile );
 			}
+		}
+		if ( m_currTile != m_job.m_furn.m_jobTile && m_destTile != m_job.m_furn.m_jobTile)
+		{
+			SetDestination ( m_job.Tile );	
 		}
 	}
 

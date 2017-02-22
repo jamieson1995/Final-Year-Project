@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2016/2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 
@@ -276,179 +282,17 @@ public class Furniture {
 		}
 	}
 
-	public bool MoveFurniture ( Tile _fromTile, string _direction )
+	public bool MoveFurniture ( Tile _toTile )
 	{
 		if ( m_movable == false )
 		{
 			//Cannot move this furniture!
 			return false;
 		}
-
-		if ( _direction == "Forwards" )
-		{
-			if ( m_tile.X == _fromTile.X + 1 )
-			{
-				if ( m_tile.Y == _fromTile.Y + 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y + 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						return true;
-					}
-
-				}
-				else if ( m_tile.Y == _fromTile.Y - 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y - 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-				else if ( m_tile.Y == _fromTile.Y )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y );
-					//if ( m_tile.m_world.MoveFurniture ( this, m_tile, m_tile.m_world.GetTileAt ( m_tile.X + 1, m_tile.Y ) ) )
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-			}
-			else if ( m_tile.X == _fromTile.X - 1 )
-			{
-				if ( m_tile.Y == _fromTile.Y + 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y + 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-				else if ( m_tile.Y == _fromTile.Y - 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y - 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-				else if ( m_tile.Y == _fromTile.Y )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X - 1, m_tile.Y );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-			}
-			else if ( m_tile.X == _fromTile.X )
-			{
-				if ( m_tile.Y == _fromTile.Y + 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X, m_tile.Y + 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-				else if ( m_tile.Y == _fromTile.Y - 1 )
-				{
-					Tile nextTile = m_tile.m_world.GetTileAt ( m_tile.X, m_tile.Y - 1 );
-					if ( nextTile.m_furniture != null )
-					{	
-						Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-						return false;
-					}
-					else
-					{
-						m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-						m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-						m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-						return true;
-					}
-
-				}
-			}
-		}
-		else
-		{
-			Tile nextTile = _fromTile;
-			if ( nextTile.m_furniture != null )
-			{	
-				Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
-				return false;
-			}
-			else
-			{
-				m_tile.m_world.MoveFurniture ( this, m_tile, nextTile );
-				m_furnParameters [ "m_destTile.X" ] = nextTile.X;
-				m_furnParameters [ "m_destTile.Y" ] = nextTile.Y;
-				return true;
-			}
-		}
+		m_furnParameters [ "m_movementPercentage" ] = 0;
+		m_furnParameters [ "m_destTile.X" ] = _toTile.X;
+		m_furnParameters [ "m_destTile.Y" ] = _toTile.Y;
+		m_tile.m_world.MoveFurniture ( this, m_tile, _toTile );
 
 		return true;
 	}

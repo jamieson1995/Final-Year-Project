@@ -6,14 +6,13 @@ using System.Linq;
 public class Path_AStar {
 
 	Queue<Tile> m_path;
+	Queue<Tile> m_initalPath;
 
 	public Path_AStar ( World _world, Tile _tileStart, Tile _tileEnd )
 	{
 
-		if ( _world.m_tileGraph == null )
-		{
-			_world.m_tileGraph = new Path_TileGraph ( _world );
-		}
+		_world.m_tileGraph = new Path_TileGraph ( _world );
+
 
 		Dictionary<Tile, Path_Node<Tile>> nodes = _world.m_tileGraph.m_nodes;
 
@@ -112,6 +111,7 @@ public class Path_AStar {
 			total_path.Enqueue ( current.m_data );
 
 			m_path = new Queue<Tile> ( total_path.Reverse () );
+			m_initalPath = new Queue<Tile> ( m_path );
 		}
 	}
 
@@ -143,6 +143,16 @@ public class Path_AStar {
 
 	public Tile Dequeue(){
 		return m_path.Dequeue();
+	}
+
+	public Tile[] CurrPathToArray ()
+	{
+		return m_path.ToArray();
+	}
+
+	public Tile[] InitialPathToArray ()
+	{
+		return m_initalPath.ToArray();
 	}
 
 	public int Length ()

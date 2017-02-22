@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +23,7 @@ public class Job {
 	//Create a new job with no given PrimaryState. State of the job will default to ServeOnTill.
 	public Job ()
 	{
-		m_primaryState = PrimaryStates.ServeOnTill;
+		m_primaryState = PrimaryStates.ServeOnCheckout;
 	}
 
 	//Create a new job with its state set to the given PrimaryState.
@@ -27,12 +33,12 @@ public class Job {
 	}
 
 	public enum PrimaryStates{
-		ServeOnTill,
-		WorkStockCage,
-		EmptyStockCage,
+		ServeOnCheckout,
+		WorkStockcage,
+		EmptyStockcage,
 		WorkBackStock,
 		FaceUp,
-		CountTillMoney
+		CountCheckoutMoney
 	}
 	
 	public enum SecondaryStates{
@@ -68,13 +74,13 @@ public class Job {
 			World world = WorldController.instance.m_world;
 			switch ( m_primaryState )
 			{
-			case PrimaryStates.ServeOnTill:
+			case PrimaryStates.ServeOnCheckout:
 				return "Checkout";
 
-			case Job.PrimaryStates.WorkStockCage:
+			case Job.PrimaryStates.WorkStockcage:
 				return "Stockcage";
 	
-			case Job.PrimaryStates.EmptyStockCage:
+			case Job.PrimaryStates.EmptyStockcage:
 					return "Stockcage";
 	
 			case Job.PrimaryStates.WorkBackStock:
@@ -83,7 +89,7 @@ public class Job {
 			case Job.PrimaryStates.FaceUp:
 				return "StockShelf";
 	
-			case Job.PrimaryStates.CountTillMoney:
+			case Job.PrimaryStates.CountCheckoutMoney:
 				return "Checkout";
 			}
 

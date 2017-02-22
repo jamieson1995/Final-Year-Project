@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2016/2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using UnityEngine;
 using System.Collections;
 
 public enum ENTERABILITY { Yes, Never, Soon } //Every tile has a ENTERABILITY value based upon the furniture in the tile.
@@ -14,6 +20,8 @@ public class Tile {
 	public int Y { get; protected set; }
 
 	public Furniture m_furniture { get; protected set; }
+
+	public bool m_outside;
 
 	public float m_movementCost
 	{
