@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System;
 
 /// <summary>
-/// A character is an abstract thing. It can either be an employee or a character.
+/// A character is an abstract entity. It can either be an employee or a customer.
 /// </summary>
 public abstract class Character {
 
@@ -33,10 +33,15 @@ public abstract class Character {
 	public string m_name { get; protected set; } //Character's Name
 
 	public Tile m_currTile {get; protected set;}
-	protected Tile m_destTile;
+	protected Tile m_destTile; //The final tile in the pathfinding sequence
 	protected Tile m_nextTile; //The next tile in the pathfinding sequence
-	protected Tile m_moveFurnTo;
 	protected Path_AStar m_pathAStar;
+
+	protected Tile m_movingFurnsFinalTile;
+
+	public Furniture m_requiredFurn { get; protected set; } //Furniture that currently needs to be used, therefore if it is in front of where we need to go, 
+															//we are probably moving it, so don't worry about trying to find a spare tile for it.
+
 	enum Direction
 	{
 		North,
@@ -54,13 +59,13 @@ public abstract class Character {
 
 	protected Stock m_stock;
 
-	protected bool m_ignoreJob;
+	protected bool m_ignoreTask;
 
 	//Tiles per second
 	protected float m_maxSpeed = 4f; //Character's default speed
 	public float m_currentSpeed;
 
-	Furniture m_movingFurniture;
+	protected Furniture m_movingFurniture;
 
 	Action<Character> cbCharacterChanged;
 
@@ -72,7 +77,6 @@ public abstract class Character {
 		m_currentSpeed = m_maxSpeed;
 
 		m_name = _name;
-		//TODO: Add default values here such as stock carried or jobs assigned.
 	}
 
 	public void Update( float _deltaTime )
@@ -81,12 +85,10 @@ public abstract class Character {
 		Update_DoThink();
 	}
 
-	void ResetDefaultVariables()
+	protected void ResetDefaultVariables()
 	{
 		m_pathAStar = null;
 		m_movingFurniture = null;
-//		m_pushingFurn = null;
-		m_ignoreJob = false;
 		m_nearestFreeTile = null;
 		m_currentSpeed = m_maxSpeed;
 	}
@@ -102,7 +104,7 @@ public abstract class Character {
 			return;	// We're already where we want to be.
 		}
 
-		if ( m_nextTile == null || m_nextTile == m_currTile )
+		if ( m_nextTile == null || m_nextTile == m_currTile || m_pathAStar == null)
 		{
 			// Get the next tile from the pathfinder.
 			if ( m_pathAStar == null || m_pathAStar.Length () == 0 )
@@ -117,7 +119,7 @@ public abstract class Character {
 				}
 			}
 
-			// Grab the next waypoint from the pathing system!
+			// Grab the next waypoint from the pathing system.
 			m_nextTile = m_pathAStar.Dequeue ();
 
 			if ( m_nextTile == m_currTile )
@@ -125,7 +127,6 @@ public abstract class Character {
 				Debug.LogError ( "Update_DoMovement - nextTile is currTile?" );
 			}
 		}
-
 		// At this point we should have a valid nextTile to move to.
 
 		//Calculates the distance from point A to point B
@@ -148,53 +149,62 @@ public abstract class Character {
 		}
 		else
 		{
-			//The tile is enterable.	
-
+			//The tile is enterable.
 			if ( m_nextTile.m_furniture != null && m_nextTile.m_furniture.m_movable == true || m_movingFurniture != null )
 			{
 				//This tile is enterable, but has furniture on it
 				//However, the furniture can be moved, so move it to the nearest tile that is not on the path to our destination.
-				if ( m_nearestFreeTile == null )
+				if ( m_nextTile != m_currTile && m_nextTile != m_requiredFurn.m_mainTile && m_currTile != m_requiredFurn.m_mainTile && m_movingFurniture == null )
 				{
-					bool foundValidTile = false;
-
-					List<Tile> invalidTiles = new List<Tile> ();
-					foreach ( Tile t in m_pathAStar.InitialPathToArray () )
+					if ( m_nearestFreeTile == null )
 					{
-						invalidTiles.Add ( t );
-					}
+						bool foundValidTile = false;
 
-					for ( int x = 0; x < m_world.m_width; x++ )
-					{
-						for ( int y = 0; y < m_world.m_height; y++ )
+						List<Tile> invalidTiles = new List<Tile> ();
+						foreach ( Tile t in m_pathAStar.CurrPathToArray () )
 						{
-							if ( m_world.GetTileAt ( x, y ).m_outside == true )
+							invalidTiles.Add ( t );
+						}
+
+						for ( int x = 0; x < m_world.m_width; x++ )
+						{
+							for ( int y = 0; y < m_world.m_height; y++ )
 							{
-								invalidTiles.Add ( m_world.GetTileAt ( x, y ) );
+								if ( m_world.GetTileAt ( x, y ).m_outside == true )
+								{
+									invalidTiles.Add ( m_world.GetTileAt ( x, y ) );
+								}
 							}
 						}
-					}
 
-					while ( foundValidTile == false )
-					{
-						m_nearestFreeTile = FindValidPositionToMoveFurn ( m_currTile, m_nextTile, invalidTiles );
-						Tile tryTile = new FindNearestFreeTile ( m_world, m_nextTile, invalidTiles.ToArray () ).m_tileFound;
-						if ( m_nearestFreeTile == tryTile )
+						invalidTiles.Add ( m_currTile );
+
+						while ( foundValidTile == false )
 						{
-							foundValidTile = true;
+							m_nearestFreeTile = FindValidPositionToMoveFurn ( m_currTile, m_nextTile, invalidTiles );
+							Tile tryTile = new FindNearestFreeTile ( m_world, m_nextTile, invalidTiles.ToArray () ).m_tileFound;
+							if ( m_nearestFreeTile == tryTile )
+							{
+								foundValidTile = true;
+							}
+							else
+							{
+								invalidTiles.Add ( tryTile );
+							}
+						}
+						if ( m_nextTile.m_furniture != m_requiredFurn )
+						{
+							m_ignoreTask = true;
+						}
+						if ( MoveFurnitureToTile ( m_nextTile.m_furniture, m_nearestFreeTile ) == false )
+						{
+							Debug.LogError ( "Tried to move a piece of furniture somewhere but it returned false. This might mean we are not next to the piece of furniture." );
+							return;
 						}
 						else
 						{
-							invalidTiles.Add ( tryTile );
+							m_movingFurnsFinalTile = m_nearestFreeTile;
 						}
-					}
-
-					m_ignoreJob = true;
-					m_moveFurnTo = m_nearestFreeTile;
-					if ( MoveFurnitureToTile ( m_nextTile.m_furniture, m_nearestFreeTile ) == false)
-					{
-						Debug.LogError("Tried to move a piece of furniture somewhere but it returned false. This might mean we are not next to the piece of furniture.");
-						return;
 					}
 				}
 
@@ -202,13 +212,17 @@ public abstract class Character {
 				Tile toTile = null;
 				if ( m_pushingFurn == true )
 				{
-					if ( m_pathAStar.CurrPathToArray ().Length == 1 )
+					if ( m_currTile == m_nextTile )
+					{
+						toTile = m_movingFurniture.m_mainTile;
+					}
+					else if ( m_pathAStar.Length () > 0 )
 					{
 						toTile = m_pathAStar.CurrPathToArray () [ 0 ];
 					}
 					else
 					{
-						toTile = m_pathAStar.CurrPathToArray () [ 1 ];
+						toTile = m_nearestFreeTile;
 					}
 				}
 				else if ( m_pushingFurn == false )
@@ -217,11 +231,11 @@ public abstract class Character {
 				}
 				if ( toTile == null )
 				{
-					Debug.LogError("We are not pushing or pulling a furniture. Most likely the direction parameters were wrong.");
+					Debug.LogError ( "We are not pushing or pulling a furniture. Most likely the direction parameters were wrong." );
 					return;
 				}
 
-				if ( m_movingFurniture.m_moving == false && m_movingFurniture.MoveFurniture(toTile) == false)
+				if ( m_movingFurniture != null && m_movingFurniture.m_moving == false && m_movingFurniture.MoveFurniture ( toTile ) == false )
 				{
 					Debug.LogError ( "Failed to push furniture: " + m_nextTile.m_furniture.m_name );
 					m_pathAStar = null;
@@ -254,7 +268,13 @@ public abstract class Character {
 
 			m_currTile = m_nextTile;
 			m_movementPercentage = 0;
-			// FIXME?  Do we actually want to retain any overshot movement?
+		}
+
+		if ( m_movingFurnsFinalTile != null && m_movingFurniture != null && m_movingFurnsFinalTile == m_movingFurniture.m_mainTile)
+		{
+			//The furniture was going to a free tile, and we are where we needed to go. So stop pushing it.
+			m_movingFurniture.m_moving = false;
+			ResetDefaultVariables();
 		}
 
 		if ( cbCharacterChanged != null )
@@ -269,17 +289,15 @@ public abstract class Character {
 
 	public void SetDestination( Tile _tile )
 	{
+		m_nextTile = m_currTile;
 		m_destTile = _tile;
-		//m_pathAStar = null;
 	}
 
-	public void SetDestWithFurn ( Tile _furnitureDestTile, Tile _characterDestTile, Furniture _furn )
+	public void SetDestWithFurn ( Tile _characterDestTile, Furniture _furn )
 	{
-		//Debug.Log ( _furnitureDestTile.X + ", " + _furnitureDestTile.Y );
-		//Debug.Log ( _characterDestTile.X + ", " + _characterDestTile.Y );
 		if ( _characterDestTile.m_movementCost == 0 )
 		{
-			Debug.Log("Moving the furniture to (" + _characterDestTile.X + ", " + _characterDestTile.Y + ") means the character will need to go to an invalid tile");
+			Debug.LogError("Moving the furniture to (" + _characterDestTile.X + ", " + _characterDestTile.Y + ") means the character will need to go to an invalid tile");
 			return;
 		}
 		m_nextTile = m_currTile;
@@ -312,19 +330,21 @@ public abstract class Character {
 		//If we are pulling it, then the final tile we need to get to will be 1 AFTER the m_pathAStar's final tile.
 		//If we are pushing it, then the final tile we need to get to will be 1 BEFORE the m_pathAStar's final tile.
 		
-		Direction m_directionOfTravelWithFurnTEMP = CalculateDirectionOfMovement ( m_pathAStarTEMP.InitialPathToArray () [ 0 ], m_pathAStarTEMP.InitialPathToArray () [ 1 ] );
-
-		Direction dirFromFurn = CalculateDirectionOfMovement ( _furnTile, _charTile );
 		bool m_pushingFurnTEMP;
-		//Now we know where we need to be, and where the furniture needs to be.
-		if ( dirFromFurn == m_directionOfTravelWithFurnTEMP )
+		if ( m_pathAStarTEMP.InitialPathToArray () [ 0 ] == _furnTile )
 		{
-			m_pushingFurnTEMP = false;
+			//The next tile we need to go to is the furn's tile. so we must be pushing it.
+			m_pushingFurnTEMP = true;
 		}
 		else
 		{
-			m_pushingFurnTEMP = true;
+			m_pushingFurnTEMP = false;
 		}
+
+		Direction dirFromFurn = CalculateDirectionOfMovement ( _furnTile, _charTile );
+
+		//Now we know where we need to be, and where the furniture needs to be.
+
 		if ( m_pushingFurnTEMP != true )
 		{
 			Tile finalCharTile = m_pathAStarTEMP.InitialPathToArray () [ m_pathAStarTEMP.InitialPathToArray ().Length - 1 ];
@@ -417,9 +437,15 @@ public abstract class Character {
 
 	protected bool MoveFurnitureToTile ( Furniture _furn, Tile _toTile )
 	{
+		if ( _furn == null )
+		{
+			Debug.LogError ( m_name + " is trying to move a null furniture to (" + _toTile.X + ", " + _toTile.Y + ")." );
+			return false;
+		}
+
 		if ( _furn.m_movable == false )
 		{
-			Debug.Log(m_name + " is trying to move a " + _furn.m_name + " but cannot because it is unmovable.");
+			Debug.Log ( m_name + " is trying to move a " + _furn.m_name + " but cannot because it is unmovable." );
 			return false;
 		}
 
@@ -440,7 +466,7 @@ public abstract class Character {
 		Direction dirFromFurn = Direction.NONE;
 
 		//Are we next to the piece of furniture we want to move?
-		Tile[] neightbours = _furn.m_tile.GetNeighbours ();
+		Tile[] neightbours = _furn.m_mainTile.GetNeighbours (true);
 		bool nextToFurn = false;
 		foreach ( Tile t in neightbours )
 		{
@@ -453,7 +479,7 @@ public abstract class Character {
 			{
 				nextToFurn = false;
 				//We are not next to the furniture, but we are on our way there, so there's nothing we need to do.
-				Debug.Log("Moving to furniture");
+				Debug.Log ( "Moving to furniture" );
 				return false;
 			}
 		}
@@ -461,7 +487,7 @@ public abstract class Character {
 		if ( nextToFurn == false )
 		{
 			//We are not next to the furniture so we need to get there.
-			m_pathAStar = new Path_AStar ( m_world, m_currTile, _furn.m_tile );
+			m_pathAStar = new Path_AStar ( m_world, m_currTile, _furn.m_mainTile );
 			if ( m_pathAStar.InitialPathToArray ().Length > 1 )
 			{
 				SetDestination ( m_pathAStar.InitialPathToArray () [ m_pathAStar.InitialPathToArray ().Length - 2 ] );
@@ -475,7 +501,7 @@ public abstract class Character {
 			else
 			{
 				//Cannot reach the piece of furniture
-				Debug.Log("Cannot reach the piece of furniture: " + _furn.m_name);
+				Debug.Log ( "Cannot reach the piece of furniture: " + _furn.m_name );
 			}
 		}
 
@@ -491,7 +517,7 @@ public abstract class Character {
 		m_directionOfTravelWithFurn = CalculateDirectionOfMovement ( m_pathAStar.InitialPathToArray () [ 0 ], m_pathAStar.InitialPathToArray () [ 1 ] );
 		m_movingFurniture = _furn;
 
-		dirFromFurn = CalculateDirectionOfMovement ( _furn.m_tile, m_currTile );
+		dirFromFurn = CalculateDirectionOfMovement ( _furn.m_mainTile, m_currTile );
 		
 		//Now we know where we need to be, and where the furniture needs to be.
 		if ( dirFromFurn == m_directionOfTravelWithFurn )
@@ -512,16 +538,16 @@ public abstract class Character {
 			switch ( dirFromFurn )
 			{
 				case Direction.North:
-					SetDestWithFurn ( m_moveFurnTo, m_world.GetTileAt ( finalTile.X, finalTile.Y + 1 ), _furn );
+					SetDestWithFurn ( m_world.GetTileAt ( finalTile.X, finalTile.Y + 1 ), _furn );
 					break;
 				case Direction.East:
-					SetDestWithFurn ( m_moveFurnTo, m_world.GetTileAt ( finalTile.X + 1, finalTile.Y ), _furn );
+					SetDestWithFurn ( m_world.GetTileAt ( finalTile.X + 1, finalTile.Y ), _furn );
 					break;
 				case Direction.South:
-					SetDestWithFurn ( m_moveFurnTo, m_world.GetTileAt ( finalTile.X, finalTile.Y - 1 ), _furn );
+					SetDestWithFurn ( m_world.GetTileAt ( finalTile.X, finalTile.Y - 1 ), _furn );
 					break;
 				case Direction.West:
-					SetDestWithFurn ( m_moveFurnTo, m_world.GetTileAt ( finalTile.X - 1, finalTile.Y ), _furn );
+					SetDestWithFurn ( m_world.GetTileAt ( finalTile.X - 1, finalTile.Y ), _furn );
 					break;
 				default:
 					return true;
@@ -530,32 +556,32 @@ public abstract class Character {
 		else
 		{
 			//We are pushing the furniture
-			SetDestWithFurn ( m_moveFurnTo, m_pathAStar.InitialPathToArray () [ m_pathAStar.InitialPathToArray ().Length - 2 ], m_nextTile.m_furniture );
+			SetDestWithFurn ( m_pathAStar.InitialPathToArray () [ m_pathAStar.InitialPathToArray ().Length - 2 ], _furn );
 		}
 
 		return true;
 
 	}
 
-	Direction CalculateDirectionOfMovement ( Tile _initallTile, Tile _nextTile )
+	Direction CalculateDirectionOfMovement ( Tile _initialTile, Tile _nextTile )
 	{
-		
-		if ( _initallTile.Y + 1 == _nextTile.Y )
+
+		if ( _initialTile.Y + 1 == _nextTile.Y )
 		{
 			// We are heading north
 			return Direction.North;
 		}
-		else if ( _initallTile.X + 1 == _nextTile.X )
+		else if ( _initialTile.X + 1 == _nextTile.X )
 		{
 			// We are heading east
 			return Direction.East;
 		}
-		else if ( _initallTile.Y - 1 == _nextTile.Y )
+		else if ( _initialTile.Y - 1 == _nextTile.Y )
 		{
 			// We are heading south
 			return Direction.South;
 		}
-		else if ( _initallTile.X - 1 == _nextTile.X )
+		else if ( _initialTile.X - 1 == _nextTile.X )
 		{
 			// We are heading west
 			return Direction.West;
@@ -566,9 +592,9 @@ public abstract class Character {
 	}
 
 	/// <summary>
-	/// the character tries to pick up any piece of stock from the specified piece of furniture.
+	/// The character tries to pick up any piece of stock from the specified piece of furniture.
 	/// </summary>
-	protected bool TryTakeAnyStock ( Furniture _furn, bool _scannedMatters )
+	protected bool TryTakeAnyStock ( Furniture _furn, bool _scannedMatters = false)
 	{
 		foreach ( var stockList in _furn.m_stock )
 		{

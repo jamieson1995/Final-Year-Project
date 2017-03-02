@@ -84,11 +84,11 @@ public class Path_TileGraph{
 				return false;
 			}
 
-			if( _currTile.m_world.GetTileAt( _currTile.X - dX, _currTile.Y).m_movementCost == 0 ){
+			if( _currTile.m_world.GetTileAt( _currTile.X - dX, _currTile.Y).m_movementCost == 0 || _currTile.m_world.GetTileAt( _currTile.X - dX, _currTile.Y).m_movementCost > 1){
 				//East or West is unwalkable, or has a furniture, therefore this would be a clipped movement.
 				return true;
 			}
-				if( _currTile.m_world.GetTileAt( _currTile.X, _currTile.Y - dY ).m_movementCost == 0 ){
+			if( _currTile.m_world.GetTileAt( _currTile.X, _currTile.Y - dY ).m_movementCost == 0 || _currTile.m_world.GetTileAt( _currTile.X, _currTile.Y - dY ).m_movementCost > 1){
 				//North or South is unwalkable,or has a furniture, therefore this would be a clipped movement.
 				return true;
 			}

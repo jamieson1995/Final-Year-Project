@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////
-//Copyright James Jamieson 2016/2017
+//Copyright James Jamieson 2017
 //University Dissertation Project
 //Shop Manager AI Simulation
 //////////////////////////////////////////////////////
@@ -1286,11 +1286,7 @@ public class WorldController : MonoBehaviour {
 
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 4, 17 ), stockToAdd );
-		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 6, 4), 2 );
-		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 6, 5 ) );
-		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 7, 5 ) );
-		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 3, 5 ) );
-		m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( 2, 5 ) );
+		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 2, 16), 2 );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 3 ) );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 19 ) );
 		m_world.CreateEmployee("James", 10000, m_world.GetTileAt ( 1, 1 ), "Manager");

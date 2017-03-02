@@ -1,4 +1,11 @@
-﻿using System.Collections;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,6 +33,8 @@ public class Stock {
 	public Temperature Temperature { get; protected set; }
 
 	public bool m_scanned;	
+
+	public bool m_triedGoingOut;
 
 	//This takes the price of this stock, and tranfers the value into a nice to read string. If the value is less than 100, the price is shown
 	//in pence instead of pounds, but is still formatted to fit the same space.

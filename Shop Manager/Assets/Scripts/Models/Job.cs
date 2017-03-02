@@ -13,6 +13,8 @@ public class Job {
 	public Tile Tile { get; protected set; }
 
 	public float m_maxTime;
+
+	public bool RequiresTrolley { get; protected set;}
 	
 	public Furniture m_furn;
 
@@ -29,7 +31,7 @@ public class Job {
 	//Create a new job with its state set to the given PrimaryState.
 	public Job ( PrimaryStates _state )
 	{
-		m_primaryState = _state;
+		SetPrimaryState(_state);
 	}
 
 	public enum PrimaryStates{
@@ -74,23 +76,23 @@ public class Job {
 			World world = WorldController.instance.m_world;
 			switch ( m_primaryState )
 			{
-			case PrimaryStates.ServeOnCheckout:
-				return "Checkout";
+				case PrimaryStates.ServeOnCheckout:
+					return "Checkout";
 
-			case Job.PrimaryStates.WorkStockcage:
-				return "Stockcage";
-	
-			case Job.PrimaryStates.EmptyStockcage:
+				case Job.PrimaryStates.WorkStockcage:
 					return "Stockcage";
 	
-			case Job.PrimaryStates.WorkBackStock:
-				return "StockShelf";
+				case Job.PrimaryStates.EmptyStockcage:
+					return "Stockcage";
 	
-			case Job.PrimaryStates.FaceUp:
-				return "StockShelf";
+				case Job.PrimaryStates.WorkBackStock:
+					return "FrontShelf";
 	
-			case Job.PrimaryStates.CountCheckoutMoney:
-				return "Checkout";
+				case Job.PrimaryStates.FaceUp:
+					return "FrontShelf";
+	
+				case Job.PrimaryStates.CountCheckoutMoney:
+					return "Checkout";
 			}
 
 			return null;
@@ -102,10 +104,39 @@ public class Job {
 		}
 	}
 
+	void ResetJobVariables ()
+	{
+		if ( m_furn != null )
+		{
+			m_furn.m_manned = false;
+		}
+		m_furn = null;
+		Tile = null;
+		m_requiredFurniture = null;
+	}
+
+	/// <summary>
+	/// Sets this job's furn with the specified furniture, and then sets the Job's tile to the furniture's job tile.
+	/// </summary>
+	public void SetJobFurn ( Furniture _furn )
+	{
+		if ( _furn == null )
+		{
+			ResetJobVariables();
+			return;
+		}
+		m_furn = _furn;
+		SetJobTile(_furn);
+	}
+
+	/// <summary>
+	/// Checks to see if specified furniture is the same as this job's furniture, if true, this job's tile gets set to the furniture's job tile.
+	/// If returns false, specified furniture is different than the job's furniture.
+	/// </summary>
 	public bool SetJobTile ( Furniture _furn )
 	{
 		//Check to see if the furniture is the one required for the job.
-		if ( m_furn == _furn )
+		if ( m_furn != null && _furn != null && m_furn == _furn )
 		{
 			//Check to see if the job's tile is furniture free 
 			//TODO In the future, furniture should be not able to be placed in a furniture job tile, and also furniture should not be
@@ -117,12 +148,31 @@ public class Job {
 				return true;
 			}
 		}
+		else
+		{
+			Debug.LogError("SetJobTile() -- Specified furniture: " + _furn.m_name + " is different from job's furniture: " + m_furn.m_name);
+			return false;
+		}
 
+		//This should be unreachable.
 		return false;
 	}
-	
-	public void SetPrimaryState(PrimaryStates _state)
+
+	public void SetPrimaryState ( PrimaryStates _state )
 	{
+		ResetJobVariables();
+		if ( _state == PrimaryStates.WorkBackStock || _state == PrimaryStates.WorkStockcage )
+		{
+			RequiresTrolley = true;
+		}
+		else
+		{
+			RequiresTrolley = false;
+		}
+		if ( m_primaryState == PrimaryStates.ServeOnCheckout )
+		{
+			WorldController.instance.m_world.m_numberOfMannedTills--;
+		}
 		m_primaryState = _state;
 	}
 

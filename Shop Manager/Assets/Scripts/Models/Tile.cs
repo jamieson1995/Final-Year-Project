@@ -55,7 +55,7 @@ public class Tile {
 
 		if ( m_world.PositionCheck(this, _furn, _direction) == false )
 		{
-			Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid" );
+			Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid: (" + X + ", " + Y + ")");
 			return false;
 		}
 
@@ -80,7 +80,7 @@ public class Tile {
 	}
 
 	//Tells us if two tile are adjacent
-    public bool IsNeighbour ( Tile _tile, bool _diagOK )
+    public bool IsNeighbour ( Tile _tile, bool _diagOK = false)
 	{
 		if ( this.X == _tile.X && ( this.Y == _tile.Y + 1 || this.Y == _tile.Y - 1 ) )
 			return true;

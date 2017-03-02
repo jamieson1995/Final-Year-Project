@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////
-//Copyright James Jamieson 2016/2017
+//Copyright James Jamieson 2017
 //University Dissertation Project
 //Shop Manager AI Simulation
 //////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ public class Furniture {
 			}
 			else
 			{
-				return m_tile.X;
+				return m_mainTile.X;
 			}
 		}
 	}
@@ -35,12 +35,14 @@ public class Furniture {
 			}
 			else
 			{
-				return m_tile.Y;
+				return m_mainTile.Y;
 			}
 		}
 	}
 
-	public Tile m_tile;
+	public Tile m_mainTile;
+
+	public Tile m_middleTile;
 
 	public Tile m_jobTile { get; protected set; }
 
@@ -74,6 +76,8 @@ public class Furniture {
 	public int m_maxCarryWeight { get; protected set; } //This represents the maximum amount of stock that this furniture can carry.
 
 	public int m_weightUsed { get; protected set; } //This represents the weight used, based on the stock currently on the furniture.
+
+	public bool m_full { get; protected set; } //Flag for whether the furniture is full or not.
 
 	public Action<Furniture> cbOnChanged; //After this action gets activated, whenever it gets called, a given event will trigger, i.e changing the visual of this furniture
 
@@ -153,7 +157,7 @@ public class Furniture {
 
 		furn.RotateFurniture(_direction);
 
-		furn.m_tile = _tile;
+		furn.m_mainTile = _tile;
 		if ( furn.m_rotation == 1 )
 		{
 			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
@@ -170,6 +174,8 @@ public class Furniture {
 		{
 			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) - 1, _tile.Y + ( furn.Height / 2 ) );
 		}
+
+		furn.m_middleTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) , _tile.Y + ( furn.Height / 2 ) );
 
 		if ( _tile.PlaceFurniture ( furn, _direction) == false )
 		{
@@ -224,7 +230,8 @@ public class Furniture {
 		}
 		if ( m_weightUsed + _stock.Weight > m_maxCarryWeight )
 		{
-			Debug.LogWarning ( "Tried to add stock to furniture but it was too heavy: Stock: " + _stock.Name + ", Furniture " + m_name );
+			Debug.LogWarning ( "Tried to add stock to furniture but it was too heavy: Stock: " + _stock.Name + ", Furniture: " + m_name );
+			m_full = true;
 			return false;
 		}
 
@@ -251,6 +258,7 @@ public class Furniture {
 				m_stock.Remove(_stock);
 			}
 			m_weightUsed -= WorldController.instance.m_world.m_stockPrototypes[_stock].Weight;
+			m_full = false;
 			return true;
 		}
 
@@ -292,7 +300,7 @@ public class Furniture {
 		m_furnParameters [ "m_movementPercentage" ] = 0;
 		m_furnParameters [ "m_destTile.X" ] = _toTile.X;
 		m_furnParameters [ "m_destTile.Y" ] = _toTile.Y;
-		m_tile.m_world.MoveFurniture ( this, m_tile, _toTile );
+		m_mainTile.m_world.MoveFurniture ( this, m_mainTile, _toTile );
 
 		return true;
 	}

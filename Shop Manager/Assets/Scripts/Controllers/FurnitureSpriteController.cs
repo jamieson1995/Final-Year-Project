@@ -40,8 +40,8 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 		if ( _furn.m_name == "Door" )
 		{
-			Tile northTile = m_world.GetTileAt ( _furn.m_tile.X, _furn.m_tile.Y + 1 );
-			Tile southTile = m_world.GetTileAt ( _furn.m_tile.X, _furn.m_tile.Y - 1 );
+			Tile northTile = m_world.GetTileAt ( _furn.m_mainTile.X, _furn.m_mainTile.Y + 1 );
+			Tile southTile = m_world.GetTileAt ( _furn.m_mainTile.X, _furn.m_mainTile.Y - 1 );
 			if ( northTile != null && southTile != null &&
 			     northTile.m_furniture != null && southTile.m_furniture != null &&
 			     northTile.m_furniture.m_name == "Wall" && southTile.m_furniture.m_name == "Wall" )
@@ -52,8 +52,8 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 		m_furnitureGameObjectMap.Add ( _furn, furn_go );
 
-		furn_go.name = _furn.m_name + "(" + _furn.m_tile.X + "_" + _furn.m_tile.Y + ")";
-		furn_go.transform.position = new Vector3 ( _furn.m_tile.X + ( ( _furn.Width - 1 ) ) / 2f, _furn.m_tile.Y + ( ( _furn.Height - 1 ) / 2f ), 0 );
+		furn_go.name = _furn.m_name + "(" + _furn.m_mainTile.X + "_" + _furn.m_mainTile.Y + ")";
+		furn_go.transform.position = new Vector3 ( _furn.m_mainTile.X + ( ( _furn.Width - 1 ) ) / 2f, _furn.m_mainTile.Y + ( ( _furn.Height - 1 ) / 2f ), 0 );
 		if ( _furn.m_name != "Door" )
 		{
 			furn_go.transform.rotation = Quaternion.Euler ( 0, 0, ( _furn.m_rotation * 90 ) - 90 );
@@ -84,7 +84,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		}
 		GameObject furn_go = m_furnitureGameObjectMap [ _furn ];
 		furn_go.GetComponent<SpriteRenderer> ().sprite = GetSpriteForFurniture ( _furn );
-		furn_go.transform.position = new Vector3 (_furn.m_tile.X, _furn.m_tile.Y, 0);
+		furn_go.transform.position = new Vector3 (_furn.m_mainTile.X, _furn.m_mainTile.Y, 0);
     }
 
 	public Sprite GetSpriteForFurniture ( Furniture _furn )
@@ -125,8 +125,8 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 		//Check for neighbour - North, East, South, West
 
-		int x = _furn.m_tile.X;
-		int y = _furn.m_tile.Y;
+		int x = _furn.m_mainTile.X;
+		int y = _furn.m_mainTile.Y;
 
 		Tile t;
 		//Check North

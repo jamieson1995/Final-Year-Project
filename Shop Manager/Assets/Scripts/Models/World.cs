@@ -61,7 +61,7 @@ public class World {
 
 
 	/// <summary>
-	/// All character's that are using a piece of furniture, look up by used furniture.
+	/// All characters that are using a piece of furniture, look up by used furniture.
 	/// </summary>
 	public Dictionary<Furniture, Character> m_characterFurniture; //This stores each character and which furniture they are currently using.
 																  //If a character is not in this dictionary, its means they aren't using a piece of
@@ -99,8 +99,8 @@ public class World {
 		m_numberOfMannedTills = 0;
 
 		//Until customers are added to the game, the amount of customers in store needs to be hardcoded so the employee AI can be tested
-		m_customersInStore = 3;
-		m_customersInQueue = 2;
+		m_customersInStore = 0;
+		m_customersInQueue = 0;
 		}
 
 	//Returns a Tile at a certain coordinate

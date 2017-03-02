@@ -111,6 +111,7 @@ public class Path_AStar {
 			total_path.Enqueue ( current.m_data );
 
 			m_path = new Queue<Tile> ( total_path.Reverse () );
+			m_path.Dequeue();
 			m_initalPath = new Queue<Tile> ( m_path );
 		}
 	}

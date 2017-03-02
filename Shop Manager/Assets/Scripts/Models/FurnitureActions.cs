@@ -65,7 +65,7 @@ public static class FurnitureActions {
 			{
 				_furn.m_furnParameters[ "m_currTile.X" ] = _furn.m_furnParameters[ "m_destTile.X" ];
 				_furn.m_furnParameters[ "m_currTile.Y" ] = _furn.m_furnParameters[ "m_destTile.Y" ];
-				_furn.m_tile = WorldController.instance.m_world.GetTileAt( (int)_furn.m_furnParameters[ "m_destTile.X" ], (int)_furn.m_furnParameters[ "m_destTile.Y" ] );
+				_furn.m_mainTile = WorldController.instance.m_world.GetTileAt( (int)_furn.m_furnParameters[ "m_destTile.X" ], (int)_furn.m_furnParameters[ "m_destTile.Y" ] );
 				_furn.m_furnParameters["m_movementPercentage"] = 0.0f;
 			}
 				WorldController.instance.m_world.cbFurnitureMoved( _furn );

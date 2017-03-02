@@ -72,6 +72,29 @@ public class SelectDisplay : MonoBehaviour {
 				}
 			}
 		}
+		int count = 0;
+
+		if ( m_inputController.m_selectedFurn == null )
+		{
+			return;
+		}
+		foreach ( var stockList in m_inputController.m_selectedFurn.m_stock )
+		{
+			foreach ( Stock stock in m_inputController.m_selectedFurn.m_stock[stockList.Key] )
+			{
+				count++;
+			}
+		}
+		m_furnitureNumberOfItemsGOText.text = "Number of Items: " + count;
+		if ( count == 0 )
+		{
+			m_viewStockButton.interactable = false;
+			m_inputController.m_stockDisplay.SetActive(false);
+		}
+		else
+		{
+			m_viewStockButton.interactable = true;
+		}
 
 		if ( m_inputController.m_stockDisplay.activeSelf == true )
 		{
@@ -100,24 +123,5 @@ public class SelectDisplay : MonoBehaviour {
 	public void SetUpSelectionDisplay ()
 	{
 		m_furnitureNameGOText.text = "Name: " + m_inputController.m_selectedFurn.m_name;
-		int count = 0;
-		foreach ( var stockList in m_inputController.m_selectedFurn.m_stock )
-		{
-			foreach ( Stock stock in m_inputController.m_selectedFurn.m_stock[stockList.Key] )
-			{
-				count++;
-			}
-		}
-
-		m_furnitureNumberOfItemsGOText.text = "Number of Items: " + count;
-		if ( count == 0 )
-		{
-			m_viewStockButton.interactable = false;
-			m_inputController.m_stockDisplay.SetActive(false);
-		}
-		else
-		{
-			m_viewStockButton.interactable = true;
-		}
 	}
 }
