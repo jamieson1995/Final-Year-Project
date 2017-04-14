@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////
-//Copyright James Jamieson 2016/2017
+//Copyright James Jamieson 2017
 //University Dissertation Project
 //Shop Manager AI Simulation
 //////////////////////////////////////////////////////
@@ -9,13 +9,17 @@ using System.Collections.Generic;
 
 public class FurnitureSpriteController : MonoBehaviour {
 
-	Dictionary<Furniture, GameObject> m_furnitureGameObjectMap; //This dictionary is used to quickly find a certain furniture gameobject based upon what is entered.
+	///Returns the GameObject linked to the furniture input.
+	Dictionary<Furniture, GameObject> m_furnitureGameObjectMap; 
 
-	public Dictionary<string, Sprite> m_furnitureSprites { get; protected set; } //This dictionary is used to quickly return the correct sprite based upon its name.
+	///Returns the Sprite based on the input name.
+	public Dictionary<string, Sprite> m_furnitureSprites { get; protected set; } 
 
-	public Sprite[] m_sprites;
+	///An array of all furniture sprites.
+	public Sprite[] m_sprites; 
 
-	World m_world;
+	/// Reference to WorldController.instance.m_world
+	World m_world; 
 
 	void Start ()
 	{
@@ -23,6 +27,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		m_furnitureSprites = new Dictionary<string, Sprite> ();
 	}
 
+	/// Establishes the reference to WorldController.instance.m_world and sets up the callbacks and sprites.
 	public void SetUpWorld ()
 	{
 		m_world = WorldController.instance.m_world;
@@ -34,10 +39,12 @@ public class FurnitureSpriteController : MonoBehaviour {
 		}
 	}
 
+	/// Callback function which runs when a furniture gets created.
 	public void OnFurnitureCreated ( Furniture _furn )
 	{
 		GameObject furn_go = new GameObject ();
 
+		//Door is unique as it rotates if the walls it connects to are north and south rather than east and west.
 		if ( _furn.m_name == "Door" )
 		{
 			Tile northTile = m_world.GetTileAt ( _furn.m_mainTile.X, _furn.m_mainTile.Y + 1 );
@@ -54,6 +61,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 
 		furn_go.name = _furn.m_name + "(" + _furn.m_mainTile.X + "_" + _furn.m_mainTile.Y + ")";
 		furn_go.transform.position = new Vector3 ( _furn.m_mainTile.X + ( ( _furn.Width - 1 ) ) / 2f, _furn.m_mainTile.Y + ( ( _furn.Height - 1 ) / 2f ), 0 );
+		//Rotates the sprite based upon the furniture rotation reference, excludes door furniture.
 		if ( _furn.m_name != "Door" )
 		{
 			furn_go.transform.rotation = Quaternion.Euler ( 0, 0, ( _furn.m_rotation * 90 ) - 90 );
@@ -61,6 +69,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		furn_go.transform.SetParent(this.transform, true);
 		SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
 		sr.sprite = GetSpriteForFurniture( _furn );
+		//Door furniture needs to render on top of all other furniture.
 		if (_furn.m_name == "Door" )
 		{
 			sr.sortingLayerName = "Furniture - Door";
@@ -70,9 +79,11 @@ public class FurnitureSpriteController : MonoBehaviour {
 			sr.sortingLayerName = "Furniture";
 		}
 
+		//Registers the callback for when a furniture changes visually - position, sprite etc.
 		_furn.RegisterOnChangedCallback(OnFurnitureChanged);
 	}
 
+	///Callback function which runs when a furniture changes.
 	void OnFurnitureChanged ( Furniture _furn )
 	{
 		//Make sure the furniture's graphics get corrected.
@@ -87,10 +98,10 @@ public class FurnitureSpriteController : MonoBehaviour {
 		furn_go.transform.position = new Vector3 (_furn.m_mainTile.X, _furn.m_mainTile.Y, 0);
     }
 
+    /// Returns the sprite required for the furniture given.
 	public Sprite GetSpriteForFurniture ( Furniture _furn )
 	{
 		string spriteName = _furn.m_name;
-
 		if ( _furn.m_linksToNeighbour == false )
 		{
 			if ( _furn.m_name == "Door" )
@@ -173,9 +184,9 @@ public class FurnitureSpriteController : MonoBehaviour {
 		return m_furnitureSprites [ spriteName ];
 	}
 
+	/// Returns the sprite for a furniture based on the name given.
 	public Sprite GetSpriteForFurniture ( string _furnName )
 	{
-
 		if ( m_furnitureSprites.ContainsKey ( _furnName ) )
 		{
 			return m_furnitureSprites [ _furnName ];
@@ -189,6 +200,7 @@ public class FurnitureSpriteController : MonoBehaviour {
 		return null;
 	}
 
+	///Callback function which runs when a furniture moves.
 	void OnFurnitureMoved ( Furniture _furn )
 	{
 		if ( m_furnitureGameObjectMap.ContainsKey ( _furn ) == false )

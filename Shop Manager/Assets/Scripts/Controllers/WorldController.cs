@@ -6,35 +6,52 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class WorldController : MonoBehaviour {
 
-	public static WorldController instance {get; protected set;} //Singleton
+	/// Reference the instance of this class.
+	public static WorldController instance { get; protected set; }
 
-	public World m_world {get; protected set;}
+	///Reference to the main World.
+	public World m_world  {get; protected set; }
 
+	///Reference to the m_tiledFloor Sprite
 	public Sprite m_tiledFloor;
+
+	///Reference to the m_concreteFloor Sprite.
 	public Sprite m_concreteFloor;
 
-	public GameObject m_tileGameObjects; //This will be the parent of all the tile GameObjects, this allows us to keep the hierarchy uncluttered. 
+	///This GameObject acts as the parent to the tile GameObjects. Keeps the hierarchy clean and uncluttered.
+	public GameObject m_tileGameObjects;
 
-	Dictionary<Tile, GameObject> tileGameObjectMap; //This is needed to track which tile is related to which GameObject.
+	///Returns a Tile based onpn the given GameObject.
+	Dictionary<Tile, GameObject> tileGameObjectMap;
 
+	///Reference to the Create World Button.
 	public GameObject m_createWorldButton;
+
+	///Reference to the GameUI.
 	public GameObject m_gameUI;
 
+	///Reference to the FurnitureSpriteController.
 	public FurnitureSpriteController FSC;
+
+	///Reference to the CharacterSpriteController.
 	public CharacterSpriteController CSC;
 
-	void Awake(){
+	void Awake ()
+	{
 
-		if (instance == null){
+		if ( instance == null )
+		{
 			instance = this;
 		}
 		else
-			Debug.Log("Second World Controller tried to be created. Cannot have more than one World Controller.");
+		{
+			Debug.Log ( "Second World Controller tried to be created. Cannot have more than one World Controller." );
+		}
 
-		
 	}
 
 	void Update ()
@@ -47,6 +64,7 @@ public class WorldController : MonoBehaviour {
 		m_world.Update(Time.deltaTime); //TODO Speed controls?
 	}
 
+	///Returns a Tile based upon given Vector3 coordinates and flag defining if coordinates can be out of bounds.
 	public Tile GetTileAtWorldCoord (Vector3 _coord, bool _canBeOutOfBounds = false)
     {
         int x = Mathf.FloorToInt (_coord.x + 0.5f);
@@ -62,6 +80,7 @@ public class WorldController : MonoBehaviour {
         return m_world.GetTileAt(x,y);
     }
 
+	///Sets up, and creates the entire world.
     public void SetUpWorld ()
 	{
 		m_world = new World ( 21, 23 );
@@ -123,6 +142,7 @@ public class WorldController : MonoBehaviour {
 
 	}
 
+	///This function is very messy, and hardcodes the shop needed for the testing.
 	void CreateShopEnvironment ()
 	{
 
@@ -181,12 +201,12 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet1750" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet1750" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade2000" ].Clone() );
 						}
 					}
 
@@ -194,12 +214,12 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 25; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChoppedTomatoes4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChoppedTomatoes4" ].Clone() );
 						}
 
 						for ( int i = 0; i < 25; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "TunaChucks4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "TunaChucks4" ].Clone() );
 						}
 					}
 
@@ -237,11 +257,11 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Bananas5Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Bananas5Pack" ].Clone() );
 						}
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Apples5Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Apples5Pack" ].Clone() );
 						}
 					}
 
@@ -249,19 +269,19 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GreenSeedlessGrapes500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GreenSeedlessGrapes500" ].Clone() );
 						}
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "RedSeedlessGrapes500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "RedSeedlessGrapes500" ].Clone() );
 						}
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LimeSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LimeSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonSingle" ].Clone() );
 						}
 					}
 
@@ -269,19 +289,19 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MangoSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MangoSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PearSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PearSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemon5Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemon5Pack" ].Clone() );
 						}
 					}
 
@@ -289,11 +309,11 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 2; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WatermelonSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WatermelonSingle" ].Clone() );
 						}
 					}
 
@@ -301,27 +321,27 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PassionFruit3Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PassionFruit3Pack" ].Clone() );
 						}
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleChucks400" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleChucks400" ].Clone() );
 						}
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Mango3Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Mango3Pack" ].Clone() );
 						}
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Pears550" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Pears550" ].Clone() );
 						}
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Strawberries300" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Strawberries300" ].Clone() );
 						}
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleFingers500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleFingers500" ].Clone() );
 						}
 
 					}
@@ -337,17 +357,17 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreast950" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreast950" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakMince500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakMince500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SmokedBackBacon10" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SmokedBackBacon10" ].Clone() );
 						}
 
 
@@ -357,17 +377,17 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsmokedBackBacon10" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsmokedBackBacon10" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeWholeChicken" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeWholeChicken" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ThickPorkSausages12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ThickPorkSausages12" ].Clone() );
 						}
 					}
 
@@ -375,22 +395,22 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicChickenKiev2" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicChickenKiev2" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BreadedChickenGoujons270" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BreadedChickenGoujons270" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "DicedBeef600" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DicedBeef600" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakBurgers4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakBurgers4" ].Clone() );
 						}
 					}
 					m_world.PlaceFurnitureInWorldWithStock ( "BigFridge", m_world.GetTileAt ( x, y ), stockToAdd );
@@ -403,27 +423,27 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WatermelonPack380" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WatermelonPack380" ].Clone() );
 						}
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PlumSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PlumSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CarrotSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CarrotSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WhiteOnionSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WhiteOnionSingle" ].Clone() );
 						}
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MushroomPack300" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MushroomPack300" ].Clone() );
 						}
 						for ( int i = 0; i < 15; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SpringOnionPack100" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SpringOnionPack100" ].Clone() );
 						}
 					}
 
@@ -431,37 +451,37 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 3; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PotatoesPack2500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PotatoesPack2500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "RedOnionLoose" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "RedOnionLoose" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BakingPotatoSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BakingPotatoSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CauliflowerSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CauliflowerSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BroccoliSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BroccoliSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SweetPotatoSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SweetPotatoSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ParsnipSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ParsnipSingle" ].Clone() );
 						}
 					}
 
@@ -469,62 +489,62 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GreenBeans220" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GreenBeans220" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BabyButtonMushrooms250" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BabyButtonMushrooms250" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LeekSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LeekSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CourgetteLoose" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CourgetteLoose" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BabySpinach240" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BabySpinach240" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "RootGingerSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "RootGingerSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CucumberSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CucumberSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MixedPeppers3Pack" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MixedPeppers3Pack" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SaladTomatoes360" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SaladTomatoes360" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "IcebergLettuceSingle" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "IcebergLettuceSingle" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Chillies60" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Chillies60" ].Clone() );
 						}
 					}
 					m_world.PlaceFurnitureInWorldWithStock ( "FrontShelf", m_world.GetTileAt ( x, y ), stockToAdd, 4 );
@@ -537,52 +557,52 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PuffPastryRolled320" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PuffPastryRolled320" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GooseFat200" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GooseFat200" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CornishCustard500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CornishCustard500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "HamPineapplePizza310" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "HamPineapplePizza310" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenTikkaMasalaPilauRice450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenTikkaMasalaPilauRice450" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefLasagne450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefLasagne450" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CottagePie450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CottagePie450" ].Clone() );
 						}
 
 					}
@@ -591,47 +611,47 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CranberryJuice1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CranberryJuice1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleJuice1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleJuice1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice3" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "AppleJuice3" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice3" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OrangeJuice3" ].Clone() );
 						}
 
 						for ( int i = 0; i < 12; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleJuice3" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PineappleJuice3" ].Clone() );
 						}
 					}
 
@@ -646,32 +666,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola1750" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola1750" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet1750" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet1750" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonadeDiet2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonadeDiet2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 3; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola24" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola24" ].Clone() );
 						}
 
 						for ( int i = 0; i < 3; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet24" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaColaDiet24" ].Clone() );
 						}
 					}
 
@@ -679,22 +699,22 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange6" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange6" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Lemonade12" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonadeDiet12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonadeDiet12" ].Clone() );
 						}
 					}
 
@@ -702,22 +722,22 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater12" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SparklingWater2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SparklingWater2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater2000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater2000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BakedBeans4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BakedBeans4" ].Clone() );
 						}
 					}
 
@@ -725,17 +745,17 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 60; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "TomatoSoup400" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "TomatoSoup400" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChoppedTomatoes4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChoppedTomatoes4" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "TunaChucks4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "TunaChucks4" ].Clone() );
 						}
 					}
 
@@ -743,37 +763,37 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateBiscuit8" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateBiscuit8" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "JaffaCakes2" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "JaffaCakes2" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateDigestives500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateDigestives500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateBar200" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateBar200" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateButtons119" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateButtons119" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MarsBars4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MarsBars4" ].Clone() );
 						}
 
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MinstrelsPouch130" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MinstrelsPouch130" ].Clone() );
 						}
 					}
 
@@ -789,17 +809,17 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk4pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk4pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 22; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk4pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk4pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 19; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk4pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk4pt" ].Clone() );
 						}
 					}
 
@@ -807,32 +827,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 40; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk1pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk1pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 40; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk1pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk1pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 40; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk1pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk1pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 19; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk2pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SMilk2pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk2pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SSMilk2pt" ].Clone() );
 						}
 
 						for ( int i = 0; i < 17; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk2pt" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "WMilk2pt" ].Clone() );
 						}
 					}
 
@@ -840,52 +860,52 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 30; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PuffPastryRolled320" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PuffPastryRolled320" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GooseFat200" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GooseFat200" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CornishCustard500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CornishCustard500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "HamPineapplePizza310" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "HamPineapplePizza310" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenTikkaMasalaPilauRice450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenTikkaMasalaPilauRice450" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefLasagne450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefLasagne450" ].Clone() );
 						}
 
 						for ( int i = 0; i < 6; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CottagePie450" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CottagePie450" ].Clone() );
 						}
 
 					}
@@ -901,32 +921,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 40; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MediumEggs6" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MediumEggs6" ].Clone() );
 						}
 
 						for ( int i = 0; i < 19; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MediumEggs12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MediumEggs12" ].Clone() );
 						}
 
 						for ( int i = 0; i < 35; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeEggs6" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeEggs6" ].Clone() );
 						}
 
 						for ( int i = 0; i < 21; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeEggs12" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeEggs12" ].Clone() );
 						}
 
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SaltedButter250" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SaltedButter250" ].Clone() );
 						}
 
 						for ( int i = 0; i < 50; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsaltedButter250" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsaltedButter250" ].Clone() );
 						}
 					}
 
@@ -934,32 +954,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-								stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream300" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream300" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-								stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream600" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream600" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-								stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream600" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream600" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SlightySaltedSpreadable500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SlightySaltedSpreadable500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OriginalSpread500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OriginalSpread500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream150" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoubleCream150" ].Clone() );
 						}
 
 					}
@@ -975,27 +995,27 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenDippers42" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenDippers42" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreastFillet1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreastFillet1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SouthernFriedChicken2" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SouthernFriedChicken2" ].Clone() );
 						}
 
 						for ( int i = 0; i < 5; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PorkSausages20" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PorkSausages20" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicButterBreadedChickenKievs4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicButterBreadedChickenKievs4" ].Clone() );
 						}
 					}
 
@@ -1003,37 +1023,37 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "CrispyChicken5" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "CrispyChicken5" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenQuarterPounders4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenQuarterPounders4" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefBurgers4" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefBurgers4" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenFingers14" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenFingers14" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "HomeChips1500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "HomeChips1500" ].Clone() );
 						}	
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "OvenChips1500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "OvenChips1500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "PotatoWaffles10" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "PotatoWaffles10" ].Clone() );
 						}
 					}
 
@@ -1041,32 +1061,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "ExtraChunkyHomeChips1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "ExtraChunkyHomeChips1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 20; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BatteredOnionRings375" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BatteredOnionRings375" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "FourCheesePizza330" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "FourCheesePizza330" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoublePepperoniPizza330" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DoublePepperoniPizza330" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicCheesePizzaBread210" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicCheesePizzaBread210" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BreadedOnionRings750" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BreadedOnionRings750" ].Clone() );
 						}
 					}
 
@@ -1074,32 +1094,32 @@ public class WorldController : MonoBehaviour {
 					{
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "GardenPeas1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "GardenPeas1000" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "BroccoliFlorets900" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "BroccoliFlorets900" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "DicedOnions500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "DicedOnions500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "MixedPeppers500" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "MixedPeppers500" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "Sweetcorn907" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "Sweetcorn907" ].Clone() );
 						}
 
 						for ( int i = 0; i < 10; i++ )
 						{
-							stockToAdd.Add ( m_world.m_stockPrototypes [ "SlicedCarrots1000" ] );
+							stockToAdd.Add ( m_world.m_stockPrototypes [ "SlicedCarrots1000" ].Clone() );
 						}
 					}
 
@@ -1113,184 +1133,217 @@ public class WorldController : MonoBehaviour {
 			}
 		}
 
-		stockToAdd.Clear();
+		stockToAdd.Clear ();
 		#region StocktoAddDefined
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "BananaMilkshake400" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "BananaMilkshake400" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateMilkshake400" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateMilkshake400" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "StrawberryMilkshake400" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "StrawberryMilkshake400" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "StillWater500" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "CokeCola500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "CokeCola500" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "CokeColaDiet500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "CokeColaDiet500" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "FizzyOrange500" ].Clone() );
 		}
 
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "BigFridge", m_world.GetTileAt ( 19, 8 ), stockToAdd, 4 );
-		stockToAdd.Clear();
+		stockToAdd.Clear ();
 		#region StockToAddDefined
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "MatureCheddarBlock350" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "MatureCheddarBlock350" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "MatureCheddarBlock550" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "MatureCheddarBlock550" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "GratedCheddar500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "GratedCheddar500" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "MozzarellaBlock150" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "MozzarellaBlock150" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "GratedMozzarella250" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "GratedMozzarella250" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateMousse6" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "MilkChocolateMousse6" ].Clone() );
 		}
 
 		for ( int i = 0; i < 5; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "StrawberryTrifle3" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "StrawberryTrifle3" ].Clone() );
 		}
 
 		for ( int i = 0; i < 5; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "VanillaCheesecake540" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "VanillaCheesecake540" ].Clone() );
 		}
 
 		for ( int i = 0; i < 5; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateCheesecake540" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateCheesecake540" ].Clone() );
 		}
 
 		for ( int i = 0; i < 5; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "TreacleTart380" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "TreacleTart380" ].Clone() );
 		}
 
 		for ( int i = 0; i < 5; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonTart385" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "LemonTart385" ].Clone() );
 		}
 
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "BigFridge", m_world.GetTileAt ( 18, 11 ), stockToAdd );
-		stockToAdd.Clear();
+		stockToAdd.Clear ();
 		#region StockToAddDefined
 		for ( int i = 0; i < 10; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreast950" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChickenBreast950" ].Clone() );
 		}
 
 		for ( int i = 0; i < 10; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakMince500" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "BeefSteakMince500" ].Clone() );
 		}
 
 		for ( int i = 0; i < 10; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "SmokedBackBacon10" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "SmokedBackBacon10" ].Clone() );
 		}
 
 		for ( int i = 0; i < 10; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsmokedBackBacon10" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "UnsmokedBackBacon10" ].Clone() );
 		}
 
 		for ( int i = 0; i < 3; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeWholeChicken" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "LargeWholeChicken" ].Clone() );
 		}
 
 		for ( int i = 0; i < 6; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "GarlicBaguettes2" ].Clone() );
 		}
 
 		for ( int i = 0; i < 6; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "PepperoniPizza309" ].Clone() );
 		}
 
 		for ( int i = 0; i < 6; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "CheeseFeastPizza341" ].Clone() );
 		}
 
 		for ( int i = 0; i < 20; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola1750" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "CocaCola1750" ].Clone() );
 		}
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 3, 14 ), stockToAdd, 3 );
-		stockToAdd.Clear();
+		stockToAdd.Clear ();
 		#region StockToAddDefined
 
 		for ( int i = 0; i < 12; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "BakedBeans4" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "BakedBeans4" ].Clone() );
 		}
 
 		for ( int i = 0; i < 50; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "TomatoSoup400" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "TomatoSoup400" ].Clone() );
 		}
 
 		for ( int i = 0; i < 50; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateBiscuit8" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "ChocolateBiscuit8" ].Clone() );
 		}
 
 		for ( int i = 0; i < 50; i++ )
 		{
-			stockToAdd.Add ( m_world.m_stockPrototypes [ "JaffaCakes2" ] );
+			stockToAdd.Add ( m_world.m_stockPrototypes [ "JaffaCakes2" ].Clone() );
 		}
 
 		#endregion
 		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 4, 17 ), stockToAdd );
-		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 2, 16), 2 );
+		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 2, 16 ), 2 );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 3 ) );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 19 ) );
-		m_world.CreateEmployee("James", 10000, m_world.GetTileAt ( 1, 1 ), "Manager");
-		//m_world.CreateEmployee("John", 10000, m_world.GetTileAt ( 2, 1 ), "Assistant Manager");
+		//Employee e = m_world.CreateEmployee ( "James", 10000, m_world.GetTileAt ( 1, 1 ), Title.Manager );
+		//m_world.InCharge = e;
+		//m_world.CreateEmployee("John", 10000, m_world.GetTileAt ( 10, 10 ), Title.AssistantManager);
+		//m_world.CreateEmployee("Emily", 10000, m_world.GetTileAt ( 15, 10 ), Title.Supervisor);
+
+		m_world.CreateCustomer("Hannah", 10000, m_world.GetTileAt( 0, 0 ) );
+
+		m_world.m_frontFurniture.Reverse ();
+		m_world.m_backFurniture.Reverse ();
+
+
+		foreach ( Furniture f in m_world.m_frontFurniture )
+		{
+			foreach ( var key in f.m_stock.Keys )
+			{
+				int i = 0;
+				while ( i < f.m_stock [ key ].Count )
+				{
+					if ( i % 2 == 0 )
+					{
+						f.m_stock[key][i].m_facedUp = false;
+					}	
+					i++;
+				}
+			}
+		}
+	}
+
+	/// Calls the SetGameSpeed function in m_world with the specified parameter.
+	public void SetGameSpeed ( float _gameSpeed )
+	{
+		if ( m_world != null )
+		{
+			m_world.SetGameSpeed ( _gameSpeed );
+		}
 	}
 
 }

@@ -13,14 +13,17 @@ using System;
 /// </summary>
 public abstract class Character {
 
-	public float X //Character's X Coordinate
+	/// Character's X Coordinates
+	public float X
 	{ 
 		get
 		{
 			return Mathf.Lerp( m_currTile.X, m_nextTile.X, m_movementPercentage );
 		}
 	} 
-	public float Y //Character's Y Coordinate
+
+	/// Character's Y Coordinates
+	public float Y
 	{
 		get
 		{
@@ -28,20 +31,61 @@ public abstract class Character {
 		}
 	}
 
+	/// Reference to WorldController.instance.m_world
 	protected World m_world;
 
-	public string m_name { get; protected set; } //Character's Name
+	/// Has the character got a basket. If they do, they can carry more than on piece of stock and thier max carry weight increases.
+	public bool m_basket;
 
+	/// String that represent's the charcater's full name.
+	public string m_name { get; protected set; }
+
+	/// Reference to the tile the character is currently in.
 	public Tile m_currTile {get; protected set;}
-	protected Tile m_destTile; //The final tile in the pathfinding sequence
-	protected Tile m_nextTile; //The next tile in the pathfinding sequence
+
+	///Reference to the final Tile in the pathfinding sequence.
+	protected Tile m_destTile;
+
+	/// Reference to the next tile in the pathfinding sequence.
+	protected Tile m_nextTile;
+
+	/// The character's curr tile must be the same as this tasktile in order for the character to be able to continue with thier task/job.
+	protected Tile m_taskTile;
+
+	/// Flag to determine if the destination has changed.
+	bool m_resetDest;
+
+	/// Reference to the current AStar path.
 	protected Path_AStar m_pathAStar;
 
+	/// Reference to the tile that the furniture this character is pushing is finally going to.
 	protected Tile m_movingFurnsFinalTile;
 
-	public Furniture m_requiredFurn { get; protected set; } //Furniture that currently needs to be used, therefore if it is in front of where we need to go, 
-															//we are probably moving it, so don't worry about trying to find a spare tile for it.
+	/// Reference to the Furniture that is currently needed for a task.
+	public Furniture m_requiredFurn { get; protected set; } 
 
+	/// Flag to determine if this character is currently picking up or putting down a piece of stock.
+	public bool m_movingStock { get; protected set; }
+
+	/// Number of seconds it will take to pick up or put down this stock.
+	public float m_fullTimeToMoveStock { get; protected set; }
+
+	/// Number of seconds into picking up or putting down this stock.
+	public float m_elaspedTimeToMoveStock { get; protected set; }
+
+	/// Number of seconds it will take to finish the current interaction.
+	public float m_fullTimeInteraction { get; protected set; }
+
+	/// Number of seconds into the interaction.
+	public float m_elaspedTimeInteraction { get; protected set; }
+
+	/// Used when interacting with other character to determine who is in charge of the interaction.
+	public int m_authorityLevel;
+
+	/// Flag to determine if this character can continue to their destination while interacting with another character.
+	public bool m_walkAndTalk;
+
+	/// All avaiable directions to move in.
 	enum Direction
 	{
 		North,
@@ -51,30 +95,66 @@ public abstract class Character {
 		NONE
 	}
 
+	///Direction that the furniture is next moving in.
 	Direction m_directionOfTravelWithFurn;
+
+	///Nearest Tile that the furniture this character is moving can be at, without it obstructing us to our destination.
 	protected Tile m_nearestFreeTile;
+
+	/// The percentage this character is along thier current Tile. 1 - 100%, 0 - 0%
 	protected float m_movementPercentage;
 
+	/// Flag that determines if we are pushing a furniture, as oppose to pulling it.
 	bool m_pushingFurn;
 
+	/// Reference to the Stock this charcater is currently holding.
 	protected Stock m_stock;
 
+	protected List<Stock> m_basketContents;
+
+	/// Flag that determines if this character should ignore thier current pathfinding sequence for thier job. For example when moving a furniture out of the way.
 	protected bool m_ignoreTask;
 
-	//Tiles per second
-	protected float m_maxSpeed = 4f; //Character's default speed
+	/// The maximum speed of this character. Tiles Per Second.
+	protected float m_maxSpeed = 4f; 
+
+	/// The current speed of this character. Different from m_maxSpeed when moving furniture for example. Tiles Per Second.
 	public float m_currentSpeed;
 
+	/// Reference to the Furniture this charcater is currently moving.
 	protected Furniture m_movingFurniture;
 
+	/// Callback for when this character changes.
 	Action<Character> cbCharacterChanged;
 
-	//Spawns a character on a designated tile.
+	/// Reference to the character that this character is interacting with, if any.
+	public Character m_interacting { get; protected set; }
+
+	/// Flag to determine if this character will accept interaction from another character.
+	public bool m_canInteract //{ get; protected set; }
+	{
+		get
+		{
+			return true;
+		}
+		set
+		{
+			m_canInteract = value;
+		}
+	}
+
+	/// Flag to determine if this character can move from their curr tile.
+	public bool m_canMove { get; protected set; }
+
+	/// Spawns a character with the specified name, specified maxCarryWeight, on the specified Tile.
 	public Character ( string _name, int _maxCarryWeight, Tile _tile )
 	{
 		m_world = WorldController.instance.m_world;
 		m_currTile = m_destTile = m_nextTile = _tile; //Set all three tile variables to tile the character will spawn on.
+		m_taskTile = null;
 		m_currentSpeed = m_maxSpeed;
+
+		m_basketContents = new List<Stock>();
 
 		m_name = _name;
 	}
@@ -82,61 +162,72 @@ public abstract class Character {
 	public void Update( float _deltaTime )
 	{
 		Update_DoMovement( _deltaTime );
-		Update_DoThink();
+		Update_DoThink( _deltaTime );
 	}
 
+	/// Sets this character's movement, and furniture variables to their default. m_pathAStar, m_movingFurniture, m_nearestFreeTile, m_currentSpeed.
 	protected void ResetDefaultVariables()
 	{
 		m_pathAStar = null;
-		m_movingFurniture = null;
+		//m_movingFurniture = null;
 		m_nearestFreeTile = null;
 		m_currentSpeed = m_maxSpeed;
 	}
 
 	void Update_DoMovement ( float _deltaTime )
 	{
-		float distToTravel;
 
-		if ( m_currTile == m_destTile )
+		if ( m_canMove == false )
 		{
+			//Character cannot move from this location.
+			return;
+		}
+
+		if ( m_currTile == m_destTile || m_resetDest)
+		{
+			//We are already where we need to be, so reset all defaults, and return from function.
 			ResetDefaultVariables ();
-			m_currTile.IsEnterable ();
-			return;	// We're already where we want to be.
+			m_resetDest = false;
+			return;
 		}
 
 		if ( m_nextTile == null || m_nextTile == m_currTile || m_pathAStar == null)
 		{
-			// Get the next tile from the pathfinder.
+			//We don't have the next tile, it is the same as our current tile, or we have no path at all.
 			if ( m_pathAStar == null || m_pathAStar.Length () == 0 )
 			{
-				// Generate a path to our destination
-				m_pathAStar = new Path_AStar ( m_world, m_currTile, m_destTile );	// This will calculate a path from curr to dest.
+				//We have no path, or our path's length is 0, so get a new path.
+				m_pathAStar = new Path_AStar ( m_world, m_currTile, m_destTile );
 				if ( m_pathAStar.Length () == 0 )
 				{
+					//If we just found a new path, and its length is 0, clearly we cannot have a valid path to the destination, assumming the destTile was different from the currTile.
 					Debug.LogError ( "Path_AStar returned no path to destination!" );
 					m_pathAStar = null;
 					return;
 				}
 			}
 
-			// Grab the next waypoint from the pathing system.
+			//Set pur nextTile to the next tile in the path, and remove it from the path's queue.
 			m_nextTile = m_pathAStar.Dequeue ();
 
 			if ( m_nextTile == m_currTile )
 			{
+				//We just got the next tile, so if its the same as our current tile, something must have gone wrong.
 				Debug.LogError ( "Update_DoMovement - nextTile is currTile?" );
 			}
 		}
+
 		// At this point we should have a valid nextTile to move to.
 
 		//Calculates the distance from point A to point B
-		distToTravel = Mathf.Sqrt (
+		float distToTravel = Mathf.Sqrt (
 			Mathf.Pow ( m_currTile.X - m_nextTile.X, 2 ) +
 			Mathf.Pow ( m_currTile.Y - m_nextTile.Y, 2 )
 		);
 
 		if ( m_nextTile.IsEnterable () == ENTERABILITY.Never )
-		{
+		{	
+			//The next tile cannot be entered, so we need a new path. setting m_pathAStar to null will cause the next frame to give us a new path to our destTile.
 			Debug.LogError ( "FIXME: A character is trying to enter an unwalkable tile." );
 			m_nextTile = null;
 			m_pathAStar = null;
@@ -181,6 +272,7 @@ public abstract class Character {
 
 						while ( foundValidTile == false )
 						{
+							//Keep finding new tiles to move to, and keep working out if they are valid.
 							m_nearestFreeTile = FindValidPositionToMoveFurn ( m_currTile, m_nextTile, invalidTiles );
 							Tile tryTile = new FindNearestFreeTile ( m_world, m_nextTile, invalidTiles.ToArray () ).m_tileFound;
 							if ( m_nearestFreeTile == tryTile )
@@ -194,6 +286,7 @@ public abstract class Character {
 						}
 						if ( m_nextTile.m_furniture != m_requiredFurn )
 						{
+							//The furniture we are moving if not the one we need for our task, so ignore the task so that we can move this furniture to the free tile.
 							m_ignoreTask = true;
 						}
 						if ( MoveFurnitureToTile ( m_nextTile.m_furniture, m_nearestFreeTile ) == false )
@@ -209,7 +302,7 @@ public abstract class Character {
 				}
 
 				//Now we know where we need to be, and where the furniture needs to be.
-				Tile toTile = null;
+				Tile toTile = null;	
 				if ( m_pushingFurn == true )
 				{
 					if ( m_currTile == m_nextTile )
@@ -251,20 +344,18 @@ public abstract class Character {
 			}
 		}
 
-
-
-
-		// How much distance can be travel this Update?
+		// Work out how much we will be moving this frame.
 		float distThisFrame = m_currentSpeed / m_nextTile.m_movementCost * _deltaTime;
 
-		// How much is that in terms of percentage to our destination?
+		// Work out how much we will be moving this frame as a percentage.
 		float percThisFrame = distThisFrame / distToTravel;
 
-		// Add that to overall percentage travelled.
+		// Add that percentage to our already travelled percentage.
 		m_movementPercentage += percThisFrame;
 
 		if(m_movementPercentage >= 1) {
-			// We have reached our destination
+
+			//If our percentage is 100% or above, we have reached the next tile, so update currTile, and reset the movement percentage.
 
 			m_currTile = m_nextTile;
 			m_movementPercentage = 0;
@@ -277,22 +368,88 @@ public abstract class Character {
 			ResetDefaultVariables();
 		}
 
+		//Update this character's visuals.
 		if ( cbCharacterChanged != null )
 		{
 			cbCharacterChanged(this);
 		}
 	}
 
-	protected virtual void Update_DoThink()
+	///Used as a placeholder for the employee and customer Update_DoThink function.
+	protected virtual void Update_DoThink(float _deltaTime)
 	{
 	}
 
-	public void SetDestination( Tile _tile )
+	/// Returns whether this character can interact with the specified character.
+	public bool ReceiveInteraction ( Character _char, float _time )
 	{
-		m_nextTile = m_currTile;
+		if ( m_canInteract )
+		{
+			m_interacting = _char;
+			if ( m_authorityLevel >= _char.m_authorityLevel )
+			{
+				//Our authority level is the same or higher than the other character's, so we need to stop moving to our task.
+				m_ignoreTask = true;
+			}
+			BeginInteraction(_time);
+			return true;
+
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Returns the outcome of requesting interaction with the specified character.
+	public bool RequestInteraction ( Character _char, float _time )
+	{
+		if ( m_currTile.IsNeighbour ( _char.m_currTile, true, true ) == false)
+		{
+			//The character's aren't adjacent.
+			return false;
+		}
+		if ( _char.ReceiveInteraction ( this, _time ) )
+		{
+			m_interacting = _char;
+			if ( m_authorityLevel >= _char.m_authorityLevel )
+			{
+				//Our authority level is the same or higher than the other character's, so we need to stop moving.
+				m_ignoreTask = true;
+			}
+			Debug.Log(m_name + " and " + _char.m_name + " are interacting");
+			BeginInteraction(_time);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public void BeginInteraction ( float _time )
+	{
+		m_fullTimeInteraction = _time;
+	}
+
+	public void StopInteraction ()
+	{
+		m_interacting = null;
+	}
+
+	///Sets this character's destTile to the specified Tile, and sets the nextTile to this character's currTile.
+	public void SetDestination ( Tile _tile )
+	{
+		if ( _tile == m_destTile )
+		{
+			//Dest tile doesn't change.
+			return;
+		}
+		m_resetDest = true;
 		m_destTile = _tile;
 	}
 
+	///Sets this character's destTile to the specified Tile with the spcified furniture.
 	public void SetDestWithFurn ( Tile _characterDestTile, Furniture _furn )
 	{
 		if ( _characterDestTile.m_movementCost == 0 )
@@ -300,22 +457,23 @@ public abstract class Character {
 			Debug.LogError("Moving the furniture to (" + _characterDestTile.X + ", " + _characterDestTile.Y + ") means the character will need to go to an invalid tile");
 			return;
 		}
-		m_nextTile = m_currTile;
 		m_movingFurniture = _furn;
 		SetDestination ( _characterDestTile );
 	}
 
-	/// <summary>
 	/// This function will recursively check for valid tiles. It will keep calling itself as long as the character needs to walk through the furniture it is moving
 	/// to get to its final destination. If this returns null, it means that if you continue moving the furniture to the given spot, the character will need to move it again
 	/// and will continue to try to move it to new spots until the character blocks themselves in. If it doesn't return null, it will return the valid spot that can be used
 	/// with the knowledge the character will not trap themselves.
-	/// </summary>
+
+	///Recursively finds out if the given Tiles are valid, based upon the given invalidTiles
 	Tile FindValidPositionToMoveFurn ( Tile _charTile, Tile _furnTile, List<Tile> _invalidTiles )
 	{
+		//Flood fill, finding the nearest free tile.
 		FindNearestFreeTile m_nearestFreeTileTEMP = new FindNearestFreeTile ( m_world, _furnTile, _invalidTiles.ToArray () );
 		Tile m_moveFurnToTEMP = m_nearestFreeTileTEMP.m_tileFound;
-		//The nearest free tile is the one the furniture needs to get to, so the tile 1 before that is where we need to go.
+
+		//Find a path from our current tile, to the found valid tile.
 		Path_AStar m_pathAStarTEMP = new Path_AStar ( m_world, _charTile, m_nearestFreeTileTEMP.m_tileFound );
 
 		if ( m_pathAStarTEMP.Length () == 0 )
@@ -417,6 +575,7 @@ public abstract class Character {
 		return m_nearestFreeTileTEMP.m_tileFound;
 	}
 
+	///Returns true if _furnTile is in the path between _charTile and destTile
 	bool IsThisTileInPath ( Tile _furnTile, Tile _charTile )
 	{
 		Path_AStar TempPath = new Path_AStar ( m_world, _charTile, m_destTile );
@@ -435,6 +594,7 @@ public abstract class Character {
 		return false;
 	}
 
+	/// Begins the process of moving the specified furniture to the specified tile.
 	protected bool MoveFurnitureToTile ( Furniture _furn, Tile _toTile )
 	{
 		if ( _furn == null )
@@ -563,8 +723,15 @@ public abstract class Character {
 
 	}
 
+	/// Returns a direction based upon the relation between the two tiles specified. Tiles must be adjacent.
 	Direction CalculateDirectionOfMovement ( Tile _initialTile, Tile _nextTile )
 	{
+
+		if ( _initialTile.IsNeighbour ( _nextTile ) == false )
+		{
+			Debug.Log("The given tiles were not adjacent. _initalTile: (" + _initialTile.X + ", " + _initialTile.Y + "), _nextTile: (" + _nextTile.X + ", " + _nextTile.Y) ;
+			return Direction.NONE;
+		}
 
 		if ( _initialTile.Y + 1 == _nextTile.Y )
 		{
@@ -591,18 +758,23 @@ public abstract class Character {
 		return Direction.NONE;
 	}
 
-	/// <summary>
-	/// The character tries to pick up any piece of stock from the specified piece of furniture.
-	/// </summary>
-	protected bool TryTakeAnyStock ( Furniture _furn, bool _scannedMatters = false)
+	/// Returns outcome of attempt. Attempts to take any stock from the specified furniture.
+	protected bool TryTakeAnyStock ( Furniture _furn, bool _ignoreScanned = false, bool _ignoreWorked = false )
 	{
 		foreach ( var stockList in _furn.m_stock )
 		{
 			foreach ( Stock stock in _furn.m_stock[stockList.Key] )
 			{
-				if ( _scannedMatters == true )
+				if ( _ignoreScanned )
 				{
-					if ( stock.m_scanned == true )
+					if ( stock.m_scanned )
+					{
+						continue;
+					}
+				}
+				if ( _ignoreWorked )
+				{
+					if ( stock.m_triedGoingOut )
 					{
 						continue;
 					}
@@ -613,7 +785,6 @@ public abstract class Character {
 				}
 				else
 				{
-					Debug.Log("Successfully picked up: " + stock.Name);
 					return true;
 				}
 			}
@@ -622,21 +793,31 @@ public abstract class Character {
 		return false;
 	}
 
-	/// <summary>
-	/// The character tries to pick up the specified piece of stock from the specified piece of furniture.
-	/// </summary
+	/// Returns the outcome of attempt. Attempts to take a specified instance of stock from a specified furniture.
 	protected bool TryTakeStock ( Stock _stock, Furniture _furn )
 	{
-
-		if ( m_stock != null)
+		if ( m_basket == false )
 		{
-			Debug.LogWarning("Tried to pick up stock but already carrying stock: Character: " + m_name + ", AttemptedStock: " + _stock.IDName);
-			return false;
+			if ( m_stock != null )
+			{
+				Debug.LogWarning ( "Tried to pick up stock but already carrying stock: Character: " + m_name + ", AttemptedStock: " + _stock.IDName );
+				return false;
+			}
 		}
 
 		if ( _furn.TryGiveStock ( _stock.IDName ) )
 		{
-			m_stock = _stock;
+			if ( m_basket )
+			{
+				m_basketContents.Add(_stock);
+			}
+			else
+			{
+				m_stock = _stock;
+			}
+
+			m_movingStock = true;
+			m_fullTimeToMoveStock = 1f + ((float)_stock.Weight/1000f);
 
 			return true;
 		}
@@ -644,26 +825,68 @@ public abstract class Character {
 		return false;
 	}
 
-	protected Stock TryGiveStock ( string _stock )
+	/// Returns the stock the character is currently carrying, if it matches the specified IDName.
+	protected Stock TryGiveStock ( string _stockIDName )
 	{
-		if ( m_stock.IDName != _stock )
+		Stock ourStock;
+
+		if ( m_basket )
 		{
-			Debug.LogWarning ( "Character tried to give stock they don't possess: Character: " + m_name + ", Stock: " + _stock );
+			foreach ( Stock s in m_basketContents.ToArray() )
+			{
+				if ( s.IDName == _stockIDName )
+				{
+					ourStock = s;
+					break;
+				}
+			}
+			//If we get here, we didn't find any stock in our basket that is required to be given.
+			Debug.LogWarning ( "Character tried to give stock they don't possess: Character: " + m_name + ", Stock: " + _stockIDName );
 			return null;
 		}
+		else
+		{
+			if ( m_stock.IDName != _stockIDName )
+			{
+				Debug.LogWarning ( "Character tried to give stock they don't possess: Character: " + m_name + ", Stock: " + _stockIDName );
+				return null;
+			}
+			else
+			{
+				ourStock = m_stock;
+			}
+		}
 
-		Stock stock = m_stock;
+		Stock stock = ourStock;
 
-		m_stock = null;
+		m_movingStock = true;
+		m_fullTimeToMoveStock = 1f + ( (float)stock.Weight / 1000f );
+
+		if ( m_basket == false )
+		{
+			m_stock = null;
+		}
+		else
+		{
+			for ( int i = 0; i < m_basketContents.Count; i++ )
+			{
+				if ( ourStock == m_basketContents [ i ] )
+				{
+					m_basketContents.RemoveAt(i);
+				}
+			}
+		}
 
 		return stock;
 	}
 
+	/// Registers the OnChanged Callback
 	public void RegisterOnChangedCallback( Action<Character> _callbackFunc )
 	{
 		cbCharacterChanged += _callbackFunc;
 	}
 
+	/// Unregisters the OnChanged Callback
 	public void UnregisterOnChangedCallback( Action<Character> _callbackFunc )
 	{
 		cbCharacterChanged -= _callbackFunc;

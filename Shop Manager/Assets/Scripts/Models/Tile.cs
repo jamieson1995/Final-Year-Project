@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////
-//Copyright James Jamieson 2016/2017
+//Copyright James Jamieson 2017
 //University Dissertation Project
 //Shop Manager AI Simulation
 //////////////////////////////////////////////////////
@@ -14,29 +14,38 @@ public enum ENTERABILITY { Yes, Never, Soon } //Every tile has a ENTERABILITY va
 
 public class Tile {
 
+	/// Reference to WorldController.instance.m_world
 	public World m_world { get; protected set; }
 
+	/// This tile's X coordinate.
 	public int X { get; protected set; }
+
+	/// This tile's Y coordinate.
 	public int Y { get; protected set; }
 
+	/// Reference to the furniture in this tile. Null means no furniture is in this tile.
 	public Furniture m_furniture { get; protected set; }
 
+	/// Flag to determine if this tile is an outside tile.
 	public bool m_outside;
 
+	/// The movement cost of walking on this tile.
 	public float m_movementCost
 	{
 		get
 		{
-			if(m_furniture == null)
-				//If there is no furniture, the movement must be 1.
+			if ( m_furniture == null )
+			{
+				// If there is no furniture, the movement must be 1. 
 				return 1;
+			}
 
-			//If there is furniture, go find the movement cost for the furniture and use that value.
+			// The movement cost is above 1, which means there must be furniture in this tile, so return the furniture's movement cost.
 			return m_furniture.m_movementCost;
 		}
 	}
 
-
+	/// Creates a new Tile with the specified reference to world, and the specified cooordinates.
 	public Tile(World _world, int _x, int _y)
 	{
 		this.m_world = _world;
@@ -44,8 +53,7 @@ public class Tile {
 		this.Y = _y;
 	}
 
-
-	//Tries to place a piece of furniture on this tile. If successful it will return true, and the furniture gets placed. If it cannot be placed, this returns false.
+	/// Returns the outcome of the attempt. Attempts to place the specified furniture in this tile, with the specified rotation.
 	public bool PlaceFurniture ( Furniture _furn, int _direction = 1)
 	{
 		if ( _furn == null )
@@ -55,7 +63,6 @@ public class Tile {
 
 		if ( m_world.PositionCheck(this, _furn, _direction) == false )
 		{
-			Debug.LogError ( "Trying to assign a furniture to a tile that isn't valid: (" + X + ", " + Y + ")");
 			return false;
 		}
 
@@ -74,13 +81,14 @@ public class Tile {
 		return true;
 	}
 
+	/// Sets this tile's furniture reference to null.
 	public void RemoveFurniture ()
 	{
 		m_furniture = null;
 	}
 
-	//Tells us if two tile are adjacent
-    public bool IsNeighbour ( Tile _tile, bool _diagOK = false)
+	//Returns true if the the specified tile is adjacent to this one.
+    public bool IsNeighbour ( Tile _tile, bool _sameTile = false, bool _diagOK = false )
 	{
 		if ( this.X == _tile.X && ( this.Y == _tile.Y + 1 || this.Y == _tile.Y - 1 ) )
 			return true;
@@ -90,18 +98,26 @@ public class Tile {
 
 		if ( _diagOK )
 		{
-			if(this.X == _tile.X+1 && (this.Y == _tile.Y+1 || this.Y == _tile.Y-1))
-    		return true;
+			if ( this.X == _tile.X + 1 && ( this.Y == _tile.Y + 1 || this.Y == _tile.Y - 1 ) )
+				return true;
 
-			if(this.X == _tile.X-1 && (this.Y == _tile.Y+1 || this.Y == _tile.Y-1))
-    		return true;
+			if ( this.X == _tile.X - 1 && ( this.Y == _tile.Y + 1 || this.Y == _tile.Y - 1 ) )
+				return true;
 
+		}
+
+		if ( _sameTile )
+		{
+			if ( this == _tile )
+			{
+				return true;
+			}
 		}
 
     	return false;
     }
 
-    //Returns an array of tiles, containing the neighbouring tiles.
+	/// Returns an array. The array is filled with this tile's neighbouring tiles.
 	public Tile[] GetNeighbours ( bool _diagOK = false )
 	{
 
@@ -153,7 +169,7 @@ public class Tile {
 
     }
 
-	//Returns an array of furniture, containing the neighbouring tiles' furniture.
+	/// Returns an array. The array is filled with this tile's neighbouring tiles' furniture. If an entry is null, that tile was empty of furniture.
 	public Furniture[] GetNeighboursFurniture ( bool _diagOk )
 	{
 		Tile[] neighbours = GetNeighbours ( _diagOk );
@@ -169,15 +185,17 @@ public class Tile {
 		return neighboursFurn;
 	}
 
+	/// Returns the enterability of this tile.
 	public ENTERABILITY IsEnterable ()
 	{
-		//Returns true if you can enter this tile RIGHT NOW
 		if ( m_movementCost == 0 )
 		{
 			return ENTERABILITY.Never;
 		}
+
 		if ( m_furniture != null && m_furniture.m_isEnterable != null )
 		{
+			// If the movement cost is above 0, and the tile has furniture, get the furniture's enterability and return it.
 			return m_furniture.m_isEnterable(m_furniture);
 		}
 

@@ -6,104 +6,184 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 
 public class World {
 
-	public bool m_worldSetUp { get; protected set; }
-
+	/// Reference to all tiles in the world, ordered in an array.
 	Tile[,] m_tiles;
 
-	public List<Character> m_characters { get; protected set; } //List of all characters in the world.
-	public List<Employee> m_employees { get; protected set; } //List of all employees in the world.
+	/// List of all charcaters in the world.
+	public List<Character> m_characters { get; protected set; }
 
+	/// List of all employees in the world.
+	public List<Employee> m_employees { get; protected set; }
+
+	/// Reference to the employee that is currently in charge of the shop.
+	Employee m_inCharge;
+
+	/// Property for m_inCharge.
+	public Employee InCharge
+	{
+		get
+		{
+			if ( m_inCharge != null )
+			{
+				return m_inCharge;
+			}
+			else
+			{
+				return SetEmployeeInCharge(null);
+			}
+		}
+		set
+		{
+			if ( m_inCharge != null )
+			{
+				m_inCharge.InCharge = false;
+			}
+			m_inCharge = value;
+		}
+	}
+
+	/// Width of the world in Tiles.
 	public int m_width  { get; protected set; }
 
+	/// Height of the world in Tiles.
 	public int m_height { get; protected set; }
 
+	/// Global Game Speed. 
+	public float m_gameSpeed { get; protected set; }
+
+	/// Number of customers inside the store.
 	public int m_customersInStore;
 
+	/// Number of customers waiting in the queue.
 	public int m_customersInQueue;
 
-	public int m_numberOfMannedTills;
+	/// Number of checkouts being manned by employees.
+	public int m_numberOfMannedCheckouts;
 
+	/// Reference to the current tileGraph of the world.
 	public Path_TileGraph m_tileGraph;
 
-	/// <summary>
-	/// List of all furniture in the world, ordered by first placed.
-	///	Can be used to find out if a specific piece of furniture is in the game.
-	/// </summary>
+	/// List of all furniture in the game. Ordered by first placed.
 	public List<Furniture> m_furnitures { get; protected set; }
 
-	/// <summary>
-	/// Dictionary of all furniture in the world, sorted and grouped by full name.
-	/// </summary>
+	/// List of all furniture types in the world. Input is Furniture's name.
 	public Dictionary<string, List<Furniture> > m_furnitureInWorld;
 
-	/// <summary>
-	/// Dictionary of all furniture avaliable in the game, look up by full name.
-	/// </summary>
-	/// <value>The m furniture prototypes.</value>
+	/// All furniture that is avaliable to be placed. Input is Furniture's name.
 	public Dictionary<string, Furniture> m_furniturePrototypes { get; protected set; }
 
-	/// <summary>
-	/// Dictionary of all Stock araliable in the game, look up by full name.
-	/// </summary>
+	/// All stock that is avaliable to be created. Input is Stock's IDName.
 	public Dictionary<string, Stock> m_stockPrototypes { get; protected set; }
 
-	/// <summary>
-	/// Dictionary of all Stock the shop currently sells, sorted and grouped by name.
-	/// </summary>
+	/// List of all stock in the world. Input is the Stock's name.
 	public Dictionary<string, List<Stock> > m_stockInWorld { get; protected set; } //TODO this should only be avaliable to characters if
 																				   //they have access to the manager's computer with that
 																				   //information on, or possibly any computer in the 
 																				   //store connected to the intranet.
 
-
-	/// <summary>
-	/// All characters that are using a piece of furniture, look up by used furniture.
-	/// </summary>
+	/// All character's in the game currently using furniture. Input is the furniture being used.
 	public Dictionary<Furniture, Character> m_characterFurniture; //This stores each character and which furniture they are currently using.
 																  //If a character is not in this dictionary, its means they aren't using a piece of
 																  //furniture.
-																												
 
+	/// All furniture in the world that employees will use as front Furniture when performing jobs.
+	public List<Furniture> m_frontFurniture;
+
+	/// All furniture in the world that employees will use as back Furniture when performing jobs.
+	public List<Furniture> m_backFurniture;																
+
+	/// List of all characters in the world, ordered by authority.
+	public List<Employee> m_authorityLevels;
+
+	public struct ShoppingListItem
+	{
+		public Stock stock;
+		public int price;
+		public bool pickedUp;
+		public bool couldNotFind;
+
+		public ShoppingListItem(Stock _stock, int _price, bool _pickedUp = false, bool _couldNotFind = false)
+		{
+			stock = _stock;
+			price = _price;
+			pickedUp = _pickedUp;
+			couldNotFind = _couldNotFind;
+		}
+	}
+
+	public Dictionary< int, List<ShoppingListItem> > m_shoppingLists { get; protected set; }
+
+	/// Callback for when a furniture gets created.
 	public Action<Furniture> cbFurnitureCreated;
+
+	/// Callback for when a furniture moves.
 	public Action<Furniture> cbFurnitureMoved;
+
+	/// Callback for when a character gets created.
 	public Action<Character> cbCharacterCreated;
 
-	public World (int _width = 50, int _height = 50){
+
+	/// Creates a new World, with specified width and height.
+	public World ( int _width = 50, int _height = 50 )
+	{
 
 		this.m_width = _width;
 		this.m_height = _height;
 
 		m_tiles = new Tile[_width, _height];
 
-		for	( int _x = 0; _x < _width; _x++ )
+		for ( int _x = 0; _x < _width; _x++ )
 		{
 			for ( int _y = 0; _y < _height; _y++ )
 			{
-				m_tiles[_x, _y] = new Tile ( this, _x, _y);
+				m_tiles [ _x, _y ] = new Tile ( this, _x, _y );
 			}
 		}
 
 		CreateFurniturePrototypes ();
-		CreateStockPrototypes();
+		CreateStockPrototypes ();
 
 		m_furnitures = new List<Furniture> ();
 		m_furnitureInWorld = new Dictionary<string, List<Furniture> > ();
 		m_characters = new List<Character> ();
 		m_employees = new List<Employee> ();
-		m_characterFurniture = new Dictionary<Furniture, Character>();
+		m_characterFurniture = new Dictionary<Furniture, Character> ();
+		m_frontFurniture = new List<Furniture>();
+		m_backFurniture = new List<Furniture>();
+		m_authorityLevels = new List<Employee>();
+		m_shoppingLists = new Dictionary<int, List<ShoppingListItem>>();
 
-		m_numberOfMannedTills = 0;
+		m_shoppingLists.Add(1, new List<ShoppingListItem>() );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Bananas5Pack"], 80 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Apples5Pack"], 149 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["RedSeedlessGrapes500"], 200 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["PotatoesPack2500"], 200 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"], 43 ) );
+		//m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"], 43 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["StillWater12"], 229 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["ChocolateBiscuit8"], 159 ) );
+
+		m_numberOfMannedCheckouts = 0;
 
 		//Until customers are added to the game, the amount of customers in store needs to be hardcoded so the employee AI can be tested
-		m_customersInStore = 0;
-		m_customersInQueue = 0;
-		}
+		m_customersInStore = 10;
+		m_customersInQueue = 10;
 
-	//Returns a Tile at a certain coordinate
+		m_gameSpeed = 1.0f;
+	}
+
+	/// Sets the Game Speed to the specified value.
+	public void SetGameSpeed ( float _gameSpeed )
+	{
+		m_gameSpeed = _gameSpeed;
+	}
+
+	/// Returns a Tile with specified coordinates.
 	public Tile GetTileAt ( int _x, int _y )
 	{
 		//Need to check to see if the tile that is being asked for is actually within the bounds of the world.
@@ -116,19 +196,50 @@ public class World {
 		return m_tiles[_x,_y];
 	}
 
+	/// Processes all the furniture's and character's Update functions.
 	public void Update ( float _deltaTime )
 	{
+
+		if ( m_gameSpeed == 0 )
+		{
+			return;
+		}
+		
+		float GameSpeedDT = _deltaTime * m_gameSpeed;
+
 		foreach ( Character c in m_characters )
 		{
-			c.Update(_deltaTime);
+			c.Update(GameSpeedDT);
 		}
 		foreach ( Furniture f in m_furnitures )
 		{
-			f.Update(_deltaTime);
+			f.Update(GameSpeedDT);
 		}
 	}
 
-	public Employee CreateEmployee ( string _name, int _maxCarryWeight, Tile _tile, string _title )
+	public Customer CreateCustomer ( string _name, int _maxCarryWeight, Tile _tile )
+	{
+		if ( _tile.m_furniture != null )
+		{
+			//Cannot spawn character here because there is a piece of furniture here.
+			Debug.LogError ( "Tried to spawn character: " + _name + " on tile: (" + _tile.X + ", " + _tile.Y + "), but couldn't because there is a piece of furniture in the way: " + _tile.m_furniture.m_name );
+			return null;
+		}
+
+		Customer c = new Customer(_name, _maxCarryWeight, _tile);
+
+		if ( cbCharacterCreated != null )
+		{
+			cbCharacterCreated ( c );
+		}
+
+		m_characters.Add ( c );
+
+		return c;
+	}
+
+	/// Returns an Employee with specified variables.
+	public Employee CreateEmployee ( string _name, int _maxCarryWeight, Tile _tile, Title _title )
 	{
 		if ( _tile.m_furniture != null )
 		{
@@ -138,6 +249,103 @@ public class World {
 		}
 
 		Employee e = new Employee ( _name, _maxCarryWeight, _tile, _title );	
+
+		e.m_walkAndTalk = true;
+
+		switch ( _title )
+		{
+			case Title.Manager:
+				m_authorityLevels.Insert ( 0, e );
+				e.m_authorityLevel = 0;
+				foreach ( Employee emp in m_authorityLevels.ToArray() )
+				{
+					if ( emp != e )
+					{
+						if ( emp.m_authorityLevel >= e.m_authorityLevel )
+						{
+							emp.m_authorityLevel++;
+						}
+					}
+				}
+				break;
+			case Title.AssistantManager:
+				if ( m_authorityLevels.Count == 0 )
+				{
+					m_authorityLevels.Insert ( 0, e );
+					e.m_authorityLevel = 0;
+				}
+				else
+				{
+					if ( m_authorityLevels [ 0 ].m_title == Title.Manager )
+					{
+						m_authorityLevels.Insert ( 1, e );
+						e.m_authorityLevel = 1;
+					}
+					else
+					{
+						m_authorityLevels.Insert ( 0, e );
+						e.m_authorityLevel = 0;
+					}
+				}
+				foreach ( Employee emp in m_authorityLevels.ToArray() )
+				{
+					if ( emp.m_authorityLevel >= e.m_authorityLevel )
+					{
+						emp.m_authorityLevel++;
+					}
+				}
+				break;
+			case Title.Supervisor:
+				if ( m_authorityLevels.Count == 0 )
+				{
+					m_authorityLevels.Insert ( 0, e );
+					e.m_authorityLevel = 0;
+				}
+				else
+				{
+					bool found = false;
+					int i = 0;
+					while ( found == false )
+					{
+						if ( m_authorityLevels.Count == i )
+						{
+							m_authorityLevels.Add(e);
+							e.m_authorityLevel = m_authorityLevels.Count;
+							found = true;
+
+						}
+						else if ( m_authorityLevels [ i ].m_title == Title.CustomerServiceAssistant )
+						{
+							if ( i == 0 )
+							{
+								Debug.Log ( "Why was there a Customer Service Assistant in charge?????" );
+								m_authorityLevels.Insert ( 0, e );
+								e.m_authorityLevel = 0;
+								found = true;
+							}
+							else
+							{
+								m_authorityLevels.Insert ( i, e );
+								e.m_authorityLevel = i;
+								found = true;
+							}
+						}
+						i++;
+					}
+				}
+				foreach ( Employee emp in m_authorityLevels.ToArray() )
+				{
+					if ( emp.m_authorityLevel >= e.m_authorityLevel )
+					{
+						emp.m_authorityLevel++;
+					}
+				}
+				break;
+			case Title.CustomerServiceAssistant:
+				m_authorityLevels.Add(e);
+				break;
+		}
+	
 		if ( cbCharacterCreated != null )
 		{
 			cbCharacterCreated ( e );
@@ -149,6 +357,7 @@ public class World {
 		return e;
 	}
 
+	/// Adds all the furniture required into the correct Lists and Dictionaries
 	void CreateFurniturePrototypes ()
 	{
 
@@ -317,6 +526,7 @@ public class World {
 
 	}
 
+	/// Adds all the stock required into the correct Lists and Dictionaries
 	void CreateStockPrototypes ()
 	{
 		m_stockPrototypes = new Dictionary<string, Stock>();
@@ -2125,7 +2335,7 @@ public class World {
 		m_stockPrototypes.Add("JaffaCakes2",
 			new Stock(
 				"JaffaCakes2", 		//IDName
-				"Jaff aCakes Twin",	//Name
+				"Jaffa Cakes Twin",	//Name
 				300, 		      	//Weight
 				100, 		       	//Price
 				Temperature.Room 	//Temperature
@@ -2196,8 +2406,8 @@ public class World {
 
 	}
 
-	//Attempts to place a furniture onto a specified tile. If it fails this returns null, else it returns the instance of the furniture
-	//that got placed.
+	/// Returns a Furniture with the specified name at the specified Tile, with the specified rotation.
+	/// If return is null, placement was unsuccessful.
 	public Furniture PlaceFurnitureInWorld ( string _furnName, Tile _tile, int _direction = 1 )
 	{
 		if ( m_furniturePrototypes.ContainsKey ( _furnName ) == false )
@@ -2211,6 +2421,27 @@ public class World {
 		if ( furn == null )
 		{
 			return null;
+		}
+
+		if ( _furnName == "BackShelf" )
+		{
+			furn.m_allStockWorked = true;
+		}
+		else
+		{
+			furn.m_allStockWorked = false;
+		}
+
+		furn.SetFaceUpPerc ( 100 );
+
+		if ( _furnName == "FrontShelf" || _furnName == "Fridge" || _furnName == "BigFridge" || _furnName == "Freezer" || _furnName == "BigFreezer" )
+		{
+			m_frontFurniture.Add ( furn );	
+			furn.m_worked = false;
+		}
+		else if ( _furnName == "BackShelf" )
+		{
+			m_backFurniture.Add ( furn );	
 		}
 
 		m_furnitures.Add ( furn );
@@ -2234,9 +2465,23 @@ public class World {
 
 	//Attempts to place a furniture onto a specified tile with specified stock. If it fails this returns null, else it returns the instance of the furniture
 	//that got placed.
-	public Furniture PlaceFurnitureInWorldWithStock ( string _furnName, Tile _tile, List<Stock> _stock, int _direction = 1)
+
+	/// Returns a Furniture with the specified name at the specified Tile, with the specified rotation and with the specified stock list..
+	/// If return is null, placement was unsuccessful.
+	public Furniture PlaceFurnitureInWorldWithStock ( string _furnName, Tile _tile, List<Stock> _stock, int _direction = 1 )
 	{
 		Furniture furn = PlaceFurnitureInWorld ( _furnName, _tile, _direction );
+
+		if ( _furnName == "BackShelf" && _stock.Count == 0 )
+		{
+			furn.m_allStockWorked = true;
+		}
+		else
+		{
+			furn.m_allStockWorked = false;
+		}
+
+		furn.SetFaceUpPerc(50);
 
 		foreach ( Stock stock in _stock )
 		{
@@ -2250,6 +2495,7 @@ public class World {
 		return furn;
 	}
 
+	/// Returns the attempt's outcome. Attempts to move specified furniture from specifed Tile, to specified Tile.
 	public bool MoveFurniture ( Furniture _furn, Tile _from, Tile _to )
 	{
 		if ( GetTileAt ( _to.X, _to.Y ).PlaceFurniture ( _furn ) )
@@ -2263,6 +2509,7 @@ public class World {
 		}
 	}
 
+	/// Returns whether the specified furniture can be placed at the specified tile, with the specified rotation.
 	public bool PositionCheck ( Tile _tile, Furniture _furn, int _direction )
 	{
 		if ( _tile == null )
@@ -2319,36 +2566,129 @@ public class World {
 		return true;
 	}
 
+	/// Sets the tileGraph to null.
 	public void InvalidateTileGraph()
 	{
 		m_tileGraph = null;
 	}
 
+	/// Returns the number of employees with the specified Job Title.
+	public int NumberOfEmployeesWithTitle ( Title _title )
+	{
+		int num = 0;
+		foreach ( Employee emp in m_employees )
+		{
+			if ( emp.m_title == _title )
+			{
+				num++;
+			}
+		}
+
+		return num;
+	}
+
+	/// Sets employee in charge to specified _employee. If _employee is null, charge is set to highest ranking Title.
+	Employee SetEmployeeInCharge ( Employee _employee )
+	{
+		if ( _employee != null )
+		{
+			if ( m_inCharge != null )
+			{
+				m_inCharge.InCharge = false;
+			}	
+			m_inCharge = _employee;
+			return m_inCharge;
+		}
+		else
+		{
+			Debug.LogError ( "Did not find an employee in charge. Setting charge to highest ranking employee." );
+			bool found = false;
+			int rank = 1;
+			while ( found == false )
+			{
+				foreach ( Employee emp in m_employees )
+				{
+					if ( rank == 1 )
+					{
+						if ( emp.m_title == Title.Manager )
+						{
+							emp.InCharge = true;
+							if ( emp.InCharge == true )
+							{
+								return emp;
+							}
+						}
+						break;
+					}
+					else if ( rank == 2 )
+					{
+						if ( emp.m_title == Title.AssistantManager )
+						{
+							emp.InCharge = true;
+							if ( emp.InCharge == true )
+							{
+								return emp;
+							}
+						}
+						break;
+					}
+					else if ( rank == 3 )
+					{
+						if ( emp.m_title == Title.Supervisor )
+						{
+							emp.InCharge = true;
+							if ( emp.InCharge == true )
+							{
+								return emp;
+							}
+							else
+							{
+								continue;
+							}
+						}
+
+						Debug.LogError ( "No employee was found that is a Manager, Assistant Manager, or Supervisor!" );
+						return null;
+
+					}
+				}
+				rank++;
+			}
+		}
+		return null;	
+	}
+
+	/// Registers the furnitureCreated Callback
 	public void RegisterFurnitureCreated ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureCreated += _callbackFunc;
 	}
 
+	/// Unregisters the furnitureCreated Callback
 	public void UnregisterFurnitureCreated ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureCreated -= _callbackFunc;
 	}
 
+	/// Registers the furnitureMoved Callback
 	public void RegisterFurnitureMoved ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureMoved += _callbackFunc;
 	}
 
+	/// Unregisters the furnitureMoved Callback
 	public void unregisterFurnitureMoved ( Action<Furniture> _callbackFunc )
 	{
 		cbFurnitureMoved -= _callbackFunc;
 	}
 
+	/// Registers the characterCreated Callback
 	public void RegisterCharacterCreated ( Action<Character> _callbackFunc )
 	{
 		cbCharacterCreated += _callbackFunc;
 	}
 
+	/// Unregisters the characterCreated Callback
 	public void UnregisterCharacterCreated ( Action<Character> _callbackFunc )
 	{
 		cbCharacterCreated -= _callbackFunc;

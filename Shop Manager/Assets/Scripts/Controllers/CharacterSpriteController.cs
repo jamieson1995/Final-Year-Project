@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////
-//Copyright James Jamieson 2016/2017
+//Copyright James Jamieson 2017
 //University Dissertation Project
 //Shop Manager AI Simulation
 //////////////////////////////////////////////////////
@@ -9,12 +9,18 @@ using System.Collections.Generic;
 
 public class CharacterSpriteController : MonoBehaviour {
 
-	Dictionary<Character, GameObject> m_characterGameObjectMap; //Dictionary of all Character GameObjects.
-	Dictionary<string, Sprite> m_characterSprites; //Dictionary of all Character Sprites.
+	///Returns the GameObject linked to the character input.
+	Dictionary<Character, GameObject> m_characterGameObjectMap; 
 
+	///Returns the Sprite based on the input name.
+	Dictionary<string, Sprite> m_characterSprites; 
+
+	///An array of all character sprites.
 	public Sprite[] m_sprites;
 
+	/// Reference to WorldController.instance.m_world
 	World m_world;
+
 
 	void Start ()
 	{
@@ -22,6 +28,7 @@ public class CharacterSpriteController : MonoBehaviour {
 		m_characterSprites = new Dictionary<string, Sprite>();
 	}
 
+	/// Establishes the reference to world and sets up the callbacks and sprites.
 	public void SetUpWorld()
 	{
 		m_world = WorldController.instance.m_world;
@@ -37,6 +44,8 @@ public class CharacterSpriteController : MonoBehaviour {
 		}
 	}
 
+
+	/// Callback function which runs when a character gets created.
 	public void OnCharacterCreated(Character _char)
 	{
 		GameObject char_go = new GameObject();
@@ -49,10 +58,12 @@ public class CharacterSpriteController : MonoBehaviour {
 		sr.sprite = m_characterSprites["StickMan"];
 		sr.sortingLayerName = "Character";
 
+		//Registers the callback for when a character changes visually - position etc.
 		_char.RegisterOnChangedCallback( OnCharacterMoved );
 
 	}
 
+	/// Callback function which runs when a character moves.
 	void OnCharacterMoved ( Character _char )
 	{
 		//Make sure the Character's graphics are correct.

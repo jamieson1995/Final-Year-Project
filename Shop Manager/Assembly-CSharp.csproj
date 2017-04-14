@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\Controllers\InputController.cs" />
      <Compile Include="Assets\Scripts\Controllers\WorldController.cs" />
      <Compile Include="Assets\Scripts\Models\Character.cs" />
+     <Compile Include="Assets\Scripts\Models\Customer.cs" />
      <Compile Include="Assets\Scripts\Models\Employee.cs" />
      <Compile Include="Assets\Scripts\Models\Furniture.cs" />
      <Compile Include="Assets\Scripts\Models\FurnitureActions.cs" />

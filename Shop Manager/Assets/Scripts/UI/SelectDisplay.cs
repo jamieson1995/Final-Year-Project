@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿//////////////////////////////////////////////////////
+//Copyright James Jamieson 2017
+//University Dissertation Project
+//Shop Manager AI Simulation
+//////////////////////////////////////////////////////
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;

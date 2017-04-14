@@ -11,54 +11,33 @@ using UnityEngine.UI;
 
 public class InputController : MonoBehaviour {
 
-	//World position of the mouse last frame
+	///World position of the mouse at the end of last frame, used in camera movement.
 	Vector3 m_lastFramePos;
 
-	//World position of the mouse this frame
+	///World position of the mouse at the beginning of this frame.
 	Vector3 m_currFramePos;
 
-	//World position at start  of left-mouse drag operation
-	Vector3 m_dragStartPos;
-
-	bool m_isDragging;
-
+	/// String to determine the current mode of the mouse.
 	public string m_mode { get; protected set; }
 
-	string m_buildModeFurnName;
-
-	GameObject m_furniturePreview;
-
+	/// Reference to the Furniture Sprite Controller.
 	FurnitureSpriteController m_furnSpriteController;
 
-	public GameObject m_menu;
-
-	public GameObject[] m_menuButtonGOs;
-
-	public Dictionary<string, GameObject> m_menuButtons;
-
+	/// Reference to the Select Display Script.
 	SelectDisplay m_selectDisplayScript;
 
+	/// Reference to the Select Display GameObject.
 	public GameObject m_selectDisplay;
 
+	///Reference to the Stock Display GameObject.
 	public GameObject m_stockDisplay;
 
+	///Reference to the selected furniture information
 	public Furniture m_selectedFurn;
 
 	void Start()
 	{
 		m_furnSpriteController = GameObject.FindObjectOfType<FurnitureSpriteController> ();
-
-		m_furniturePreview = new GameObject ();
-		m_furniturePreview.name = "Furniture Preview";
-		m_furniturePreview.transform.SetParent ( this.transform );
-		m_furniturePreview.AddComponent<SpriteRenderer> ();
-		m_furniturePreview.SetActive ( false );
-
-		m_menuButtons = new Dictionary<string, GameObject> ();
-		foreach ( GameObject go in m_menuButtonGOs )
-		{
-			m_menuButtons.Add ( go.name, go );
-		}
 
 		m_selectDisplayScript = GameObject.FindObjectOfType<SelectDisplay>();
 	}
@@ -79,71 +58,18 @@ public class InputController : MonoBehaviour {
 		UpdateCameraMovement ();
 		ProcessKeyboardInput();
 
-		m_furniturePreview.transform.rotation = Quaternion.Euler ( 0, 0, 0 );
-
-		if ( m_mode == "Furniture" && m_buildModeFurnName != null && m_buildModeFurnName != "" )
-		{
-			//Show transparent preview of the furniture that is colour-coded based on
-			//whether or not you can actually build the furniture here.
-			//ShowFurnitureSpriteAtTile ( m_buildModeFurnName, GetTileUnderMouse () );
-			if ( m_buildModeFurnName == "Door" )
-			{
-				Furniture[] neighboursFurn = GetTileUnderMouse ().GetNeighboursFurniture ( false );
-
-				if ( neighboursFurn [ 0 ] != null && neighboursFurn [ 2 ] != null)
-				{
-					if ( neighboursFurn [ 0 ].m_name == "Wall" && neighboursFurn [ 2 ].m_name == "Wall" )
-					{
-						m_furniturePreview.transform.rotation = Quaternion.Euler ( 0, 0, 90 );
-					}
-				}
-			}
-		}
-		else
-		{
-			m_furniturePreview.SetActive ( false );
-		}
-
 		m_lastFramePos = Camera.main.ScreenToWorldPoint ( Input.mousePosition );
 		m_lastFramePos.z = 0;
 
     }
 
-    //The below function is only required if the player will be placing furniture during the game. Since this is not the case
-    //it will not be used. It has been commented out so that the functions called within this function do not cause errors.
-
-	/*void ShowFurnitureSpriteAtTile ( string _furnitureName, Tile _tile )
-	{
-		m_furniturePreview.SetActive ( true );
-
-		SpriteRenderer sr = m_furniturePreview.GetComponent<SpriteRenderer> ();
-		sr.sprite = m_furnSpriteController.GetSpriteForFurniture ( _furnitureName );
-		if ( WorldController.instance.m_world.IsFurniturePlacementValid ( _furnitureName, _tile ) )
-		{
-			sr.color = new Color ( 0.5f, 1f, 0.5f, 0.25f );
-		}
-		else
-		{
-			sr.color = new Color ( 1f, 0.5f, 0.5f, 0.25f );
-		}
-
-		sr.sortingLayerName = "Preview";
-
-		Furniture proto = WorldController.instance.m_world.m_furniturePrototypes [ _furnitureName ];	
-
-		if ( _tile != null )
-		{
-			m_furniturePreview.transform.position = new Vector3 ( _tile.X + ( ( proto.Width - 1 ) / 2f ), _tile.Y + ( ( proto.Height - 1 ) / 2f ), 0 );
-		}
-	}
-	*/
-
-
+    /// Returns m_currFramePos - Vector3
 	public Vector3 GetMousePosition ()
 	{
 		return m_currFramePos;
 	}
 
+	/// Deals with the camera position and zooming.
 	void UpdateCameraMovement()
 	{
 		//Screen Dragging
@@ -158,6 +84,7 @@ public class InputController : MonoBehaviour {
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 1, 10); //This sets the zoom level to always be between 1 and 20.
 	}
 
+	/// Deals with all mouse inputs, and processing the dragging and selecting of tiles and furniture.
 	void UpdateDragging ()
 	{
 
@@ -171,145 +98,89 @@ public class InputController : MonoBehaviour {
 			return;
 		}
 
-		//Start Drag
-		if ( Input.GetMouseButtonDown ( 0 ) )
-		{
-			m_isDragging = true;
-			m_dragStartPos = m_currFramePos;
-		}
-
-		if ( m_buildModeFurnName != null && WorldController.instance.m_world.m_furniturePrototypes [ m_buildModeFurnName ].m_draggable == false )
-		{
-			m_dragStartPos = m_currFramePos;
-		}
-
-		int start_x = Mathf.FloorToInt ( m_dragStartPos.x + 0.5f );
-		int end_x = Mathf.FloorToInt ( m_currFramePos.x + 0.5f );
-		int start_y = Mathf.FloorToInt ( m_dragStartPos.y + 0.5f );
-		int end_y = Mathf.FloorToInt ( m_currFramePos.y + 0.5f );
-
-		if ( end_x < start_x )
-		{
-			int tmp = end_x;
-			end_x = start_x;
-			start_x = tmp;
-		}
-
-		if ( end_y < start_y )
-		{
-			int tmp = end_y;
-			end_y = start_y;
-			start_y = tmp;
-		}
-
-		//End Drag
-		if ( Input.GetMouseButtonUp ( 0 ) && m_isDragging == true )
+		//If the left-mouse button is released.
+		if ( Input.GetMouseButtonUp ( 0 ) )
 		{
 
-			World world = WorldController.instance.m_world;
-
-			for ( int x = start_x; x <= end_x; x++ )
+			Tile t = GetTileUnderMouse();
+			if ( t != null )
 			{
-				for ( int y = start_y; y <= end_y; y++ )
-				{
-					Tile t = world.GetTileAt ( x, y );
-					if ( t != null )
-					{
-						Debug.Log("Tile clicked: (" + t.X + ", " + t.Y + ")");
-						switch ( m_mode )
-						{
-							case "Furniture":
-								world.PlaceFurnitureInWorld ( m_buildModeFurnName, t );
-								break;
-							case "CharacterWalk":
-								world.m_characters [ 0 ].SetDestination ( t );
-								break;
-							default: //This means nothing is selected and the mouse is not in any mode.
-									 //Default is essentailly "Select" mode.
-								if ( t.m_furniture != null )
-								{
-									//A tile with some furniture was clicked.
-									m_selectedFurn = t.m_furniture;
-									m_selectDisplay.SetActive ( true );
-									m_selectDisplayScript.SetUpSelectionDisplay ();
-									Debug.Log("A tile with some furniture was clicked: Furniture: " + t.m_furniture.m_name);
-								}
-								break;
-						}
-						//Other modes will be implemented once characters and deleting furniture has been developed.
-                    }
-                }
-            }
-            m_isDragging = false;
-          }
+				Debug.Log("Tile clicked: (" + t.X + ", " + t.Y + ")");
 
+				//If we get here, we have clicked on a valid tile.
+				switch ( m_mode )
+				{
+					//The only mode is selction mode, which is active when no other mode is active.
+					//This placeholder is here so the switch statement can exsist, if more mode need to be added later.
+					case "PLACEHOLDER":
+						break;
+					default: //This means nothing is selected and the mouse is not in any mode.
+							 //Default is essentailly "Select" mode.
+						if ( t.m_furniture != null )
+						{
+							//A tile with some furniture was clicked.
+							m_selectedFurn = t.m_furniture;
+							m_selectDisplay.SetActive ( true );
+							m_selectDisplayScript.SetUpSelectionDisplay ();
+						}
+						break;
+				}
+			}
+		}
     }
 
+    /// Processes the keyboard inputs.
 	void ProcessKeyboardInput ()
 	{
+
 		if ( Input.GetKeyDown ( KeyCode.Escape ) )
 		{
-			m_selectDisplay.SetActive(false);
-			m_stockDisplay.SetActive(false);
+			m_selectDisplay.SetActive ( false );
+			m_stockDisplay.SetActive ( false );
 			m_mode = null;
+		}
+		else if ( Input.GetKeyDown ( KeyCode.Alpha1 ) )
+		{
+			WorldController.instance.SetGameSpeed ( 0.5f );
+		}
+		else if ( Input.GetKeyDown ( KeyCode.Alpha2 ) )
+		{
+			WorldController.instance.SetGameSpeed ( 1f );
+		}
+		else if ( Input.GetKeyDown ( KeyCode.Alpha3 ) )
+		{
+			WorldController.instance.SetGameSpeed ( 10f );
+		}
+		else if ( Input.GetKeyDown ( KeyCode.P ) )
+		{
+			if ( WorldController.instance.m_world != null && WorldController.instance.m_world.m_gameSpeed == 0 )
+			{
+				WorldController.instance.SetGameSpeed ( 1f );
+			}
+			else if ( WorldController.instance.m_world != null && WorldController.instance.m_world.m_gameSpeed != 0 )
+			{
+				WorldController.instance.SetGameSpeed ( 0f );
+			}
 		}
 	}
 
-	//Returns the tile that the mouse is currently on top of
+	///Returns the tile that the mouse is currently on top of.
 	public Tile GetTileUnderMouse ()
 	{
+		if ( WorldController.instance.m_world == null )
+		{
+			return null;
+		}
+
+
 		return WorldController.instance.m_world.GetTileAt(
 		Mathf.FloorToInt(m_currFramePos.x + 0.5f),
 		Mathf.FloorToInt(m_currFramePos.y + 0.5f)
 		);
 	}
 
-	public void SetMode_BuildFurniture (string _furnName)
-	{
-		Debug.Log("Set build mose to: " + _furnName);
-		m_mode = "Furniture";
-		m_buildModeFurnName = _furnName;
-	}
-
-	public void RevealMenuList ( string _list )
-	{
-		GameObject go = m_menuButtons [ _list ];
-
-		for ( int i = 0; i < go.transform.childCount; i++ )
-		{
-			if ( go.transform.GetChild ( i ).name == "Menu" )
-			{
-				if ( go.transform.GetChild ( i ).gameObject.activeSelf == false )
-				{
-					go.transform.GetChild ( i ).gameObject.SetActive ( true );
-				}
-				else
-				{
-					go.transform.GetChild ( i ).gameObject.SetActive ( false );
-				}
-			}
-		}
-
-		for ( int i = 0; i < m_menu.transform.childCount; i++ )
-		{
-			for ( int j = 0; j < m_menu.transform.GetChild ( i ).childCount; j++ )
-			{
-				if ( m_menu.transform.GetChild ( i ).GetChild ( j ).name == "Menu" && m_menu.transform.GetChild ( i ).name != _list)
-				{
-					m_menu.transform.GetChild ( i ).GetChild ( j ).gameObject.SetActive ( false );	
-				}
-
-			}
-			
-		}
-    }
-
-    public void SetCharacterDest ()
-	{
-		m_mode = "CharacterWalk"; //This means that when the user clicks a tile. The character's destination will change.
-	}
-
-	public void ViewStock ()
+	///Reverses the activeness of the StockDisplay. Inactive becomes active, and active becomes inactive.
+	public void ReverseStockDisplayActiveness ()
 	{
 		//This will cause the activeness of the StockDisplay to switch.
 		//If it is true, it will become false.

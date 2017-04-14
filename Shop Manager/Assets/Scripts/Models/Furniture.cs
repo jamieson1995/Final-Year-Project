@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 public class Furniture {
 
+	/// Furniture's X coordinate
 	public float X
 	{
 		get
@@ -25,6 +26,7 @@ public class Furniture {
 		}
 	}
 
+	/// Furniture's Y coordinate
 	public float Y
 	{
 		get
@@ -40,62 +42,87 @@ public class Furniture {
 		}
 	}
 
+	/// Reference to this furniture's main Tile. Tile in which placement was made.
 	public Tile m_mainTile;
 
+	/// Reference to this furniture's middle Tile. If height or width is even, Tile is right-most middle tile.
 	public Tile m_middleTile;
 
-	public Tile m_jobTile { get; protected set; }
+	/// Reference to this furniture's action Tile. Job tile is the one character's stand in if this furniture is used for a task
+	public Tile m_actionTile { get; protected set; }
 
+	/// List of Stock types in this Tile. Input is the Stock's name.
 	public Dictionary<string, List<Stock> > m_stock { get; protected set; }
 
+	/// Represents this furniture name.
 	public string m_name {get; protected set;} 
 
-	public float m_movementCost { get; protected set; } //This is a multiplier. So a value of '2' here means it takes 2 times as long to walk through this tile.
-														//SPECIAL: If this is 0, it means the furniture is impassible (e.g. a wall)
+	/// Represents this furniture movement cost of a character passing through this furniture's Tiles. 
+	/// This is a mulitplier, i.e. a value of 2 would cause a character to pass through this tile 2x as slowly.
+	/// If this value is 0, characters cannot pass through this furniture's Tiles.
+	public float m_movementCost { get; protected set; }
 
+	/// The Width of this furniture in Tiles
 	public int Width { get; protected set; }
 
+	/// The Height of this furniture in Tiles.
 	public int Height { get; protected set; }
 
-	public bool m_linksToNeighbour { get; protected set; } //If this true then this furniture's sprite will change if there is a neighbour that needs it to change, i.e. walls.
+	/// Flag to determine if this furniture links to neighbouring furniture of the same name.
+	public bool m_linksToNeighbour { get; protected set; }
 
-	public bool m_draggable { get; protected set; } //This variable determines whether the furniture can be dragged along to be placed down
-													//i.e. walls
-												
+	/// Flag to determine is characters can move this furniture.
 	public bool m_movable { get; protected set; }
 
+	/// The rotation of this furniture.
 	public int m_rotation { get; protected set; } //1 - Default - South Facing
 												  //2 - East Facing
 												  //3 - North Facing
 												  //4 - West Facing
 
+	/// Flag to determine if a character is currently moving this furniture.
 	public bool m_moving;
 
+	/// Flag to determine if an employee is currently manning this furniture.
 	public bool m_manned;
 
-	public int m_maxCarryWeight { get; protected set; } //This represents the maximum amount of stock that this furniture can carry.
+	/// The maximum of Stock weight allowed on this furniture.
+	public int m_maxCarryWeight { get; protected set; }
 
-	public int m_weightUsed { get; protected set; } //This represents the weight used, based on the stock currently on the furniture.
+	/// Current amount of Stock weight used on this furniture.
+	public int m_weightUsed { get; protected set; }
 
-	public bool m_full { get; protected set; } //Flag for whether the furniture is full or not.
+	/// Flag to determine if Stock can be added to this furniture.
+	public bool m_full { get; protected set; }
 
+	/// Flag to determine if all stock on this furniture has been worked.
+	public bool m_allStockWorked;
+
+	/// Current percentage of stock faced up.
+	public float m_facedUpPerc { get; protected set; }
+
+	/// Flag that represents if this furniture has been worked.
+	public bool m_worked;
+
+	/// Callback for when this furniture changes.
 	public Action<Furniture> cbOnChanged; //After this action gets activated, whenever it gets called, a given event will trigger, i.e changing the visual of this furniture
 
+	/// Used to determine if this furniture's tile is currently enterable.
 	public Func<Furniture, ENTERABILITY> m_isEnterable;
 
-	Func<Tile, int, bool> funcPositionValidation; //This runs a function and checks the given tile to see if the placement of the furniture is valid, it returns a bool.
+	/// Contain all of this furniture's parameters for its updates. Used in conjunction with updateActions.
+	public Dictionary<string, float> m_furnParameters;
 
-	public Dictionary<string, float> m_furnParameters; //This is used in conjuction with the updateActions action, so that parameters can be used.
-
-	public Action<Furniture, float> m_updateActions; //This is an action, which when activated, allows this tile to run its Update function
-													 //This means only furniture that need update functions can have them run i.e. doors for opening.
+	/// An action that  when active allows this furniture to have its own update function.
+	public Action<Furniture, float> m_updateActions;
 
 
 	public Furniture ()
 	{
 
 	}
-								
+
+	/// Spawns a new Furniture with the specified information.					
 	public Furniture ( string _name, float _movementCost, int _width, int _height, bool _linksToNeighbour, bool _draggable, int _maxCarryWeight, bool _movable)
 	{
 		this.m_name = _name;
@@ -103,7 +130,6 @@ public class Furniture {
 		this.Width = _width;
 		this.Height = _height;
 		this.m_linksToNeighbour = _linksToNeighbour;
-		this.m_draggable = _draggable;
 		this.m_maxCarryWeight = _maxCarryWeight;
 		this.m_movable = _movable;
 
@@ -112,8 +138,7 @@ public class Furniture {
 		m_stock = new Dictionary<string, List<Stock>>();
 	}
 
-	//When placing furniture, the actual furniture isn't being placed, a cloned version of the default furniture is. 
-	//Therefore, a temp furniture needs to be cloned from the original and that is what gets placed.
+	/// Returns a copy of this furniture
 	public Furniture Clone ()
 	{
 		return new Furniture(this);
@@ -127,7 +152,6 @@ public class Furniture {
 		this.Width = _other.Width;
 		this.Height = _other.Height;
 		this.m_linksToNeighbour = _other.m_linksToNeighbour;
-		this.m_draggable = _other.m_draggable;
 		this.m_maxCarryWeight = _other.m_maxCarryWeight;
 		this.m_movable = _other.m_movable;
 
@@ -143,6 +167,9 @@ public class Furniture {
 
 
 	//Attempts to place a certain furniture onto a given tile, if successful, a copy of that furniture is returned.
+
+	/// Returns the Furniture placed in the specifed Tile. The specified Furniture should be the same as the returned one.
+	/// If returns null, placement was unsuccessful.
 	static public Furniture PlaceInstanceOfFurniture ( Furniture _other, Tile _tile, int _direction = 1 )
 	{
 
@@ -160,19 +187,19 @@ public class Furniture {
 		furn.m_mainTile = _tile;
 		if ( furn.m_rotation == 1 )
 		{
-			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
+			furn.m_actionTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) - 1 );
 		}
 		else if ( furn.m_rotation == 2 )
 		{
-			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) + 1, _tile.Y + ( furn.Height / 2 ) );
+			furn.m_actionTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) + 1, _tile.Y + ( furn.Height / 2 ) );
 		}
 		else if ( furn.m_rotation == 3 )
 		{
-			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) + 1 );
+			furn.m_actionTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ), _tile.Y + ( furn.Height / 2 ) + 1 );
 		}
 		else if ( furn.m_rotation == 4 )
 		{
-			furn.m_jobTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) - 1, _tile.Y + ( furn.Height / 2 ) );
+			furn.m_actionTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) - 1, _tile.Y + ( furn.Height / 2 ) );
 		}
 
 		furn.m_middleTile = WorldController.instance.m_world.GetTileAt ( _tile.X + ( furn.Width / 2 ) , _tile.Y + ( furn.Height / 2 ) );
@@ -213,6 +240,7 @@ public class Furniture {
 		return furn;
 	}
 
+	/// Runs the Update function for this furniture if relevant.
 	public void Update ( float _deltaTime )
 	{
 		if ( m_updateActions != null )
@@ -221,6 +249,7 @@ public class Furniture {
 		}
 	}
 
+	/// Returns the attempt's outcome. Attempt to add specified stock to this furniture.
 	public bool TryAddStock ( Stock _stock )
 	{
 		if ( _stock == null )
@@ -247,6 +276,7 @@ public class Furniture {
 		return true;
 	}
 
+	/// Returns the attempt's outcome. Attempts to find Stock based upon the specified stock's name in this furniture.
 	public bool TryGiveStock ( string _stock )
 	{
 		if ( m_stock.ContainsKey ( _stock ) )
@@ -266,13 +296,7 @@ public class Furniture {
 		return false;
 	}
 
-	/// <summary>
-	/// Sets a furniture's rotation to the specifed direction   
-	/// <para> 1 - Default - South Facing </para>
-	/// <para> 2 - East Facing </para>
-	/// <para> 3 - North Facing </para>
-	/// <para> 4 - west Facing </para>
-	/// </summary>
+	/// Sets this furniture's rotation to the specified direction.
 	public void RotateFurniture ( int _direction = 1 )
 	{
 		World world = WorldController.instance.m_world;
@@ -290,6 +314,7 @@ public class Furniture {
 		}
 	}
 
+	/// Returns the attempt's outcome. Attempts to move this furniture to the specified Tile.
 	public bool MoveFurniture ( Tile _toTile )
 	{
 		if ( m_movable == false )
@@ -305,14 +330,41 @@ public class Furniture {
 		return true;
 	}
 
-	//When this function is called, the callback will be activated.
+	/// Changes the m_facedUpPerc variable by the specified amount, capped at 100.
+	public void ChangeFaceUpPerc ( float _amount )
+	{
+		if ( m_facedUpPerc + _amount > 100f)
+		{
+			Debug.Log("Increasing the m_facedUpPerc by " + _amount + " will cause it to go above 100.");
+			m_facedUpPerc = 100;
+			m_worked = true;
+			return;
+		}
+		m_facedUpPerc += _amount;
+
+	}
+
+	/// Sets the m_facedUpPerc variable to the specified amount, capped at 100.
+	public void SetFaceUpPerc ( float _amount )
+	{
+		if ( _amount > 100f)
+		{
+			Debug.Log("Cannot set m_facedUpPerc to above 100.");
+			m_facedUpPerc = 100f;
+			return;
+		}
+		m_facedUpPerc = _amount;
+	}
+
+	/// Registers the OnChanged Callback
 	public void RegisterOnChangedCallback( Action<Furniture> _callback )
 	{
-		cbOnChanged += _callback; //When this activates, the furniture knows it needs to re-evaluate its properties and update itself, such as change its visuals.
+		cbOnChanged += _callback;
 	}
+
+	/// Unregisters the OnChanged Callback
 	public void UnRegisterOnChangedCallback( Action<Furniture> _callback )
 	{
-		cbOnChanged -= _callback; //This function deactivates the callback, and the callback no longer gets run when the callback is called.
-								  //This is useful when, for example, a piece of furniture is destroyed.
+		cbOnChanged -= _callback;
 	}
 }

@@ -10,6 +10,7 @@ using System.Collections;
 
 public static class FurnitureActions {
 
+	/// This runs once a frame if the required furniture registers it.
 	public static void Door_UpdateAction ( Furniture _furn, float _deltaTime )
 	{
 	if ( _furn.m_furnParameters [ "m_isOpening" ] >= 1 )
@@ -30,6 +31,7 @@ public static class FurnitureActions {
 			_furn.cbOnChanged( _furn );
 	}
 
+	/// This runs once a frame if the required furniture registers it.
 	public static ENTERABILITY Door_IsEnterable ( Furniture _furn)
 	{
 		_furn.m_furnParameters [ "m_isOpening" ] = 1;
@@ -42,6 +44,7 @@ public static class FurnitureActions {
 
 	}
 
+	/// This runs once a frame if the required furniture registers it.
 	public static void MovableFurn_UpdateAction ( Furniture _furn, float _deltaTime )
 	{
 		if ( _furn.m_moving == true )

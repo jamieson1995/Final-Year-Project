@@ -10,30 +10,37 @@ using UnityEngine;
 
 public class Job {
 
+	/// Reference to the tile used by employees when performing this job.
 	public Tile Tile { get; protected set; }
 
-	public float m_maxTime;
-
+	/// Flag to determine if this job required a Trolley.
 	public bool RequiresTrolley { get; protected set;}
-	
+
+	/// Reference to the furniture required to perform this job.
 	public Furniture m_furn;
 
+	/// The current Primary State of this job.
 	public PrimaryStates m_primaryState;
-	
+
+	/// The current Secondary State of this job.
 	public SecondaryStates m_secondaryState;
 
-	//Create a new job with no given PrimaryState. State of the job will default to ServeOnTill.
+	/// The additional information required for certain Primary states.
+	public WorkTrolleyStates m_additionalInfoState;
+
+	/// Creates a new job with Primary State ServeOnCheckout
 	public Job ()
 	{
-		m_primaryState = PrimaryStates.ServeOnCheckout;
+		SetPrimaryState(PrimaryStates.ServeOnCheckout);
 	}
 
-	//Create a new job with its state set to the given PrimaryState.
+	/// Creates a new job with the specified Primary State
 	public Job ( PrimaryStates _state )
 	{
 		SetPrimaryState(_state);
 	}
 
+	/// All Primary States possible.
 	public enum PrimaryStates{
 		ServeOnCheckout,
 		WorkStockcage,
@@ -42,7 +49,8 @@ public class Job {
 		FaceUp,
 		CountCheckoutMoney
 	}
-	
+
+	/// All Secondary States possible.
 	public enum SecondaryStates{
 		GoTo, //Employee is going to a location.
 		GoWith, //Employee needs to go to a location with a piece of furniture.
@@ -50,24 +58,23 @@ public class Job {
 		Use, //Employee is using a piece of furniture.
 	}
 
-	//TODO think about whether these actually need to be states, or functions in the employee class.
-	public enum UseStates{
-		TakeStock,
-		GiveStock,
-		ScanStock,
-		TidyStock
-	}
-	
+	/// The different forms of Secondary State Idle.
 	public enum IdleStates
 	{
 		Fixed, //Employee cannot move from thier location
 		Moving, //Employee can move around
 	}
 
-	/// <summary>
-	/// This is the required furniture for the current job.
-	/// </summary>
-	/// <value>The furniture's FurnType.</value>
+	/// Additional State Information.
+	public enum WorkTrolleyStates
+	{
+		// The Primary States WorkStockcage and WorkBackStock require additional information to determine what they need to do.
+		FillTrolley,
+		EmptyTrolleyToFront,
+		EmptyTrolleyToBack
+	}
+
+	/// Returns the name of the required furniture based upon this job's current Primary State.
 	public string m_requiredFurniture
 	{
 
@@ -80,14 +87,38 @@ public class Job {
 					return "Checkout";
 
 				case Job.PrimaryStates.WorkStockcage:
-					return "Stockcage";
+					if ( m_additionalInfoState == Job.WorkTrolleyStates.FillTrolley )
+					{
+						return "Stockcage";
+					}
+					else if ( m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToFront )
+					{
+						return "FrontShelf";
+					}
+					else if ( m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
+					{
+						return "BackShelf";
+					}
+					break;
 	
 				case Job.PrimaryStates.EmptyStockcage:
 					return "Stockcage";
 	
 				case Job.PrimaryStates.WorkBackStock:
-					return "FrontShelf";
-	
+					if ( m_additionalInfoState == Job.WorkTrolleyStates.FillTrolley )
+					{
+						return "BackShelf";
+					}
+					else if ( m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToFront )
+					{
+						return "FrontShelf";
+					}
+					else if ( m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
+					{
+						return "BackShelf";
+					}
+					break;	
+						
 				case Job.PrimaryStates.FaceUp:
 					return "FrontShelf";
 	
@@ -104,10 +135,12 @@ public class Job {
 		}
 	}
 
+	/// Sets this job's furniture and tile variables to null. Before this, it sets this job's furniture to unmanned.
 	void ResetJobVariables ()
 	{
 		if ( m_furn != null )
 		{
+			WorldController.instance.m_world.m_characterFurniture.Remove(m_furn);
 			m_furn.m_manned = false;
 		}
 		m_furn = null;
@@ -115,24 +148,20 @@ public class Job {
 		m_requiredFurniture = null;
 	}
 
-	/// <summary>
-	/// Sets this job's furn with the specified furniture, and then sets the Job's tile to the furniture's job tile.
-	/// </summary>
+	/// Sets this job's furniture to the specified Furniture. Also sets this job's tile. Parameter CAN be null.
 	public void SetJobFurn ( Furniture _furn )
 	{
 		if ( _furn == null )
 		{
-			ResetJobVariables();
+			ResetJobVariables ();
 			return;
 		}
 		m_furn = _furn;
-		SetJobTile(_furn);
+		SetJobTile ( _furn );
 	}
 
-	/// <summary>
-	/// Checks to see if specified furniture is the same as this job's furniture, if true, this job's tile gets set to the furniture's job tile.
-	/// If returns false, specified furniture is different than the job's furniture.
-	/// </summary>
+	/// Returns the attempt's outcome. Attempts to set this Job's tile to the specified furniture's job tile.
+	/// If this job's furniture is different than the specified furniture, this returns false.
 	public bool SetJobTile ( Furniture _furn )
 	{
 		//Check to see if the furniture is the one required for the job.
@@ -142,9 +171,9 @@ public class Job {
 			//TODO In the future, furniture should be not able to be placed in a furniture job tile, and also furniture should not be
 			//able to be placed if its job tile spot is over another piece of furniture.
 																
-			if ( _furn.m_jobTile.m_furniture == null )
+			if ( _furn.m_actionTile.m_furniture == null || _furn.m_actionTile.m_furniture.m_movable == true)
 			{
-				Tile = _furn.m_jobTile;
+				Tile = _furn.m_actionTile;
 				return true;
 			}
 		}
@@ -158,6 +187,7 @@ public class Job {
 		return false;
 	}
 
+	/// Sets this job's Primary State to the specified state.
 	public void SetPrimaryState ( PrimaryStates _state )
 	{
 		ResetJobVariables();
@@ -171,13 +201,20 @@ public class Job {
 		}
 		if ( m_primaryState == PrimaryStates.ServeOnCheckout )
 		{
-			WorldController.instance.m_world.m_numberOfMannedTills--;
+			WorldController.instance.m_world.m_numberOfMannedCheckouts--;
 		}
 		m_primaryState = _state;
 	}
 
+	/// Sets this job's Secondary State to the specified state.
 	public void SetSecondaryState(SecondaryStates _state)
 	{
 		m_secondaryState = _state;
+	}
+
+	/// Sets this job's WorkTrolley State to the specified state.
+	public void SetWorkTrolleyState(WorkTrolleyStates _state)
+	{
+		m_additionalInfoState = _state;
 	}
 }
