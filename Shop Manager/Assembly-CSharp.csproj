@@ -46,9 +46,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\MoneyDisplay.cs" />
      <Compile Include="Assets\Scripts\Controllers\CharacterSpriteController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\EventController.cs" />
      <Compile Include="Assets\Scripts\Controllers\FurnitureSpriteController.cs" />
      <Compile Include="Assets\Scripts\Controllers\InputController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\SceneController.cs" />
      <Compile Include="Assets\Scripts\Controllers\WorldController.cs" />
      <Compile Include="Assets\Scripts\Models\Character.cs" />
      <Compile Include="Assets\Scripts\Models\Customer.cs" />
@@ -59,6 +62,7 @@
      <Compile Include="Assets\Scripts\Models\Stock.cs" />
      <Compile Include="Assets\Scripts\Models\Tile.cs" />
      <Compile Include="Assets\Scripts\Models\World.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\FindFreeQueueTile.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\FindNearestFreeTile.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\Path_AStar.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\Path_Edge.cs" />
@@ -66,8 +70,10 @@
      <Compile Include="Assets\Scripts\Pathfinding\Path_TileGraph.cs" />
      <Compile Include="Assets\Scripts\UI\AutomaticHorizontalSize.cs" />
      <Compile Include="Assets\Scripts\UI\AutomaticVerticalSize.cs" />
+     <Compile Include="Assets\Scripts\UI\DateDisplay.cs" />
      <Compile Include="Assets\Scripts\UI\SelectDisplay.cs" />
      <Compile Include="Assets\Scripts\UI\TileInspector.cs" />
+     <Compile Include="Assets\Scripts\UI\TimeDisplay.cs" />
      <Compile Include="Assets\Scripts\Utilities\PriorityQueue\FastPriorityQueue.cs" />
      <Compile Include="Assets\Scripts\Utilities\PriorityQueue\FastPriorityQueueNode.cs" />
      <Compile Include="Assets\Scripts\Utilities\PriorityQueue\IPriorityQueue.cs" />

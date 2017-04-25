@@ -56,19 +56,28 @@ public static class FurnitureActions {
 				return;
 			}
 
-			float distToTravel = Mathf.Sqrt ( Mathf.Pow ( _furn.m_furnParameters [ "m_currTile.X" ] - _furn.m_furnParameters [ "m_destTile.X" ], 2 ) +
-				                    		  Mathf.Pow ( _furn.m_furnParameters [ "m_currTile.Y" ] - _furn.m_furnParameters [ "m_destTile.Y" ], 2 ) );
+			//float distToTravel = Mathf.Sqrt ( Mathf.Pow ( _furn.m_furnParameters [ "m_currTile.X" ] - _furn.m_furnParameters [ "m_destTile.X" ], 2 ) +
+			//Mathf.Pow ( _furn.m_furnParameters [ "m_currTile.Y" ] - _furn.m_furnParameters [ "m_destTile.Y" ], 2 ) );
 
-			float distThisFrame = _furn.m_furnParameters [ "m_speed" ] * _deltaTime;
-			float percThisFrame = distThisFrame / distToTravel;
+			//float distThisFrame = _furn.m_furnParameters [ "m_speed" ] * _deltaTime;
+			//float percThisFrame = distThisFrame / distToTravel;
 
-			_furn.m_furnParameters [ "m_movementPercentage" ] += percThisFrame;
+			_furn.m_furnParameters [ "m_movementPercentage" ] += _furn.m_furnParameters [ "percThisFrame" ];
 
 			if ( _furn.m_furnParameters [ "m_movementPercentage" ] >= 1 )
 			{
-				_furn.m_furnParameters[ "m_currTile.X" ] = _furn.m_furnParameters[ "m_destTile.X" ];
-				_furn.m_furnParameters[ "m_currTile.Y" ] = _furn.m_furnParameters[ "m_destTile.Y" ];
-				_furn.m_mainTile = WorldController.instance.m_world.GetTileAt( (int)_furn.m_furnParameters[ "m_destTile.X" ], (int)_furn.m_furnParameters[ "m_destTile.Y" ] );
+				_furn.m_furnParameters [ "m_currTile.X" ] = _furn.m_furnParameters [ "m_destTile.X" ];
+				_furn.m_furnParameters [ "m_currTile.Y" ] = _furn.m_furnParameters [ "m_destTile.Y" ];
+				_furn.m_mainTile = WorldController.instance.m_world.GetTileAt ( (int)_furn.m_furnParameters [ "m_destTile.X" ], (int)_furn.m_furnParameters [ "m_destTile.Y" ] );
+
+				//FIXME
+				//This is a counter to the fix used in the world update function.
+				//If the cheat fix removes the correct trolley instance from the correct tile, this iwll put it back where it needs to be.
+				if ( _furn.m_mainTile.m_furniture == null )
+				{
+					_furn.m_mainTile.PlaceFurniture(_furn);
+				}
+
 				_furn.m_furnParameters["m_movementPercentage"] = 0.0f;
 			}
 				WorldController.instance.m_world.cbFurnitureMoved( _furn );

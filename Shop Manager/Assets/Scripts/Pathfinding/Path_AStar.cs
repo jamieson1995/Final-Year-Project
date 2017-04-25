@@ -8,22 +8,31 @@ public class Path_AStar {
 	Queue<Tile> m_path;
 	Queue<Tile> m_initalPath;
 
-	public Path_AStar ( World _world, Tile _tileStart, Tile _tileEnd )
+	public Path_AStar ( World _world, Tile _tileStart, Tile _tileEnd, bool _ignoreCharacters = true )
 	{
 
-		_world.m_tileGraph = new Path_TileGraph ( _world );
+		if ( _tileStart == _tileEnd || _tileEnd == null )
+		{
+			//We don't need to go anywhere.
+			m_path = new Queue<Tile> ();
+			m_path.Enqueue ( _tileStart );
+			m_initalPath = new Queue<Tile> ( m_path );
+			return;
+		}
+
+		_world.m_tileGraph = new Path_TileGraph ( _world, _ignoreCharacters, _tileStart);
 
 
 		Dictionary<Tile, Path_Node<Tile>> nodes = _world.m_tileGraph.m_nodes;
 
 		if ( nodes.ContainsKey ( _tileStart ) == false )
 		{
-			Debug.LogError ( "Path_AStar -- The starting tile isn't in the list of nodes." );
+			Debug.LogWarning ( "Path_AStar -- The starting tile isn't in the list of nodes." );
 			return;
 		}
 		if ( nodes.ContainsKey ( _tileEnd ) == false )
 		{
-			Debug.LogError ( "Path_AStar -- The ending tile isn't in the list of nodes." );
+			Debug.LogWarning ( "Path_AStar -- The ending tile isn't in the list of nodes." );
 			return;
 		}
 
@@ -142,17 +151,28 @@ public class Path_AStar {
 		);
 	}
 
-	public Tile Dequeue(){
-		return m_path.Dequeue();
+	public Tile Dequeue ()
+	{
+		return m_path.Dequeue ();
 	}
 
 	public Tile[] CurrPathToArray ()
 	{
+		if ( m_path == null )
+		{
+			return null;
+		}
+
 		return m_path.ToArray();
 	}
 
 	public Tile[] InitialPathToArray ()
 	{
+		if ( m_initalPath == null )
+		{
+			return null;
+		}
+
 		return m_initalPath.ToArray();
 	}
 

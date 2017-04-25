@@ -4,9 +4,9 @@ using UnityEngine.UI;
 public class TileInspector : MonoBehaviour {
 
 	public GameObject m_furnitureTypeGO;
-	public GameObject m_mouseModeGO;
+	public GameObject m_characterGO;
 	Text m_furnitureTypeGOText;
-	Text m_mouseModeGOText;
+	Text m_characterTextGO;
 	InputController m_inputController;
 
 	void Start ()
@@ -19,11 +19,11 @@ public class TileInspector : MonoBehaviour {
 			return;
 		}
 
-		m_mouseModeGOText = m_mouseModeGO.GetComponent<Text> ();
-		if ( m_mouseModeGOText == null )
+		m_characterTextGO = m_characterGO.GetComponent<Text> ();
+		if ( m_characterTextGO == null )
 		{
-			Debug.LogError ( "furnitureGO doesn't have a Text component" );
-			m_mouseModeGO.SetActive ( false );
+			Debug.LogError ( "characterGO doesn't have a Text component" );
+			m_characterGO.SetActive ( false );
 			return;
 		}
 
@@ -54,13 +54,18 @@ public class TileInspector : MonoBehaviour {
 		m_furnitureTypeGOText.text = "Furniture: " + s;
 		s = "NULL";
 
-		if ( m_inputController.m_mode != null )
+		if ( t != null && t.m_character != null )
 		{
-			s = m_inputController.m_mode.ToString ();
-			m_mouseModeGOText.text = "Mouse Mode: " + s;
+			s = t.m_character.m_name;
+			m_characterTextGO.text = "Character: " + s;
 		}
 
-		m_mouseModeGOText.text = "Mouse Mode: " + s;
+		if ( t == null )
+		{
+			s = "N/A";
+		}
+
+		m_characterTextGO.text = "Character: " + s;
 		s = "NULL";
 	}
 }

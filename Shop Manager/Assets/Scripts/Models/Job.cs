@@ -35,19 +35,18 @@ public class Job {
 	}
 
 	/// Creates a new job with the specified Primary State
-	public Job ( PrimaryStates _state )
+	public Job ( PrimaryStates _newState, Job _oldJob = null )
 	{
-		SetPrimaryState(_state);
+		SetPrimaryState(_newState, _oldJob);
 	}
 
 	/// All Primary States possible.
 	public enum PrimaryStates{
-		ServeOnCheckout,
 		WorkStockcage,
+		ServeOnCheckout,
 		EmptyStockcage,
 		WorkBackStock,
-		FaceUp,
-		CountCheckoutMoney
+		FaceUp	
 	}
 
 	/// All Secondary States possible.
@@ -77,7 +76,6 @@ public class Job {
 	/// Returns the name of the required furniture based upon this job's current Primary State.
 	public string m_requiredFurniture
 	{
-
 		get
 		{
 			World world = WorldController.instance.m_world;
@@ -122,7 +120,7 @@ public class Job {
 				case Job.PrimaryStates.FaceUp:
 					return "FrontShelf";
 	
-				case Job.PrimaryStates.CountCheckoutMoney:
+				default:
 					return "Checkout";
 			}
 
@@ -136,27 +134,43 @@ public class Job {
 	}
 
 	/// Sets this job's furniture and tile variables to null. Before this, it sets this job's furniture to unmanned.
-	void ResetJobVariables ()
+	void ResetJobVariables ( Job _oldJob )
 	{
-		if ( m_furn != null )
+		if ( _oldJob != null && _oldJob.m_furn != null )
 		{
-			WorldController.instance.m_world.m_characterFurniture.Remove(m_furn);
+			WorldController.instance.m_world.m_characterFurniture.Remove ( _oldJob.m_furn );
+			_oldJob.m_furn.m_manned = false;
+		}
+
+		if ( _oldJob == null && m_furn != null )
+		{
+			WorldController.instance.m_world.m_characterFurniture.Remove ( m_furn );
 			m_furn.m_manned = false;
 		}
+
 		m_furn = null;
 		Tile = null;
 		m_requiredFurniture = null;
 	}
 
 	/// Sets this job's furniture to the specified Furniture. Also sets this job's tile. Parameter CAN be null.
-	public void SetJobFurn ( Furniture _furn )
+	public void SetJobFurn ( Furniture _furn, Character _char )
 	{
 		if ( _furn == null )
 		{
-			ResetJobVariables ();
+			ResetJobVariables (null);
 			return;
 		}
+
 		m_furn = _furn;
+
+		if ( WorldController.instance.m_world.m_characterFurniture.ContainsKey ( _furn ) )
+		{
+			WorldController.instance.m_world.m_characterFurniture.Remove(_furn);	
+		}
+
+		WorldController.instance.m_world.m_characterFurniture.Add(_furn, _char);
+
 		SetJobTile ( _furn );
 	}
 
@@ -188,10 +202,10 @@ public class Job {
 	}
 
 	/// Sets this job's Primary State to the specified state.
-	public void SetPrimaryState ( PrimaryStates _state )
+	public void SetPrimaryState ( PrimaryStates _newState,  Job _oldJob = null)
 	{
-		ResetJobVariables();
-		if ( _state == PrimaryStates.WorkBackStock || _state == PrimaryStates.WorkStockcage )
+		ResetJobVariables(_oldJob);
+		if ( _newState == PrimaryStates.WorkBackStock || _newState == PrimaryStates.WorkStockcage )
 		{
 			RequiresTrolley = true;
 		}
@@ -199,11 +213,15 @@ public class Job {
 		{
 			RequiresTrolley = false;
 		}
-		if ( m_primaryState == PrimaryStates.ServeOnCheckout )
+
+		if ( _oldJob != null && _oldJob.m_primaryState == PrimaryStates.ServeOnCheckout )
 		{
+			_oldJob.m_furn.m_manned = false;
+			WorldController.instance.m_world.m_characterFurniture.Remove(_oldJob.m_furn);
 			WorldController.instance.m_world.m_numberOfMannedCheckouts--;
 		}
-		m_primaryState = _state;
+
+		m_primaryState = _newState;
 	}
 
 	/// Sets this job's Secondary State to the specified state.

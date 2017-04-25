@@ -16,11 +16,23 @@ public class FindNearestFreeTile {
 
 	public Tile m_tileFound { get; protected set; }
 
-	public FindNearestFreeTile ( World _world, Tile _root, Tile[] _tilesNeededForMovement )
+	public FindNearestFreeTile ( World _world, Tile _root, Tile[] _tilesNeededForMovement, bool _alwaysAddRoot = false )
 	{
+		if ( _tilesNeededForMovement == null )
+		{
+			_tilesNeededForMovement = new Tile[1];
+			_tilesNeededForMovement[0] = _root;
+		}
 
-		_world.m_tileGraph = new Path_TileGraph ( _world );
 
+		if ( _alwaysAddRoot )
+		{
+			_world.m_tileGraph = new Path_TileGraph ( _world, false, _root );
+		}
+		else
+		{
+			_world.m_tileGraph = new Path_TileGraph ( _world, false );
+		}
 
 		Dictionary<Tile, Path_Node<Tile>> nodes = _world.m_tileGraph.m_nodes;
 
@@ -60,6 +72,11 @@ public class FindNearestFreeTile {
 				}
 
 				if ( neighbour.m_data.m_furniture != null )
+				{
+					m_currTileInvalid = true;
+				}
+
+				if ( neighbour.m_data.m_character != null )
 				{
 					m_currTileInvalid = true;
 				}

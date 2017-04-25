@@ -47,36 +47,33 @@ public class Stock {
 	public bool m_facedUp;
 
 	/// Used when outputting price to UI. Conversion is made so UI shows price in pounds and pence.
-	public string StringPrice
+	public static string StringPrice(int _price)
 	{
-		get
+		string priceToString = "";
+		if ( _price < 100 )
 		{
-			string priceToString = "";
-			if ( Price < 100 )
+			if ( _price < 10 )
 			{
-				if ( Price < 10 )
-				{
-					priceToString = "      " + Price.ToString () + "p";
-				}
-				else
-				{
-					priceToString = "    " + Price.ToString () + "p";
-				}
-			}
-			else if ( Price % 100 == 0 )
-			{
-				priceToString = "£" + ( (float)Price / 100 ).ToString () + ".00";
-			}
-			else if ( Price % 10 == 0 )
-			{
-				priceToString = "£" + ( (float)Price / 100 ).ToString () + "0";
+				priceToString = "      " + _price.ToString () + "p";
 			}
 			else
 			{
-				priceToString = "£" + ( (float)Price / 100 ).ToString ();
+				priceToString = "    " + _price.ToString () + "p";
 			}
-			return priceToString;
 		}
+		else if ( _price % 100 == 0 )
+		{
+			priceToString = "£" + ( (float)_price / 100 ).ToString () + ".00";
+		}
+		else if ( _price % 10 == 0 )
+		{
+			priceToString = "£" + ( (float)_price / 100 ).ToString () + "0";
+		}
+		else
+		{
+			priceToString = "£" + ( (float)_price / 100 ).ToString ();
+		}
+		return priceToString;
 
 	}											  
 

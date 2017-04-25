@@ -26,11 +26,14 @@ public class Employee : Character {
 	/// Employee's Title as an enum.
 	public Title m_title { get; protected set; }
 
-	/// Flag that determines if all stockcages have been worked or not, according to this employee's knowledge.
-	bool? m_allStockcagesWorked;
-
 	/// Reference to the Furniture instance that is being used as the Trolley for this employee's current Job.
 	public Furniture TrolleyBeingUsed { get; protected set; }
+
+	Customer m_servingCustomer;
+
+	int transactionCost;
+
+	public bool m_busy { get; protected set; }
 
 	/// Flag to determine if this employee is in charge of the shop.
 	bool m_inCharge;
@@ -59,53 +62,114 @@ public class Employee : Character {
 			}
 			else
 			{
-				foreach ( Employee employee in m_world.m_employees )
+				foreach ( KeyValuePair<int, Employee> employee in m_world.m_employeesInWorld)
 				{
-					if ( employee.InCharge )
+					if ( employee.Value.InCharge )
 					{
-						Debug.LogError ( "Already an employee in charge: " + employee.m_name );
+						Debug.LogError ( "Already an employee in charge: " + employee.Value.m_name );
 						return;
 					}
 				}
+				//foreach ( Employee employee in m_world.m_employeesInWorld.ToArray() )
+				//{
+				//	if ( employee.InCharge )
+				//	{
+				//		Debug.LogError ( "Already an employee in charge: " + employee.m_name );
+				//		return;
+				//	}
+				//}
 				m_inCharge = true;
 			}
 		}
 	}
 
-	/// Spawns a character, and in turn employee, with the specified name, specified maxCarryWeight, on the specified Tile, and with the specified title.
-	public Employee ( string _name, int _maxCarryWeight, Tile _tile, Title _title ) : base ( _name, _maxCarryWeight, _tile )
+	public Employee() : base ()
+	{
+
+	}
+
+	/// Spawns a character, and in turn employee, with the specified name, on the specified Tile, and with the specified title.
+	public Employee ( string _name, Tile _tile, Title _title, int _age ) : base ( _name, _age, _tile )
 	{
 		SetJobTitle(_title);
 	}
 
 	/// Returns a new Job that is created based upon world circumstances.
-	Job CreateJob ()
+	Job CreateJob ( Job _oldJob, bool _overrideCurrentJob = false, bool _forceCheckout = false )
 	{
+		if ( _forceCheckout )
+		{
+			return CreateCheckoutJob(_overrideCurrentJob);
+		}
+
 		World world = WorldController.instance.m_world;
+
+		if ( TrolleyBeingUsed != null )
+		{
+			TrolleyBeingUsed.m_manned = false;
+			m_world.m_characterFurniture.Remove ( TrolleyBeingUsed );
+			TrolleyBeingUsed = null;
+			m_movingFurniture = null;
+			m_movingFurnsFinalTile = null;
+		}
+
+		if ( _overrideCurrentJob )
+		{
+			if ( ( world.m_numberOfMannedCheckouts == 0 && world.m_customersInStore > 0 ) || world.m_customersInQueue != 0 && ( world.m_customersInQueue / world.m_numberOfMannedCheckouts ) > 3 )
+			{
+				return CreateCheckoutJob ( _overrideCurrentJob );
+			}
+		}
 
 		if ( ( world.m_numberOfMannedCheckouts == 0 && world.m_customersInStore > 0 ) || world.m_customersInQueue != 0 && ( world.m_customersInQueue / world.m_numberOfMannedCheckouts ) > 3 )
 		{
-			Debug.Log("Started new job - Serve on Checkout");
-			return new Job ( Job.PrimaryStates.ServeOnCheckout );
+			return CreateCheckoutJob ( _overrideCurrentJob );
+
+		}
+		else if ( m_world.AllStockcagesEmpty == false )
+		{
+			
+			return new Job ( Job.PrimaryStates.WorkStockcage, _oldJob );
+		}
+		else if ( m_world.AllWarehouseStockWorked == false )
+		{
+			return new Job ( Job.PrimaryStates.WorkBackStock, _oldJob );
+		}
+		else if ( m_world.AllFacingUpFinished == false )
+		{
+			return new Job ( Job.PrimaryStates.FaceUp, _oldJob );
 		}
 		else
 		{
-			Debug.Log("Started new job - Work Stockcage");
-			return new Job ( Job.PrimaryStates.FaceUp );
+			return CreateCheckoutJob(_overrideCurrentJob);
 		}
 	}
 
-	public Job GiveJob ()
+	Job CreateCheckoutJob ( bool _overrideCurrentJob = false )
 	{
-		return CreateJob();
+		m_world.m_numberOfMannedCheckouts++;
+
+		Job j = new Job ( Job.PrimaryStates.ServeOnCheckout, m_job );
+
+		if ( _overrideCurrentJob )
+		{
+			m_job = j;
+		}
+
+		return j;
+	}
+
+	public Job GiveJob (Job _oldJob)
+	{
+		return CreateJob(_oldJob);
 	}
 
 	/// If employee is in charge, this returns a new job. If not, the employee will seek out an employee that can give them a job.
-	Job FindJob ()
+	void FindJob ()
 	{
 		if ( InCharge )
 		{
-			return CreateJob ();
+			m_job = CreateJob (m_job);
 		}
 		else
 		{
@@ -113,6 +177,7 @@ public class Employee : Character {
 			Employee employee = m_world.InCharge;
 
 			Path_AStar TempPath = new Path_AStar ( m_world, m_currTile, employee.m_currTile );
+
 			//Set destination 1 tile away from the employee in charge.
 			if ( m_currTile.IsNeighbour ( employee.m_currTile, true, true ) == false )
 			{
@@ -120,20 +185,9 @@ public class Employee : Character {
 			}
 			else
 			{
-				//The employee will now ask the employee in charge for a job.
-				if ( RequestInteraction ( employee, 2.0f ) )
-				{
-					//Ask for job
-					Job j = employee.GiveJob();
-					return j;
-				}
-				else
-				{
-					Debug.Log(employee.m_name + " said no to interacting with " + m_name);
-				}
-
+				m_job = CreateJob (m_job, false, true);
 			}
-			return null;
+			return;
 		}
 
 	}
@@ -145,9 +199,10 @@ public class Employee : Character {
 		switch ( _title )
 		{
 			case Title.Manager:
-				foreach ( Employee emp in m_world.m_characters.ToArray() )
+				foreach ( KeyValuePair<int, Employee> emp in m_world.m_employeesInWorld )
+				//foreach ( Employee emp in m_world.m_charactersInWorld.ToArray() )
 				{
-					if ( emp.m_title == Title.Manager )
+					if ( emp.Value.m_title == Title.Manager )
 					{
 						Debug.LogError("Already have a Manager. Cannot set another.");
 						return;
@@ -157,9 +212,10 @@ public class Employee : Character {
 				break;
 			case Title.AssistantManager:
 
-				foreach ( Employee emp in m_world.m_characters.ToArray() )
+				foreach ( KeyValuePair<int, Employee> emp in m_world.m_employeesInWorld )
+				//foreach ( Employee emp in m_world.m_charactersInWorld.ToArray() )
 				{
-					if ( emp.m_title == Title.AssistantManager )
+					if ( emp.Value.m_title == Title.AssistantManager )
 					{
 						Debug.LogError("Already have an Assistant Manager. Cannot set another.");
 						return;
@@ -183,58 +239,24 @@ public class Employee : Character {
 	}
 
 	/// The overridden Update_DoThink function from Character. Processes the employee's brain for this frame.
-	protected override void Update_DoThink ( float _deltaTime )
+	protected override void OnUpdate_DoThink ( float _deltaTime )
 	{
-
-		if ( m_interacting != null )
-		{
-			if ( m_walkAndTalk )
-			{
-				m_canMove = true;
-			}
-			else
-			{
-				m_canMove = false;
-			}
-			if ( m_authorityLevel >= m_interacting.m_authorityLevel )
-			{
-				//The character we are interacting with is has a bigger authority than us. So keep up with them.
-				if (m_currTile.IsNeighbour(m_interacting.m_currTile, true, true) == false)
-				{
-					Path_AStar TempPath = new Path_AStar(m_world, m_currTile, m_interacting.m_currTile);
-					SetDestination(TempPath.InitialPathToArray()[TempPath.Length()-2]);
-				}	
-			}
-			m_elaspedTimeInteraction += _deltaTime;
-			if ( m_elaspedTimeInteraction >= m_fullTimeInteraction )
-			{
-				m_interacting = null;
-				m_canMove = true;
-				m_ignoreTask = false;
-				StopInteraction();
-			}	
-			return;
-		}
-		else
-		{
-			m_canMove = true;
-		}
-		
-		if ( m_currTile == m_destTile )
-		{
-			m_ignoreTask = false;
-		}
-
-		//If the character ignore its current task, it doesn't need to think about what to do next. It should just carry on moving to where its going.
-		if ( m_ignoreTask == true )
-		{
-			return;
-		}
-
-		// All employees need a job, so if it hasn't got one it needs to create one.
 		if ( m_job == null )
 		{
-			m_job = FindJob ();
+			if ( m_currTile == m_destTile )
+			{
+				m_ignoreTask = false;
+			}
+
+			//If the character ignore its current task, it doesn't need to think about what to do next. It should just carry on moving to where its going.
+			if ( m_ignoreTask == true )
+			{
+				return;
+			}
+
+			// All employees need a job, so if it hasn't got one it needs to create one.
+
+			FindJob ();
 			if ( m_job == null )
 			{
 				return;
@@ -242,6 +264,31 @@ public class Employee : Character {
 		}
 
 		//If we get to here, the employee has a job.
+		//We need to check to see if more staff are needed at the checkouts.
+
+		//If we are in charge, we we are serving at the checkout, we should know if more checkout staff is required.
+		if ( InCharge || m_job.m_primaryState == Job.PrimaryStates.ServeOnCheckout )
+		{
+			//int TempNumofMannedTilles = m_world.m_numberOfMannedCheckouts - 1;
+			//if ( ( TempNumofMannedTilles == 0 && m_world.m_customersInStore > 0 ) || m_world.m_customersInQueue != 0 && ( m_world.m_customersInQueue / TempNumofMannedTilles ) > 3 )
+			//{
+			//	CreateJob (m_job,  true );
+			//}
+
+			if ( ( m_world.m_numberOfMannedCheckouts == 0 && m_world.m_customersInStore > 0 ) || m_world.m_customersInQueue != 0 && ( m_world.m_customersInQueue / m_world.m_numberOfMannedCheckouts ) > 3 )
+			{
+				m_world.RequireMoreCheckoutStaff = true;
+			}
+			else
+			{
+				m_world.RequireMoreCheckoutStaff = false;
+			}
+		}
+
+		if ( m_world.RequireMoreCheckoutStaff && m_job.m_primaryState != Job.PrimaryStates.ServeOnCheckout)
+		{
+			CreateJob (m_job,  true );
+		}
 
 		//Is the employee at the job tile?
 		if ( m_job.Tile != null && m_currTile == m_job.Tile )
@@ -261,7 +308,7 @@ public class Employee : Character {
 		switch ( m_job.m_secondaryState )
 		{
 			case Job.SecondaryStates.Use:
-				Update_DoJob (_deltaTime);
+				Update_DoJob ( _deltaTime );
 				break;
 			case Job.SecondaryStates.GoTo:
 				if ( m_job.RequiresTrolley == true )
@@ -278,8 +325,13 @@ public class Employee : Character {
 							}
 							else
 							{
-								TrolleyBeingUsed = f;
 								f.m_manned = true;
+								TrolleyBeingUsed = f;
+								if ( m_world.m_characterFurniture.ContainsKey ( TrolleyBeingUsed ) )
+								{
+									m_world.m_characterFurniture.Remove ( TrolleyBeingUsed );
+								}
+								m_world.m_characterFurniture.Add ( TrolleyBeingUsed, this );
 								break;
 							}
 						}
@@ -287,27 +339,30 @@ public class Employee : Character {
 						{
 							//We looked for a free trolley, but there wasn't one.
 							Debug.LogWarning ( "Looked for a trolley for job: " + m_job.m_primaryState + " but couldn't find a free one." );
+							WorldController.instance.EC.BackStockWorked.Invoke();
+							ChangeJobPrimaryState(Job.PrimaryStates.FaceUp);
 							return;
 						}
 					}
 					if ( TrolleyBeingUsed.m_moving == false )
 					{
-						if ( m_currTile.IsNeighbour ( TrolleyBeingUsed.m_mainTile, false, true ) == false && m_currTile != TrolleyBeingUsed.m_mainTile )
+						if ( m_currTile.IsNeighbour ( TrolleyBeingUsed.m_mainTile, true, true ) == false && m_currTile != TrolleyBeingUsed.m_mainTile )
 						{
 							//We are not next to the trolley we need to move, so go there.
-							Path_AStar TEMPPath = new Path_AStar(m_world, m_currTile, TrolleyBeingUsed.m_mainTile);
+							Path_AStar TEMPPath = new Path_AStar ( m_world, m_currTile, TrolleyBeingUsed.m_mainTile );
 							//We need a temporary path because we don't want to go to where the trolley is, we need to go to the tile one from it.
-							Tile tile = TEMPPath.InitialPathToArray()[TEMPPath.InitialPathToArray().Length - 2];
+							Tile tile = TEMPPath.InitialPathToArray () [ TEMPPath.InitialPathToArray ().Length - 2 ];
 							if ( m_destTile != tile )
 							{
-								if ( m_requiredFurn == null )
-								{
-									SetDestination ( tile );
-								}
-								else if ( TrolleyBeingUsed.m_mainTile != m_requiredFurn.m_mainTile )
-								{
-									SetDestination ( tile );
-								}
+								SetDestination ( tile );
+								//if ( m_requiredFurn == null )
+								//{
+								//	SetDestination ( tile );
+								//}
+								//else if ( TrolleyBeingUsed.m_mainTile != m_requiredFurn.m_mainTile )
+								//{
+								//	SetDestination ( tile );
+								//}
 							}
 						}
 						else
@@ -333,7 +388,29 @@ public class Employee : Character {
 				}
 				break;
 			case  Job.SecondaryStates.Idle:
-				Debug.Log(m_name + " is idle");
+				if ( m_job.m_primaryState == Job.PrimaryStates.ServeOnCheckout )
+				{
+					if ( m_job.m_furn.m_stock.Count > 0 )
+					{
+						m_job.SetSecondaryState(Job.SecondaryStates.Use);
+					}
+					if ( ( m_world.m_numberOfMannedCheckouts == 1 && m_world.m_customersInStore > 0 ) || m_world.m_customersInQueue != 0 && ( m_world.m_customersInQueue / m_world.m_numberOfMannedCheckouts + 1 ) > 3 )
+					{
+						//We need to stay.
+
+						//Check to see if there is stock on the checkout.
+						if ( m_servingCustomer != null && m_servingCustomer.FinishedWithTransaction() == false )
+						{
+							m_job.SetSecondaryState(Job.SecondaryStates.Use);
+						}
+					}
+					else
+					{
+						//We can change job.
+						CreateJob(m_job);
+					}
+
+				}
 				break;
 		}
 	}
@@ -371,15 +448,65 @@ public class Employee : Character {
 		{
 			case Job.PrimaryStates.ServeOnCheckout:
 
-				m_world.m_numberOfMannedCheckouts++;
+
+				bool transactionFinishedThisFrame = false;
 
 				if ( TryTakeAnyStock ( m_job.m_furn, true ) == false )
 				{
-					//There is no more stock to take on this till. TODO later, when customers are implemented, the employee will finish the transaction.
-					m_job.SetSecondaryState ( Job.SecondaryStates.Idle );
+					if ( inTransaction )
+					{
+						//Ask the customer if they are done with the tranaction.
+						if ( m_servingCustomer.FinishedWithTransaction () )
+						{
+							//Pick up money.
+							m_job.m_furn.m_money += transactionCost;
+							WorldController.instance.EC.TransactionEnded.Invoke();
+							m_world.m_money+=transactionCost;
+							m_servingCustomer = null;
+							transactionCost = 0;
+							inTransaction = false;
+							transactionFinishedThisFrame = true;
+							m_world.m_customersInQueue--;
+							m_world.m_customersInStore--;
+						}
+					}
+					else
+					{
+						m_job.SetSecondaryState ( Job.SecondaryStates.Idle );
+						break;
+					}
+				}
+
+				if ( inTransaction == false )
+				{
+					if ( transactionFinishedThisFrame == false )
+					{
+						inTransaction = true;
+						if ( m_servingCustomer == null )
+						{
+							m_servingCustomer = FindCustomerBeingServed ();
+						}
+					}
+					else
+					{
+						if ( m_interactingCharacter != null )
+						{
+							StopInteraction ( true );
+						}
+					}
+				}
+
+				if ( m_stock == null )
+				{
 					break;
 				}
+
+				transactionCost += m_stock.Price;
 				ScanStockTill ( m_stock );
+				if ( m_interactingCharacter != m_servingCustomer )
+				{
+					RequestInteraction ( m_servingCustomer, 30, InteractionType.TalkingAtCheckout );
+				}
 				m_job.m_furn.TryAddStock ( TryGiveStock ( m_stock.IDName ) );
 				break;
 	
@@ -398,7 +525,7 @@ public class Employee : Character {
 						{
 							Debug.Log ( "Failed to take any stock from stockcage, it is probably empty" );
 							m_job.SetWorkTrolleyState ( Job.WorkTrolleyStates.EmptyTrolleyToFront );
-							m_job.SetJobFurn ( null );
+							m_job.SetJobFurn ( null, this );
 							m_taskTile = null;
 						}
 						else
@@ -406,7 +533,10 @@ public class Employee : Character {
 							if ( TrolleyBeingUsed.TryAddStock ( TryGiveStock ( m_stock.IDName ) ) == false )
 							{
 								Debug.Log ( "Failed to give stock to trolley, it is probably full." );
-								m_job.m_furn.TryGiveStock ( m_stock.IDName );
+								if ( m_stock != null )
+								{
+									m_job.m_furn.TryGiveStock ( m_stock.IDName );
+								}
 							}
 						}
 					}
@@ -414,7 +544,7 @@ public class Employee : Character {
 					{
 						//The trolley is full, so we should work the stock.
 						m_job.SetWorkTrolleyState ( Job.WorkTrolleyStates.EmptyTrolleyToFront );
-						m_job.SetJobFurn ( null );
+						m_job.SetJobFurn ( null, this );
 						m_taskTile = null;
 					}
 				}
@@ -444,7 +574,7 @@ public class Employee : Character {
 							Debug.Log ( "Failed to take any stock from BackShelf, it is probably empty, or all the stock has already been worked." );
 							m_job.m_furn.m_allStockWorked = true;
 							m_job.SetWorkTrolleyState ( Job.WorkTrolleyStates.EmptyTrolleyToFront );
-							m_job.SetJobFurn ( null );
+							m_job.SetJobFurn ( null, this );
 							m_taskTile = null;
 						}
 						else
@@ -460,7 +590,7 @@ public class Employee : Character {
 					{
 						//The trolley is full, so we should work the stock.
 						m_job.SetWorkTrolleyState ( Job.WorkTrolleyStates.EmptyTrolleyToFront );
-						m_job.SetJobFurn ( null );
+						m_job.SetJobFurn ( null, this );
 						m_taskTile = null;
 					}
 				}
@@ -480,7 +610,7 @@ public class Employee : Character {
 				if ( m_job.m_furn.m_facedUpPerc >= 100 )
 				{
 					//All stock on the job's furniture has been faced up, so find a new furniture.
-					m_job.SetJobFurn ( null );
+					m_job.SetJobFurn ( null, this );
 					m_taskTile = null;
 					return;
 				}
@@ -512,7 +642,7 @@ public class Employee : Character {
 
 				break;
 	
-			case Job.PrimaryStates.CountCheckoutMoney:
+			default:
 	
 				break;
 		}
@@ -526,7 +656,7 @@ public class Employee : Character {
 			case Job.PrimaryStates.WorkBackStock:
 
 				//We don't know what furniture we need, so work it out.
-			//Find first type of stock in the trolley being used.
+				//Find first type of stock in the trolley being used.
 				if ( TrolleyBeingUsed == null )
 				{
 					Debug.Log ( "We don't have a trolley" );
@@ -540,21 +670,25 @@ public class Employee : Character {
 				if ( m_job.m_additionalInfoState == Job.WorkTrolleyStates.FillTrolley )
 				{
 					// We need to fill this trolley.
-					foreach ( Furniture f in m_world.m_furnitureInWorld["BackShelf"].ToArray() )
+					foreach ( Furniture furn in m_world.m_furnitureInWorld["BackShelf"].ToArray() )
 					{
-						if ( f.m_stock.Count == 0 )
+						if ( furn.m_stock.Count == 0 )
 						{
 							//This furniture has no stock, so go to the next one.
 							continue;
 						}
-						else if ( f.m_allStockWorked == true )
+						else if ( furn.m_allStockWorked == true )
 						{
 							//All stock on this furniture has been worked, so go to the next one.
 							continue;
 						}
 						else
 						{
-							m_job.SetJobFurn ( f );
+							if ( furn.m_actionTile.m_character != null )
+							{
+								continue;
+							}
+							m_job.SetJobFurn ( furn, this );
 							if ( m_job.m_furn != null )
 							{
 								m_taskTile = m_job.m_furn.m_actionTile;
@@ -564,7 +698,9 @@ public class Employee : Character {
 					}
 
 					//We did not find a BackShelf that needs working. So now we need to face up.
-					m_job.SetPrimaryState ( Job.PrimaryStates.FaceUp );
+					m_world.AllWarehouseStockWorked = true;
+					WorldController.instance.EC.BackStockWorked.Invoke();
+					ChangeJobPrimaryState ( Job.PrimaryStates.FaceUp );
 				}
 				else if ( m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToFront || m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
 				{
@@ -592,7 +728,7 @@ public class Employee : Character {
 							else if ( m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
 							{
 								furn = FindFurnWithStockOfType ( TrolleyBeingUsed.m_stock [ key ] [ 0 ].IDName, false );
-								m_job.SetJobFurn ( furn );	
+								m_job.SetJobFurn ( furn, this );	
 								if ( furn == null )
 								{
 									return false;
@@ -609,7 +745,7 @@ public class Employee : Character {
 							if ( s.m_triedGoingOut == false )
 							{
 								furn = FindFurnWithStockOfType ( s.IDName, true );
-								m_job.SetJobFurn ( furn );	
+								m_job.SetJobFurn ( furn, this );	
 								if ( m_job.m_furn != null )
 								{
 									m_taskTile = m_job.m_furn.m_actionTile;
@@ -642,7 +778,11 @@ public class Employee : Character {
 								//This stockcage doesn't have stock. So skip it.
 								continue;
 							}
-							m_job.SetJobFurn ( furn );
+							if ( furn.m_actionTile.m_character != null )
+							{
+								continue;
+							}
+							m_job.SetJobFurn ( furn, this );
 							if ( furn == null )
 							{
 								return false;
@@ -655,8 +795,9 @@ public class Employee : Character {
 						}	
 					}
 					Debug.Log ( "All stockcages worked. Changing job to WorkBackStock" );
-					m_allStockcagesWorked = true;
-					m_job.SetPrimaryState ( Job.PrimaryStates.WorkBackStock );
+					m_world.AllStockcagesEmpty = true;
+					WorldController.instance.EC.StockcageStockWorked.Invoke();
+					ChangeJobPrimaryState ( Job.PrimaryStates.WorkBackStock );
 					return false;
 				}
 				else if ( m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToFront || m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
@@ -685,7 +826,7 @@ public class Employee : Character {
 							else if ( m_job.m_additionalInfoState == Job.WorkTrolleyStates.EmptyTrolleyToBack )
 							{
 								furn = FindFurnWithStockOfType ( TrolleyBeingUsed.m_stock [ key ] [ 0 ].IDName, false );
-								m_job.SetJobFurn ( furn );
+								m_job.SetJobFurn ( furn, this );
 								if ( furn == null )
 								{
 									return false;
@@ -698,7 +839,7 @@ public class Employee : Character {
 							}
 						}
 						furn = FindFurnWithStockOfType ( TrolleyBeingUsed.m_stock [ key ] [ 0 ].IDName, true );
-						m_job.SetJobFurn ( furn );	
+						m_job.SetJobFurn ( furn, this );	
 						if ( furn == null )
 						{
 							foreach ( Stock s in TrolleyBeingUsed.m_stock [ key ] )
@@ -714,6 +855,8 @@ public class Employee : Character {
 						}
 						return true;
 					}
+					//If we get here, there is no stock on the trolley.
+					m_job.m_additionalInfoState = Job.WorkTrolleyStates.FillTrolley;
 				}
 
 				break;
@@ -729,7 +872,12 @@ public class Employee : Character {
 					}
 					if ( furn.m_worked == false )
 					{
-						m_job.SetJobFurn ( furn );
+						if ( furn.m_actionTile.m_character != null )
+						{
+							continue;
+						}
+
+						m_job.SetJobFurn ( furn, this );
 						if ( furn == null )
 						{
 							return false;
@@ -737,6 +885,7 @@ public class Employee : Character {
 						if ( m_job.m_furn != null )
 						{
 							m_taskTile = m_job.m_furn.m_actionTile;
+							return true;
 						}
 					}
 					else
@@ -744,6 +893,10 @@ public class Employee : Character {
 						continue;
 					}
 				}
+
+				//If we get here, all the stock in the store has been faced up.
+				m_world.AllFacingUpFinished = true;
+				//ChangeJobPrimaryState ( Job.PrimaryStates.ServeOnCheckout, m_job );
 
 				break;
 
@@ -757,7 +910,11 @@ public class Employee : Character {
 						{
 							continue;
 						}
-						m_job.SetJobFurn ( furn );
+						if ( furn.m_actionTile.m_character != null )
+						{
+							continue;
+						}
+						m_job.SetJobFurn ( furn, this );
 						if ( furn == null )
 						{
 							return false;
@@ -794,7 +951,7 @@ public class Employee : Character {
 			if ( FindJobFurn ( m_job.m_requiredFurniture ) )
 			{
 				World m_world = WorldController.instance.m_world;
-				if ( m_job.m_furn != null)
+				if ( m_job.m_furn != null )
 				{
 					m_job.m_furn.m_manned = true;
 				}
@@ -806,20 +963,20 @@ public class Employee : Character {
 				{
 					if ( m_taskTile == null )
 					{
-						Debug.LogError("Job's tile is null.");
+						Debug.LogError ( "Job's tile is null." );
 						return;
 					}
-					SetDestWithFurn(m_taskTile, _furn);
+					SetDestWithFurn ( m_taskTile, _furn );
 				}
 				else
 				{
 					if ( m_taskTile == null )
 					{
-						Debug.LogError("Job's tile is null.");
+						Debug.LogError ( "Job's tile is null." );
 						return;
 					}
 					m_requiredFurn = m_job.m_furn;
-					SetDestination ( m_taskTile);
+					SetDestination ( m_taskTile );
 				}
 			}
 		}
@@ -835,10 +992,10 @@ public class Employee : Character {
 		}
 		else
 		{
-			if(m_taskTile != null && m_currTile != m_taskTile && m_destTile != m_taskTile)
+			if ( m_taskTile != null && m_currTile != m_taskTile && m_destTile != m_taskTile )
 			{
 				//If we get here, we are not in the job's tile, and we are not going to the job's tile, but we have a trolley we need.
-				SetDestWithFurn(m_taskTile, _furn);	
+				SetDestWithFurn ( m_taskTile, _furn );	
 				return;
 			}
 			else
@@ -846,7 +1003,7 @@ public class Employee : Character {
 				//Trolley is at the job tile, so we need to now go there. We no longer require it, we now require the other furniture needed for the job.
 				if ( m_taskTile == null )
 				{
-					Debug.LogError("Job's tile is null.");
+					Debug.LogWarning("Job's tile is null.");
 					return;
 				}
 				m_requiredFurn = m_job.m_furn;
@@ -864,7 +1021,6 @@ public class Employee : Character {
 			return;
 		}
 		_stock.m_scanned = true;
-		Debug.Log("BEEP! " + _stock.Name + " was scanned through");
 	}
 
 	/// Returns the attempt's outcome. Attempts to move the specificed stock from TrolleyBeingWorked to the specified furniture.
@@ -902,41 +1058,69 @@ public class Employee : Character {
 	{
 		foreach ( string name in m_world.m_furnitureInWorld.Keys )
 		{
-			foreach ( Furniture f in m_world.m_furnitureInWorld[name] )
+			foreach ( Furniture furn in m_world.m_furnitureInWorld[name] )
 			{
-				if ( f.m_name == "Wall" )
+				if ( furn.m_name == "Wall" )
 				{
 					continue;
 				}
 				if ( _front )
 				{
-					if ( m_world.m_frontFurniture.Contains ( f ) == false)
+					if ( m_world.m_frontFurniture.Contains ( furn ) == false )
 					{
 						continue;
 					}
 				}
 				else
 				{
-					if ( m_world.m_backFurniture.Contains ( f ) == false)
+					if ( m_world.m_backFurniture.Contains ( furn ) == false )
 					{
 						continue;
 					}
 				}
 
+				if ( furn.m_actionTile.m_character != null )
+				{
+					continue;
+				}
+
 				//If we get here, the furniture will be of the appropriate name.
-				foreach ( string stockName in f.m_stock.Keys )
+				foreach ( string stockName in furn.m_stock.Keys )
 				{
 					if ( _stockIDName == stockName )
 					{
-						if ( f.m_full == false )
+						if ( _front == false )
 						{
-							return f;
+							if ( furn.m_full == false )
+							{
+								return furn;
+							}
+							else
+							{
+								Debug.LogWarning ( furn.m_name + " is full." );
+
+								break;
+							}
 						}
 						else
 						{
-							Debug.LogWarning ( f.m_name + " is full." );
-
-							break;
+							if ( m_currTile.IsNeighbour ( furn.m_actionTile, true, false ) )
+							{
+								if ( furn.m_full == false )
+								{
+									return furn;
+								}
+								else
+								{
+									Debug.LogWarning ( furn.m_name + " is full." );
+								
+									break;
+								}
+							}
+							else
+							{
+								return furn;
+							}
 						}
 					}
 				}
@@ -956,14 +1140,14 @@ public class Employee : Character {
 				}
 				if ( _front )
 				{
-					if ( m_world.m_frontFurniture.Contains ( f ) == false)
+					if ( m_world.m_frontFurniture.Contains ( f ) == false )
 					{
 						continue;
 					}
 				}
 				else
 				{
-					if ( m_world.m_backFurniture.Contains ( f ) == false)
+					if ( m_world.m_backFurniture.Contains ( f ) == false )
 					{
 						continue;
 					}
@@ -981,13 +1165,13 @@ public class Employee : Character {
 
 		if ( m_job.m_primaryState == Job.PrimaryStates.WorkBackStock )// || m_job.m_primaryState == Job.PrimaryStates.WorkStockcage)
 		{
-			m_job.SetWorkTrolleyState(Job.WorkTrolleyStates.EmptyTrolleyToBack);
+			m_job.SetWorkTrolleyState ( Job.WorkTrolleyStates.EmptyTrolleyToBack );
 		}
 
 		//If we get here, there is no place in the world for this stock, and no empty places either. TODO: This is when we would create overflow stockcages.
 
 		return null;
-}
+	}
 
 	void WorkStockOnTrolley ()
 	{
@@ -1041,13 +1225,25 @@ public class Employee : Character {
 				}
 			}
 			//If we get here, none of the stock in the furniture matches the stock in the trolley. So reset the job's furniture.
-			m_job.SetJobFurn(null);
+			m_job.SetJobFurn(null, this);
 			m_taskTile = null;
 		}
 	}
 
+	void ChangeJobPrimaryState ( Job.PrimaryStates _newState, Job _oldJob = null )
+	{
+		if ( TrolleyBeingUsed != null )
+		{
+			TrolleyBeingUsed.m_manned = false;
+			TrolleyBeingUsed.m_moving = false;
+			TrolleyBeingUsed = null;
+		}
+		m_movingFurniture = null;
+		m_job.SetPrimaryState(_newState, _oldJob);
+	}
+
 	/// Faces up the specified stock, and adjusts the stock's and job's furniture's face up flags and percentages.
-	void FaceUp (Stock _stock)
+	void FaceUp ( Stock _stock )
 	{
 		float percIncreased = ( (float)_stock.Weight / (float)m_job.m_furn.m_weightUsed ) * 100;
 		_stock.m_facedUp = true;
@@ -1055,21 +1251,38 @@ public class Employee : Character {
 		{
 			percIncreased = 100f - m_job.m_furn.m_facedUpPerc;
 		}
-		m_job.m_furn.ChangeFaceUpPerc(percIncreased);
+		m_job.m_furn.ChangeFaceUpPerc ( percIncreased );
+
+		m_movingStock = true;
+		m_fullTimeToMoveStock = 1.0f + ( (float)_stock.Weight / 1000.0f );
 	
-		if (m_job.m_furn.m_facedUpPerc == 100f)
+		if ( m_job.m_furn.m_facedUpPerc >= 100f )
 		{
 			m_job.m_furn.m_worked = true;
-			m_job.SetJobFurn(null);
+			m_job.SetJobFurn ( null, this );
 			m_taskTile = null;
 			return;
 		}
-		else if (m_job.m_furn.m_facedUpPerc > 100f)
+		//else if (m_job.m_furn.m_facedUpPerc > 100f)
+		//{
+		//	m_job.m_furn.m_worked = true;
+		//	m_job.SetJobFurn(null, this);
+		//	m_taskTile = null;
+		//	return;
+		//}
+	}
+
+	Customer FindCustomerBeingServed ()
+	{
+		//To find the customer in the front of the queue, the one we are serving.
+		//We need to floodfill from the center of the till to a tile with a queue number of 1.
+
+		Tile frontOfQueue = new FindFreeQueueTile ( m_world, m_job.m_furn.m_middleTile, true ).m_tileFound;
+		if ( frontOfQueue.m_character == null)
 		{
-			m_job.m_furn.m_worked = true;
-			m_job.SetJobFurn(null);
-			m_taskTile = null;
-			return;
+			Debug.Log("FindCustomerBeingServed -- No character in given tile.");
 		}
+
+		return (Customer)frontOfQueue.m_character;
 	}
 }

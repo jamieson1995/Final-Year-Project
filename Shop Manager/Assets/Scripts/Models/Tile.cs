@@ -26,8 +26,17 @@ public class Tile {
 	/// Reference to the furniture in this tile. Null means no furniture is in this tile.
 	public Furniture m_furniture { get; protected set; }
 
+	/// Reference to the character in this tile. Null means no characters are in this tile.
+	public Character m_character { get; protected set; }
+
 	/// Flag to determine if this tile is an outside tile.
 	public bool m_outside;
+
+	/// Flag to determine if this tile is avaiable to customer to queue with.
+	public bool m_queue;
+
+	/// How many tiles deep is this queue tile in this queue.
+	public int m_queueNum;
 
 	/// The movement cost of walking on this tile.
 	public float m_movementCost
@@ -53,9 +62,16 @@ public class Tile {
 		this.Y = _y;
 	}
 
-	/// Returns the outcome of the attempt. Attempts to place the specified furniture in this tile, with the specified rotation.
-	public bool PlaceFurniture ( Furniture _furn, int _direction = 1)
+	/// Changes this tile's character flag to the specified character. Can be null.
+	public void ChangeCharacterInTile ( Character _char )
 	{
+		m_character = _char;
+	}
+
+	/// Returns the outcome of the attempt. Attempts to place the specified furniture in this tile, with the specified rotation.
+	public bool PlaceFurniture ( Furniture _furn, int _direction = 1 )
+	{
+
 		if ( _furn == null )
 		{
 			Debug.Log ( "Trying to place nothing" );
@@ -170,7 +186,7 @@ public class Tile {
     }
 
 	/// Returns an array. The array is filled with this tile's neighbouring tiles' furniture. If an entry is null, that tile was empty of furniture.
-	public Furniture[] GetNeighboursFurniture ( bool _diagOk )
+	public Furniture[] GetNeighboursFurniture ( bool _diagOk = false )
 	{
 		Tile[] neighbours = GetNeighbours ( _diagOk );
 		Furniture[] neighboursFurn;
@@ -199,7 +215,17 @@ public class Tile {
 			return m_furniture.m_isEnterable(m_furniture);
 		}
 
+		if (m_character != null)
+		{
+			return ENTERABILITY.Soon;
+		}
+
 		return ENTERABILITY.Yes;
+	}
+
+	public string GetStringLocation()
+	{
+		return "( " + X + ", " + Y + " )";
 	}
 
 }

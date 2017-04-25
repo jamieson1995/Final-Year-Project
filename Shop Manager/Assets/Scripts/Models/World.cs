@@ -14,11 +14,29 @@ public class World {
 	/// Reference to all tiles in the world, ordered in an array.
 	Tile[,] m_tiles;
 
+	/// Dictionary of all charcaters that have ever been spawned. Input is the character's ID.
+	public Dictionary<int, Character> m_allCharacters { get; protected set; }
+
 	/// List of all charcaters in the world.
-	public List<Character> m_characters { get; protected set; }
+	public Dictionary<int, Character> m_charactersInWorld { get; protected set; }
 
 	/// List of all employees in the world.
-	public List<Employee> m_employees { get; protected set; }
+	public Dictionary<int, Employee> m_employeesInWorld { get; protected set; }
+
+	public Dictionary<int, Character> m_customersInWorld { get; protected set; }
+
+	public bool m_scenarioOver;
+
+	///The following variables are used for when employees in charge need to know what job to do next.
+	public bool FacingUpFinished;
+
+	public bool AllStockcagesEmpty;
+
+	public bool AllWarehouseStockWorked;
+
+	public bool AllFacingUpFinished;
+
+	public bool RequireMoreCheckoutStaff;
 
 	/// Reference to the employee that is currently in charge of the shop.
 	Employee m_inCharge;
@@ -55,6 +73,34 @@ public class World {
 
 	/// Global Game Speed. 
 	public float m_gameSpeed { get; protected set; }
+
+	public int m_second { get; protected set; }
+	public int m_minute {get; protected set; }
+	public int m_hour { get; protected set; }
+
+	public int m_dayOfWeek { get; protected set; }
+	public int m_week { get; protected set; }
+	public int m_day { get; protected set; }
+	public int m_month { get; protected set; }
+	public int m_year { get; protected set; }
+
+
+	public bool m_shopOpen { get; protected set; }
+	public int m_openingTime { get; protected set; }
+	public int m_closingTime { get; protected set; }
+
+
+	float m_maxTimeTimer;
+	float m_elapsedTimeTimer; 
+
+	float m_maxCustomerSpawnTimer;
+	float m_elapsedCustomerSpawnTimer;
+
+	//This is used to change the rate of customer spawnings.
+	float m_customerMaxSpawnRateValue;
+
+	/// The amount of money the shop has recieved during the simulation.
+	public int m_money;
 
 	/// Number of customers inside the store.
 	public int m_customersInStore;
@@ -97,7 +143,7 @@ public class World {
 	/// All furniture in the world that employees will use as back Furniture when performing jobs.
 	public List<Furniture> m_backFurniture;																
 
-	/// List of all characters in the world, ordered by authority.
+	/// List of all employees in the world, ordered by authority.
 	public List<Employee> m_authorityLevels;
 
 	public struct ShoppingListItem
@@ -125,7 +171,10 @@ public class World {
 	public Action<Furniture> cbFurnitureMoved;
 
 	/// Callback for when a character gets created.
-	public Action<Character> cbCharacterCreated;
+	public Action<Character> cbCharacterSpawned;
+
+	/// Callback for when a character gets removed from the world.
+	public Action<Character> cbCharacterRemoved;
 
 
 	/// Creates a new World, with specified width and height.
@@ -150,8 +199,10 @@ public class World {
 
 		m_furnitures = new List<Furniture> ();
 		m_furnitureInWorld = new Dictionary<string, List<Furniture> > ();
-		m_characters = new List<Character> ();
-		m_employees = new List<Employee> ();
+		m_allCharacters = new Dictionary<int, Character>();
+		m_charactersInWorld = new Dictionary<int, Character> ();
+		m_employeesInWorld = new Dictionary<int, Employee> ();
+		m_customersInWorld = new Dictionary<int, Character>();
 		m_characterFurniture = new Dictionary<Furniture, Character> ();
 		m_frontFurniture = new List<Furniture>();
 		m_backFurniture = new List<Furniture>();
@@ -164,23 +215,55 @@ public class World {
 		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["RedSeedlessGrapes500"], 200 ) );
 		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["PotatoesPack2500"], 200 ) );
 		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"], 43 ) );
-		//m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"], 43 ) );
 		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["StillWater12"], 229 ) );
 		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["ChocolateBiscuit8"], 159 ) );
 
 		m_numberOfMannedCheckouts = 0;
 
 		//Until customers are added to the game, the amount of customers in store needs to be hardcoded so the employee AI can be tested
-		m_customersInStore = 10;
-		m_customersInQueue = 10;
+		m_customersInStore = 0;
+		m_customersInQueue = 0;
 
 		m_gameSpeed = 1.0f;
+		//Should always be 1 anyway, but this is a safety measure.
+		m_maxTimeTimer = 1.0f/m_gameSpeed;
+
+		m_second = 0;
+		m_minute = 0;
+		m_hour = 11;
+		m_dayOfWeek = 3;
+		m_day = 12;
+		m_month = 4;
+		m_year = 2017;
+		m_week = 15;
+
+		m_openingTime = 8;
+		m_closingTime = 22;
+
+		if ( m_openingTime <= m_hour && m_hour < (m_openingTime + 1) )
+		{
+			m_customerMaxSpawnRateValue = 20;
+		}
+		else if ( m_openingTime + 1 <= m_hour && m_hour < 13 || 15 <= m_hour && m_hour< 18 || 20 <= m_hour && m_hour< m_closingTime - 1)
+		{
+			m_customerMaxSpawnRateValue = 2;
+		} 
+		else if ( 13 <= m_hour && m_hour< 15 || 18 <= m_hour && m_hour< 20)
+		{
+			m_customerMaxSpawnRateValue = 2;
+		} 
+		else if ( m_closingTime - 1 <= m_hour && m_hour< m_closingTime )
+		{
+			m_customerMaxSpawnRateValue = 15;
+		} 
+		m_maxCustomerSpawnTimer = 45;
 	}
 
 	/// Sets the Game Speed to the specified value.
 	public void SetGameSpeed ( float _gameSpeed )
 	{
 		m_gameSpeed = _gameSpeed;
+		m_maxTimeTimer = ( 1.0f / m_gameSpeed );
 	}
 
 	/// Returns a Tile with specified coordinates.
@@ -204,51 +287,283 @@ public class World {
 		{
 			return;
 		}
-		
+
 		float GameSpeedDT = _deltaTime * m_gameSpeed;
 
-		foreach ( Character c in m_characters )
+		m_elapsedTimeTimer += _deltaTime;
+
+		if ( m_elapsedTimeTimer >= m_maxTimeTimer )
 		{
-			c.Update(GameSpeedDT);
+			m_elapsedTimeTimer = 0;
+			m_second += 1;
+			if ( m_second >= 60 )
+			{
+				m_second = 0;
+				m_minute += 1;
+				if ( m_minute >= 60 )
+				{
+					m_minute = 0;
+					m_hour++;
+
+					//FIXME: This is specific to this scenario.
+					if ( m_hour == 12 )
+					{
+						WorldController.instance.EC.ScenarioEnd.Invoke();
+					}
+
+					if ( m_openingTime <= m_hour && m_hour < ( m_openingTime + 1 ) )
+					{
+						m_customerMaxSpawnRateValue = 20;
+					}
+					else if ( m_openingTime + 1 <= m_hour && m_hour < 13 || 15 <= m_hour && m_hour < 18 || 20 <= m_hour && m_hour < m_closingTime - 1 )
+					{
+						m_customerMaxSpawnRateValue = 10;
+					}
+					else if ( 13 <= m_hour && m_hour < 15 || 18 <= m_hour && m_hour < 20 )
+					{
+						m_customerMaxSpawnRateValue = 5;
+					}
+					else if ( m_closingTime - 1 <= m_hour && m_hour < m_closingTime )
+					{
+						m_customerMaxSpawnRateValue = 5;
+					} 
+
+					if ( m_hour >= 24 )
+					{
+						m_day++;
+						m_hour = 0;
+						m_dayOfWeek++;
+
+						if ( m_dayOfWeek > 7 )
+						{
+							m_dayOfWeek = 1;
+							m_week++;
+						}
+
+						if ( m_month == 1 || m_month == 3 || m_month == 5 || m_month == 7 || m_month == 8 || m_month == 10 || m_month == 12 )
+						{
+							if ( m_day == 32 )
+							{
+								m_day = 1;
+								m_month++;
+
+								if ( m_month == 13 )
+								{
+									m_month = 1;
+									m_year++;
+								}
+							}
+
+							if ( m_month == 1 )
+							{	
+								//If we are in January and it's a monday, and there have been less than 7 days this year,
+								//It must be week 1.
+								if ( m_dayOfWeek == 1 )
+								{
+									if ( m_day < 7 )
+									{
+										m_week = 1;
+									}
+								}
+							}
+						}
+						else if ( m_month == 4 || m_month == 6 || m_month == 9 || m_month == 11 )
+						{
+							if ( m_day == 31 )
+							{
+								m_day = 1;
+								m_month++;
+							}
+						}
+						else if ( m_month == 2 )
+						{
+							if ( m_day == 29 )
+							{
+								m_day = 1;
+								m_month++;
+							}
+						}
+					}
+				}
+
+			}
+
+			if ( m_hour == m_openingTime && m_minute == 0 && m_second == 0 )
+			{
+				m_shopOpen = true;
+				Debug.Log ( "Shop opened" );
+			}
+			if ( m_hour == m_closingTime && m_minute == 0 && m_second == 0 )
+			{
+				m_shopOpen = false;
+				Debug.Log ( "Shop closed" );
+			}
+
+			m_elapsedCustomerSpawnTimer++;
 		}
+
+		if ( m_elapsedCustomerSpawnTimer >= m_maxCustomerSpawnTimer )
+		{
+			m_elapsedCustomerSpawnTimer = 0;
+			WorldController.instance.EC.CustomerEnteredMap.Invoke ();
+			int age = UnityEngine.Random.Range ( 16, 80 );
+			bool freeTile = false;
+			Tile t = GetTileAt ( 0, 0 );
+			while ( freeTile == false )
+			{
+				t = GetTileAt ( UnityEngine.Random.Range ( 0, m_width ), 0 );
+				if ( t.m_character == null )
+				{
+					freeTile = true;
+				}
+			}
+
+			int spawnChance = UnityEngine.Random.Range ( 1, 3 );
+			if ( m_allCharacters.Count == 2 )
+			{
+				spawnChance = 1;
+			}
+
+			if ( spawnChance == 1 )
+			{
+				CreateCustomer ( "Customer ", age, t );
+			}
+			else if ( spawnChance == 2 )
+			{	
+				bool m_alreadyInMap = true;
+				int ID = 0;
+				int count = 0;
+				bool spawnedOldCustomer = false;
+				while ( m_alreadyInMap )
+				{
+					ID = UnityEngine.Random.Range ( 3, m_allCharacters.Count );
+					if ( m_charactersInWorld.ContainsKey ( ID ) == false )
+					{
+						m_alreadyInMap = false;
+					}
+					count++;
+					if ( count >= m_allCharacters.Count )
+					{
+						m_alreadyInMap = false;
+						spawnedOldCustomer = true;
+						CreateCustomer ( "Customer ", age, t );
+					}
+
+				}
+
+				if ( spawnedOldCustomer == false )
+				{
+					SpawnCustomer(ID, t);
+				}
+
+			}
+
+
+			m_maxCustomerSpawnTimer = UnityEngine.Random.Range ( 0, m_customerMaxSpawnRateValue * 60 );
+		}
+
+
+
+		if ( m_charactersInWorld.Count > 0 )
+		{
+			Dictionary<int, Character> TempDict = new Dictionary<int, Character> ();
+			foreach ( KeyValuePair<int, Character> character in m_charactersInWorld )
+			//foreach ( Character c in m_charactersInWorld )
+			{
+				TempDict.Add (character.Key, character.Value );
+			}
+
+			foreach ( KeyValuePair<int, Character> character in TempDict )
+			//foreach ( Character c in TempList )
+			{
+				character.Value.Update ( GameSpeedDT );
+			}
+		}
+
 		foreach ( Furniture f in m_furnitures )
 		{
-			f.Update(GameSpeedDT);
+			f.Update ( GameSpeedDT );
 		}
+
+		//FIXME
+		//THIS IS A TEMPORARY "CHEAT" FIX TO A KNOWN BUG
+		//The bug allows tiles to believe they have a trolley located on them even though they don't, this is screwing up the pathfinding
+		//and other AI systems.
+		//This cheat means that only the tile that the trolley is on, from the trolley's information, will keep its trolley. 
+		//The trolley's information is always correct since it does not need to do any information transfer across multiply objects.
+		foreach ( Tile t in m_tiles )
+		{
+			if ( t.m_furniture != null && t.m_furniture.m_name == "Trolley")
+			{
+				if ( t != GetTileAt ( (int)m_furnitureInWorld [ "Trolley" ] [ 0 ].m_furnParameters [ "m_currTile.X" ], (int)m_furnitureInWorld [ "Trolley" ] [ 0 ].m_furnParameters [ "m_currTile.Y" ] )
+					&&  t != GetTileAt ( (int)m_furnitureInWorld [ "Trolley" ] [ 0 ].m_furnParameters [ "m_destTile.X" ], (int)m_furnitureInWorld [ "Trolley" ] [ 0 ].m_furnParameters [ "m_destTile.Y" ] ))
+				{
+					Debug.LogError("We found a trolley in this tile where there wasn't one. Tile: " + t.GetStringLocation() );
+					t.RemoveFurniture ();
+				}
+			}
+		}
+		//END OF BUG FIX
 	}
 
-	public Customer CreateCustomer ( string _name, int _maxCarryWeight, Tile _tile )
+	public void SpawnCustomer (int ID, Tile _tile)
+	{
+		Character c = new Customer(m_allCharacters[ID], _tile);
+
+		if ( _tile.m_furniture != null )
+		{
+			//Cannot spawn character here because there is a piece of furniture here.
+			Debug.LogError ( "Tried to spawn character: " + c.m_name + " on tile: (" + _tile.X + ", " + _tile.Y + "), but couldn't because there is a piece of furniture in the way: " + _tile.m_furniture.m_name );
+			return;
+		}
+
+		if ( cbCharacterSpawned != null )
+		{
+			cbCharacterSpawned ( c );
+		}
+
+		m_charactersInWorld.Add ( c.ID, c );
+		m_customersInWorld.Add ( c.ID, c );
+
+		m_customersInStore++;
+
+	}
+
+	public void CreateCustomer ( string _name, int _age, Tile _tile )
 	{
 		if ( _tile.m_furniture != null )
+		{
+			//Cannot spawn character here because there is a piece of furniture here.
+			Debug.LogError ( "Tried to spawn character: " + _name + " on tile: (" + _tile.X + ", " + _tile.Y + "), but couldn't because there is a piece of furniture in the way: " + _tile.m_furniture.m_name );
+			return;
+		}
+
+		int nameNum = UnityEngine.Random.Range(0, Character.Names.Count + 1);
+
+		Customer c = new Customer ( Character.Names[nameNum], _age, _tile );
+
+		if ( cbCharacterSpawned != null )
+		{
+			cbCharacterSpawned ( c );
+		}
+
+		m_charactersInWorld.Add ( c.ID, c );
+		m_customersInWorld.Add ( c.ID, c );
+
+		m_customersInStore++;
+	}
+
+	/// Returns an Employee with specified variables. If tile == null, the employee isn't spawned.
+	public Employee CreateEmployee ( string _name, Tile _tile, Title _title, int _age )
+	{
+		if ( _tile != null && _tile.m_furniture != null )
 		{
 			//Cannot spawn character here because there is a piece of furniture here.
 			Debug.LogError ( "Tried to spawn character: " + _name + " on tile: (" + _tile.X + ", " + _tile.Y + "), but couldn't because there is a piece of furniture in the way: " + _tile.m_furniture.m_name );
 			return null;
 		}
 
-		Customer c = new Customer(_name, _maxCarryWeight, _tile);
-
-		if ( cbCharacterCreated != null )
-		{
-			cbCharacterCreated ( c );
-		}
-
-		m_characters.Add ( c );
-
-		return c;
-	}
-
-	/// Returns an Employee with specified variables.
-	public Employee CreateEmployee ( string _name, int _maxCarryWeight, Tile _tile, Title _title )
-	{
-		if ( _tile.m_furniture != null )
-		{
-			//Cannot spawn character here because there is a piece of furniture here.
-			Debug.LogError ( "Tried to spawn character: " + _name + " on tile: (" + _tile.X + ", " + _tile.Y + "), but couldn't because there is a piece of furniture in the way: " + _tile.m_furniture.m_name );
-			return null;
-		}
-
-		Employee e = new Employee ( _name, _maxCarryWeight, _tile, _title );	
+		Employee e = new Employee ( _name, _tile, _title, _age );	
 
 		e.m_walkAndTalk = true;
 
@@ -256,7 +571,7 @@ public class World {
 		{
 			case Title.Manager:
 				m_authorityLevels.Insert ( 0, e );
-				e.m_authorityLevel = 0;
+				e.m_authorityLevel = 1;
 				foreach ( Employee emp in m_authorityLevels.ToArray() )
 				{
 					if ( emp != e )
@@ -272,19 +587,19 @@ public class World {
 				if ( m_authorityLevels.Count == 0 )
 				{
 					m_authorityLevels.Insert ( 0, e );
-					e.m_authorityLevel = 0;
+					e.m_authorityLevel = 1;
 				}
 				else
 				{
 					if ( m_authorityLevels [ 0 ].m_title == Title.Manager )
 					{
 						m_authorityLevels.Insert ( 1, e );
-						e.m_authorityLevel = 1;
+						e.m_authorityLevel = 2;
 					}
 					else
 					{
 						m_authorityLevels.Insert ( 0, e );
-						e.m_authorityLevel = 0;
+						e.m_authorityLevel = 1;
 					}
 				}
 				foreach ( Employee emp in m_authorityLevels.ToArray() )
@@ -299,7 +614,7 @@ public class World {
 				if ( m_authorityLevels.Count == 0 )
 				{
 					m_authorityLevels.Insert ( 0, e );
-					e.m_authorityLevel = 0;
+					e.m_authorityLevel = 1;
 				}
 				else
 				{
@@ -309,7 +624,7 @@ public class World {
 					{
 						if ( m_authorityLevels.Count == i )
 						{
-							m_authorityLevels.Add(e);
+							m_authorityLevels.Add ( e );
 							e.m_authorityLevel = m_authorityLevels.Count;
 							found = true;
 
@@ -320,13 +635,13 @@ public class World {
 							{
 								Debug.Log ( "Why was there a Customer Service Assistant in charge?????" );
 								m_authorityLevels.Insert ( 0, e );
-								e.m_authorityLevel = 0;
+								e.m_authorityLevel = 1;
 								found = true;
 							}
 							else
 							{
 								m_authorityLevels.Insert ( i, e );
-								e.m_authorityLevel = i;
+								e.m_authorityLevel = i+1;
 								found = true;
 							}
 						}
@@ -342,19 +657,35 @@ public class World {
 				}
 				break;
 			case Title.CustomerServiceAssistant:
-				m_authorityLevels.Add(e);
+				m_authorityLevels.Add ( e );
 				break;
 		}
-	
-		if ( cbCharacterCreated != null )
+
+		if ( _tile != null )
 		{
-			cbCharacterCreated ( e );
+
+			if ( cbCharacterSpawned != null )
+			{
+				cbCharacterSpawned ( e );
+			}
+
+			m_charactersInWorld.Add ( e.ID, e );
+			m_employeesInWorld.Add ( e.ID, e );
 		}
 
-		m_characters.Add ( e );
-		m_employees.Add ( e );
-
 		return e;
+	}
+
+	public void RemoveCharacterFromWorld ( Character _char )
+	{
+		if ( cbCharacterRemoved != null )
+		{
+			cbCharacterRemoved ( _char );
+		}
+
+		m_customersInWorld.Remove(_char.ID);
+		m_charactersInWorld.Remove(_char.ID);
+		_char.RemoveFromWorld();
 	}
 
 	/// Adds all the furniture required into the correct Lists and Dictionaries
@@ -398,13 +729,13 @@ public class World {
 		m_furniturePrototypes.Add ( "Stockcage", 
 			new Furniture (
 				"Stockcage", // Name
-				3, 			 // Pathfinding Cost
+				0, 			 // Pathfinding Cost
 				1, 			 // Width
 				1,  		 // Height
 				false, 		 // Links to neighbour
 				false,		 // Draggable
 				75000,   	 // Max Carry Weight 
-				true		 // Movable
+				false		 // Movable
 			) 
 		);
 
@@ -422,7 +753,7 @@ public class World {
 				1,  			// Height
 				false, 			// Links to neighbour
 				false,			// Draggable
-				10000,    		// Max Carry Weight
+				30000,    		// Max Carry Weight
 				false			// Movable
 			) 
 		);
@@ -435,7 +766,7 @@ public class World {
 				1,  			// Height
 				false, 			// Links to neighbour
 				false,			// Draggable
-				20000,    		// Max Carry Weight
+				30000,    		// Max Carry Weight
 				true			// Movable
 			) 
 		);
@@ -2517,8 +2848,8 @@ public class World {
 			return false;
 		}
 
-		Furniture furn = _furn.Clone();
-		furn.RotateFurniture(_direction);
+		Furniture furn = _furn.Clone ();
+		furn.RotateFurniture ( _direction );
 
 		//This is for if the furniture is more than 1X1, and is used to check all the tiles for validity.
 		for ( int x_off = _tile.X; x_off < ( _tile.X + furn.Width ); x_off++ )
@@ -2529,7 +2860,11 @@ public class World {
 				//Make sure tile doesn't already have furniture
 				if ( t2.m_furniture != null )
 				{
-					return false;
+					if ( t2.m_furniture != _furn )
+					{
+						//It is fine if the furniture is itself.
+						return false;
+					}
 				}
 			}
 		}
@@ -2576,9 +2911,10 @@ public class World {
 	public int NumberOfEmployeesWithTitle ( Title _title )
 	{
 		int num = 0;
-		foreach ( Employee emp in m_employees )
+		foreach ( KeyValuePair<int,Employee> emp in m_employeesInWorld )
+		//foreach ( Employee emp in m_employeesInWorld )
 		{
-			if ( emp.m_title == _title )
+			if ( emp.Value.m_title == _title )
 			{
 				num++;
 			}
@@ -2606,40 +2942,42 @@ public class World {
 			int rank = 1;
 			while ( found == false )
 			{
-				foreach ( Employee emp in m_employees )
+				foreach ( KeyValuePair<int, Employee> emp in m_employeesInWorld )
+
+				//foreach ( Employee emp in m_employeesInWorld )
 				{
 					if ( rank == 1 )
 					{
-						if ( emp.m_title == Title.Manager )
+						if ( emp.Value.m_title == Title.Manager )
 						{
-							emp.InCharge = true;
-							if ( emp.InCharge == true )
+							emp.Value.InCharge = true;
+							if ( emp.Value.InCharge == true )
 							{
-								return emp;
+								return emp.Value;
 							}
 						}
 						break;
 					}
 					else if ( rank == 2 )
 					{
-						if ( emp.m_title == Title.AssistantManager )
+						if ( emp.Value.m_title == Title.AssistantManager )
 						{
-							emp.InCharge = true;
-							if ( emp.InCharge == true )
+							emp.Value.InCharge = true;
+							if ( emp.Value.InCharge == true )
 							{
-								return emp;
+								return emp.Value;
 							}
 						}
 						break;
 					}
 					else if ( rank == 3 )
 					{
-						if ( emp.m_title == Title.Supervisor )
+						if ( emp.Value.m_title == Title.Supervisor )
 						{
-							emp.InCharge = true;
-							if ( emp.InCharge == true )
+							emp.Value.InCharge = true;
+							if ( emp.Value.InCharge == true )
 							{
-								return emp;
+								return emp.Value;
 							}
 							else
 							{
@@ -2656,6 +2994,20 @@ public class World {
 			}
 		}
 		return null;	
+	}
+
+	public void SomethingWasSaid (Character _speaker, bool _positive)
+	{
+		if ( _positive )
+		{
+			//Speaker said something positive.
+			Debug.Log ( _speaker.m_name + " said something positive" );
+		}
+		else
+		{
+			//Speaker said something negative.
+			Debug.Log ( _speaker.m_name + " said something negative" );
+		}
 	}
 
 	/// Registers the furnitureCreated Callback
@@ -2683,15 +3035,27 @@ public class World {
 	}
 
 	/// Registers the characterCreated Callback
-	public void RegisterCharacterCreated ( Action<Character> _callbackFunc )
+	public void RegisterCharacterSpawned ( Action<Character> _callbackFunc )
 	{
-		cbCharacterCreated += _callbackFunc;
+		cbCharacterSpawned += _callbackFunc;
 	}
 
 	/// Unregisters the characterCreated Callback
-	public void UnregisterCharacterCreated ( Action<Character> _callbackFunc )
+	public void UnregisterCharacterSpawned ( Action<Character> _callbackFunc )
 	{
-		cbCharacterCreated -= _callbackFunc;
+		cbCharacterSpawned -= _callbackFunc;
+	}
+
+	/// Registers the characterRemoved Callback
+	public void RegisterCharacterRemoved ( Action<Character> _callbackFunc )
+	{
+		cbCharacterRemoved += _callbackFunc;
+	}
+
+	/// Unregisters the characterRemoved Callback
+	public void UnregisterCharacterRemoved ( Action<Character> _callbackFunc )
+	{
+		cbCharacterRemoved -= _callbackFunc;
 	}
 	
 }

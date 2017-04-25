@@ -104,6 +104,9 @@ public class Furniture {
 	/// Flag that represents if this furniture has been worked.
 	public bool m_worked;
 
+	///Current amount of money in the furniture. Used mainly for checkouts.
+	public int m_money;
+
 	/// Callback for when this furniture changes.
 	public Action<Furniture> cbOnChanged; //After this action gets activated, whenever it gets called, a given event will trigger, i.e changing the visual of this furniture
 
@@ -175,10 +178,9 @@ public class Furniture {
 
 		Furniture furn = _other.Clone (); 
 
-		//if ( furn.funcPositionValidation ( _tile, _direction ) == false )
 		if ( WorldController.instance.m_world.PositionCheck(_tile, _other, _direction) == false ) 
 		{
-			Debug.LogError ( "PlaceInstance -- Position validity function returned FALSE" );
+			//Debug.LogError ( "PlaceInstance -- Position validity function returned FALSE" );
 			return null;
 		}
 
@@ -325,20 +327,36 @@ public class Furniture {
 		m_furnParameters [ "m_movementPercentage" ] = 0;
 		m_furnParameters [ "m_destTile.X" ] = _toTile.X;
 		m_furnParameters [ "m_destTile.Y" ] = _toTile.Y;
-		m_mainTile.m_world.MoveFurniture ( this, m_mainTile, _toTile );
+		if ( m_mainTile.m_world.MoveFurniture ( this, m_mainTile, _toTile ) == false)
+		{
+			Debug.LogError ( "Failed to move " + m_name + " to (" + _toTile.X + ", " + _toTile.Y + ")." );
+			return false;
+		}
 
 		return true;
 	}
 
-	/// Changes the m_facedUpPerc variable by the specified amount, capped at 100.
+	/// Changes the m_facedUpPerc variable by the specified amount, capped at 0 and S100.
 	public void ChangeFaceUpPerc ( float _amount )
 	{
-		if ( m_facedUpPerc + _amount > 100f)
+		if ( m_facedUpPerc + _amount > 100f )
 		{
-			Debug.Log("Increasing the m_facedUpPerc by " + _amount + " will cause it to go above 100.");
+			Debug.Log ( "Increasing the m_facedUpPerc by " + _amount + " will cause it to go above 100." );
 			m_facedUpPerc = 100;
 			m_worked = true;
 			return;
+		}
+		if ( m_facedUpPerc + _amount < 0f )
+		{
+			Debug.Log ( "Decreasing the m_facedUpPerc by " + _amount + " will cause it to go below 0." );
+			m_facedUpPerc = 0;
+			m_worked = false;
+			return;
+		}
+		if ( _amount < 0 )
+		{
+			m_worked = false;
+			WorldController.instance.m_world.AllFacingUpFinished = false;
 		}
 		m_facedUpPerc += _amount;
 

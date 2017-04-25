@@ -7,6 +7,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class WorldController : MonoBehaviour {
 
@@ -14,7 +15,7 @@ public class WorldController : MonoBehaviour {
 	public static WorldController instance { get; protected set; }
 
 	///Reference to the main World.
-	public World m_world  {get; protected set; }
+	public World m_world  { get; protected set; }
 
 	///Reference to the m_tiledFloor Sprite
 	public Sprite m_tiledFloor;
@@ -28,17 +29,27 @@ public class WorldController : MonoBehaviour {
 	///Returns a Tile based onpn the given GameObject.
 	Dictionary<Tile, GameObject> tileGameObjectMap;
 
-	///Reference to the Create World Button.
-	public GameObject m_createWorldButton;
+	///Reference to the Start Scene.
+	public GameObject m_startScene;
 
-	///Reference to the GameUI.
-	public GameObject m_gameUI;
+	///Reference to the Instruction Scene.
+	public GameObject m_instructionScene;
+
+	///Reference to the Game Screen	.
+	public GameObject m_gameScreen;
 
 	///Reference to the FurnitureSpriteController.
 	public FurnitureSpriteController FSC;
 
 	///Reference to the CharacterSpriteController.
 	public CharacterSpriteController CSC;
+
+	///Reference to the EventController.
+	public EventController EC;
+
+	public AudioClip m_backgroundMusicClip;
+
+	AudioSource m_backgroundMusicSource;
 
 	void Awake ()
 	{
@@ -52,16 +63,40 @@ public class WorldController : MonoBehaviour {
 			Debug.Log ( "Second World Controller tried to be created. Cannot have more than one World Controller." );
 		}
 
+		if ( m_backgroundMusicClip != null )
+		{
+			m_backgroundMusicClip.LoadAudioData ();
+			m_backgroundMusicSource = gameObject.AddComponent<AudioSource> ();
+			m_backgroundMusicSource.clip = m_backgroundMusicClip;
+			m_backgroundMusicSource.loop = true;
+			m_backgroundMusicSource.volume/=10;
+		}
+
 	}
 
 	void Update ()
 	{
+
 		if ( m_world == null )
 		{
 			return;
 		}
 
-		m_world.Update(Time.deltaTime); //TODO Speed controls?
+		if ( m_world.m_scenarioOver )
+		{
+			if ( m_backgroundMusicSource.isPlaying )
+			{
+				m_backgroundMusicSource.Stop();
+			}
+			return;
+		}	
+
+		m_world.Update(Time.deltaTime);
+	}
+
+	public void ReloadStartScene ()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 	///Returns a Tile based upon given Vector3 coordinates and flag defining if coordinates can be out of bounds.
@@ -84,6 +119,8 @@ public class WorldController : MonoBehaviour {
     public void SetUpWorld ()
 	{
 		m_world = new World ( 21, 23 );
+
+		m_backgroundMusicSource.Play();
 
 		//Instantiate our dictionary that tracks which GameObject is rendering which tile data.
 		tileGameObjectMap = new Dictionary<Tile, GameObject> ();
@@ -108,13 +145,13 @@ public class WorldController : MonoBehaviour {
 					sr.sprite = m_concreteFloor;
 					tileData.m_outside = true;
 
-					if ( ( y == 19 || y == 18 || y == 17 || y == 16 || y == 15 ) && ( x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6) )
+					if ( ( y == 19 || y == 18 || y == 17 || y == 16 || y == 15 ) && ( x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6 ) )
 					{
 						sr.sprite = m_tiledFloor;
 						tileData.m_outside = false;
 					}
 
-					if ( ( y == 14 || y == 13 || y == 12 ) && (x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8 || x == 9) )
+					if ( ( y == 14 || y == 13 || y == 12 ) && ( x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8 || x == 9 ) )
 					{
 						sr.sprite = m_tiledFloor;
 						tileData.m_outside = false;
@@ -126,15 +163,40 @@ public class WorldController : MonoBehaviour {
 					tileData.m_outside = false;
 				}
 
-
+				if ( x == 16 && y == 6 )
+				{
+					tileData.m_queue = true;
+					tileData.m_queueNum = 1;
+				}
+				else if (x == 17 && y == 6)
+				{
+					tileData.m_queue = true;
+					tileData.m_queueNum = 2;
+				}
+				else if (x == 18 && y == 6)
+				{
+					tileData.m_queue = true;
+					tileData.m_queueNum = 3;
+				}
+				else if (x == 18 && y == 7)
+				{
+					tileData.m_queue = true;
+					tileData.m_queueNum = 4;
+				}
+				else if (x == 18 && y == 8)
+				{
+					tileData.m_queue = true;
+					tileData.m_queueNum = 5;
+				}
 			}
 		}
 		//Center the camera in the middle of the world.
 		Camera.main.transform.position = new Vector3( m_world.m_width/2, m_world.m_height/2, Camera.main.transform.position.z );
 		Camera.main.orthographicSize = 10;
 
-		m_createWorldButton.SetActive(false);
-		m_gameUI.SetActive(true);
+		m_startScene.SetActive(false);
+		m_instructionScene.SetActive(false);
+		m_gameScreen.SetActive(true);
 
 		FSC.SetUpWorld();
 		CSC.SetUpWorld();
@@ -153,7 +215,7 @@ public class WorldController : MonoBehaviour {
 			for ( int y = 0; y < m_world.m_height; y++ )
 			{
 
-				if ( y == 3 && x != 4 )
+				if ( y == 3 && x != 2 )//&& x != 11 )
 				{
 					m_world.PlaceFurnitureInWorld ( "Wall", m_world.GetTileAt ( x, y ) );
 				}
@@ -244,7 +306,7 @@ public class WorldController : MonoBehaviour {
 					m_world.PlaceFurnitureInWorld ( "BackShelf", m_world.GetTileAt ( x, y ), 3 );
 				}
 
-				if ( y == 5 && ( x == 13 || x == 17 ) )
+				if ( y == 5 && x == 14 )
 				{
 					stockToAdd.Clear ();
 					m_world.PlaceFurnitureInWorld ( "Checkout", m_world.GetTileAt ( x, y ) );
@@ -1172,7 +1234,7 @@ public class WorldController : MonoBehaviour {
 		}
 
 		#endregion
-		m_world.PlaceFurnitureInWorldWithStock ( "BigFridge", m_world.GetTileAt ( 19, 8 ), stockToAdd, 4 );
+		m_world.PlaceFurnitureInWorldWithStock ( "BigFridge", m_world.GetTileAt ( 18, 5 ), stockToAdd, 3 );
 		stockToAdd.Clear ();
 		#region StockToAddDefined
 
@@ -1305,16 +1367,14 @@ public class WorldController : MonoBehaviour {
 		}
 
 		#endregion
-		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 4, 17 ), stockToAdd );
+		m_world.PlaceFurnitureInWorldWithStock ( "Stockcage", m_world.GetTileAt ( 4, 18 ), stockToAdd );
 		m_world.PlaceFurnitureInWorld ( "Trolley", m_world.GetTileAt ( 2, 16 ), 2 );
-		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 3 ) );
+		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 2, 3 ) );
 		m_world.PlaceFurnitureInWorld ( "Door", m_world.GetTileAt ( 4, 19 ) );
-		//Employee e = m_world.CreateEmployee ( "James", 10000, m_world.GetTileAt ( 1, 1 ), Title.Manager );
-		//m_world.InCharge = e;
-		//m_world.CreateEmployee("John", 10000, m_world.GetTileAt ( 10, 10 ), Title.AssistantManager);
-		//m_world.CreateEmployee("Emily", 10000, m_world.GetTileAt ( 15, 10 ), Title.Supervisor);
-
-		m_world.CreateCustomer("Hannah", 10000, m_world.GetTileAt( 0, 0 ) );
+		Employee e = m_world.CreateEmployee ( "James", m_world.GetTileAt ( 4, 16), Title.Manager, 46 );
+		m_world.InCharge = e;
+		e.m_authorityLevel = 1;
+		m_world.CreateEmployee("Michael", m_world.GetTileAt ( 9, 10 ), Title.AssistantManager, 24);
 
 		m_world.m_frontFurniture.Reverse ();
 		m_world.m_backFurniture.Reverse ();
@@ -1335,6 +1395,7 @@ public class WorldController : MonoBehaviour {
 				}
 			}
 		}
+
 	}
 
 	/// Calls the SetGameSpeed function in m_world with the specified parameter.

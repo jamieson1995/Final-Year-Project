@@ -10,7 +10,7 @@ public class Path_TileGraph{
 
 	public Dictionary<Tile, Path_Node<Tile>> m_nodes { get; protected set; }
 
-	public Path_TileGraph ( World _world )
+	public Path_TileGraph ( World _world, bool _ignoreCharacters = true, Tile _root = null )
 	{
 		//Loop through all tile of the world
 		//For each tile, create a node.
@@ -24,9 +24,12 @@ public class Path_TileGraph{
 				Tile t = _world.GetTileAt ( x, y );
 				if ( t.m_movementCost > 0 )
 				{
-					Path_Node<Tile> n = new Path_Node<Tile> ();
-					n.m_data = t;
-					m_nodes.Add ( t, n );
+					if ( t == _root || _ignoreCharacters || ( _ignoreCharacters == false && t.m_character == null ) )
+					{
+						Path_Node<Tile> n = new Path_Node<Tile> ();
+						n.m_data = t;
+						m_nodes.Add ( t, n );
+					}
 				}
 			}
 		}
@@ -46,9 +49,10 @@ public class Path_TileGraph{
 			//If neighbour is walkable, create an edge to the relevant node
 			for ( int i = 0; i < neighbours.Length; i++ )
 			{
-					if (neighbours [ i ] != null && neighbours [ i ].m_movementCost > 0 )
+				if ( neighbours [ i ] != null && neighbours [ i ].m_movementCost > 0 )
+				{
+					if ( _ignoreCharacters || ( _ignoreCharacters == false && neighbours [ i ].m_character == null ) )
 					{
-
 						//This neighbour is walkable, so create an edge.
 
 						//But first, mke sure we are not clipping a diagonal, or trying to squeeze unappropiately
@@ -60,8 +64,8 @@ public class Path_TileGraph{
 						Path_Edge<Tile> e = new Path_Edge<Tile> ();
 						e.m_cost = neighbours [ i ].m_movementCost;
 						e.m_node = m_nodes [ neighbours [ i ] ];
-
 						edges.Add ( e );
+					}
 					}
 			}
 
