@@ -1,23 +1,24 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Models\Customer.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Models\Character.cs">
     <Files>
-      <File FileName="Assets\Scripts\Models\World.cs" Line="159" Column="44" />
-      <File FileName="Assets\Scripts\Models\Character.cs" Line="165" Column="1" />
-      <File FileName="Assets\Scripts\Models\Employee.cs" Line="406" Column="59" />
-      <File FileName="Assets\Scripts\Models\Customer.cs" Line="65" Column="6" />
-      <File FileName="Assets\Scripts\Models\Stock.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Controllers\WorldController.cs" Line="1317" Column="3" />
-      <File FileName="Assets\Scripts\Models\Furniture.cs" Line="297" Column="1" />
-      <File FileName="Assets\Scripts\Models\Job.cs" Line="40" Column="27" />
+      <File FileName="Assets\Scripts\Models\World.cs" Line="543" Column="71" />
+      <File FileName="Assets\Scripts\Controllers\WorldController.cs" Line="87" Column="44" />
+      <File FileName="Assets\Scripts\Controllers\EventController.cs" Line="74" Column="2" />
+      <File FileName="Assets\Scripts\UI\SelectDisplay.cs" Line="433" Column="68" />
+      <File FileName="Assets\Scripts\Models\Character.cs" Line="21" Column="67" />
+      <File FileName="Assets\Scripts\Models\Employee.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Models\Customer.cs" Line="40" Column="14" />
+      <File FileName="Assets\Scripts\Models\Furniture.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Controllers\SceneController.cs" Line="38" Column="51" />
+      <File FileName="Assets\Scripts\Controllers\FurnitureSpriteController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Controllers\CharacterSpriteController.cs" Line="47" Column="1" />
+      <File FileName="Assets\Scripts\Controllers\InputController.cs" Line="253" Column="33" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="C:\Users\James\Desktop\Final-Year-Project\Shop Manager\Assets\Scripts\Models\Employee.cs" line="794" column="1" />
-      <Breakpoint file="C:\Users\James\Desktop\Final-Year-Project\Shop Manager\Assets\Scripts\Models\Customer.cs" line="159" column="1" />
-      <Breakpoint file="C:\Users\James\Desktop\Final-Year-Project\Shop Manager\Assets\Scripts\Models\Customer.cs" line="224" column="1" />
-      <Breakpoint file="C:\Users\James\Desktop\Final-Year-Project\Shop Manager\Assets\Scripts\Models\Character.cs" line="165" column="1" />
+      <Breakpoint file="C:\Users\James\Desktop\Final-Year-Project\Shop Manager\Assets\Scripts\Models\Character.cs" line="776" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
