@@ -111,7 +111,7 @@ public class InputController : MonoBehaviour {
 
 		//Camera Zooming
 		Camera.main.orthographicSize -=Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
-		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 1, 6); //This sets the zoom level to always be between 1 and 20.
+		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 1, 10); //This sets the zoom level to always be between 1 and 20.
 	}
 
 	/// Deals with all mouse inputs, and processing the dragging and selecting of tiles and furniture.
@@ -153,6 +153,7 @@ public class InputController : MonoBehaviour {
 							m_selectedFurn = t.m_furniture;
 							m_characterSelectDisplay.SetActive ( false );
 							m_furnitureSelectDisplay.SetActive ( true );
+							m_traitDisplay.SetActive ( false );
 							m_selectDisplayScript.SetUpFurnitureSelectionDisplay ();
 							if (m_selectedFurn.m_name == "Wall")
 							{
@@ -173,6 +174,7 @@ public class InputController : MonoBehaviour {
 							m_furnitureSelectDisplay.SetActive ( false );
 							m_characterSelectDisplay.SetActive ( false );
 							m_stockDisplay.SetActive ( false );
+							m_traitDisplay.SetActive ( false );
 						}
 
 						break;
@@ -219,12 +221,12 @@ public class InputController : MonoBehaviour {
 		else if ( Input.GetKeyDown ( KeyCode.Minus ) || Input.GetKeyDown ( KeyCode.KeypadMinus ) )
 		{
 			Camera.main.orthographicSize += 1;
-			Camera.main.orthographicSize = Mathf.Clamp ( Camera.main.orthographicSize, 1, 6 ); //This sets the zoom level to always be between 1 and 20.
+			Camera.main.orthographicSize = Mathf.Clamp ( Camera.main.orthographicSize, 1, 10 ); //This sets the zoom level to always be between 1 and 20.
 		}
 		else if ( Input.GetKeyDown ( KeyCode.Equals ) || Input.GetKeyDown ( KeyCode.KeypadPlus ) )
 		{
 			Camera.main.orthographicSize -= 1;
-			Camera.main.orthographicSize = Mathf.Clamp ( Camera.main.orthographicSize, 1, 6 ); //This sets the zoom level to always be between 1 and 20.
+			Camera.main.orthographicSize = Mathf.Clamp ( Camera.main.orthographicSize, 1, 10 ); //This sets the zoom level to always be between 1 and 20.
 		}
 	}
 
