@@ -165,6 +165,18 @@ public class Customer : Character {
 						}
 						else
 						{
+							
+							if (m_basketContents.Count < 0)
+							{
+								//We couldn't find any our our items.
+								//Just leave.
+								m_primaryState = PrimaryStates.GoTo;
+								SetDestination ( m_world.GetTileAt ( UnityEngine.Random.Range ( 0, m_world.m_width), 0 ) );
+								m_taskTile = m_destTile;
+								m_currentFurniture = null;
+								return;
+							}
+							//We have found all our items. So head to the queue.
 							Tile t = new FindFreeQueueTile ( m_world, m_currTile ).m_tileFound;
 							SetDestination ( t );
 							m_primaryState = PrimaryStates.GoTo;
@@ -305,7 +317,7 @@ public class Customer : Character {
 								{
 									if ( stockName == m_shoppingList [ i ].stock.IDName )
 									{
-										m_shoppingList [ i ] = new World.ShoppingListItem ( item.stock, item.price, true, false );
+										m_shoppingList [ i ] = new World.ShoppingListItem ( item.stock, true, false );
 										foundItem = true;
 									}
 								}

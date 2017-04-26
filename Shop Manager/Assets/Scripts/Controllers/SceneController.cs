@@ -37,4 +37,9 @@ public class SceneController : MonoBehaviour {
 		m_endScene.SetActive(true);
 		m_worldController.m_world.m_scenarioOver = true;
 	}
+
+	public void Quit()
+	{
+		Application.Quit();
+	}
 }

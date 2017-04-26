@@ -158,7 +158,8 @@ public class SelectDisplay : MonoBehaviour {
 					     || m_inputController.m_selectedFurn.m_name == "Stockcage"
 					     || m_inputController.m_selectedFurn.m_name == "Trolley"
 					     || m_inputController.m_selectedFurn.m_name == "BackShelf"
-					     || m_inputController.m_selectedFurn.m_name == "Wall" )
+					     || m_inputController.m_selectedFurn.m_name == "Wall"
+						 || m_inputController.m_selectedFurn.m_name == "Door" )
 					{
 						m_furnitureFUPGOText.text = "";
 					}
@@ -168,7 +169,7 @@ public class SelectDisplay : MonoBehaviour {
 					}
 					if ( m_inputController.m_selectedFurn != null )
 					{
-						if ( m_inputController.m_selectedFurn.m_name == "Wall" )
+						if ( m_inputController.m_selectedFurn.m_name == "Wall" || m_inputController.m_selectedFurn.m_name == "Door")
 						{
 							m_furnitureMannedGOText.text = "";
 						}
@@ -191,7 +192,7 @@ public class SelectDisplay : MonoBehaviour {
 					return;
 				}
 
-				if ( m_inputController.m_selectedFurn.m_name == "Wall" )
+				if ( m_inputController.m_selectedFurn.m_name == "Wall" || m_inputController.m_selectedFurn.m_name == "Door")
 				{
 					m_furnitureNumberOfItemsGOText.text = "";
 					m_furnitureViewStockButtonGO.SetActive ( false );

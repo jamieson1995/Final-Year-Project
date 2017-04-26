@@ -51,6 +51,8 @@ public class WorldController : MonoBehaviour {
 
 	AudioSource m_backgroundMusicSource;
 
+	public GameObject m_pausedMessageGO;
+
 	void Awake ()
 	{
 
@@ -1405,6 +1407,16 @@ public class WorldController : MonoBehaviour {
 		{
 			m_world.SetGameSpeed ( _gameSpeed );
 		}
+
+		if ( _gameSpeed == 0 )
+		{
+			m_pausedMessageGO.SetActive(true);
+		}
+		else
+		{
+			m_pausedMessageGO.SetActive(false);
+		}
+
 	}
 
 }

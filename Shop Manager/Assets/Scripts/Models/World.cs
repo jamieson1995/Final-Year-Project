@@ -149,14 +149,12 @@ public class World {
 	public struct ShoppingListItem
 	{
 		public Stock stock;
-		public int price;
 		public bool pickedUp;
 		public bool couldNotFind;
 
-		public ShoppingListItem(Stock _stock, int _price, bool _pickedUp = false, bool _couldNotFind = false)
+		public ShoppingListItem(Stock _stock, bool _pickedUp = false, bool _couldNotFind = false)
 		{
 			stock = _stock;
-			price = _price;
 			pickedUp = _pickedUp;
 			couldNotFind = _couldNotFind;
 		}
@@ -210,13 +208,40 @@ public class World {
 		m_shoppingLists = new Dictionary<int, List<ShoppingListItem>>();
 
 		m_shoppingLists.Add(1, new List<ShoppingListItem>() );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Bananas5Pack"], 80 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Apples5Pack"], 149 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["RedSeedlessGrapes500"], 200 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["PotatoesPack2500"], 200 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"], 43 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["StillWater12"], 229 ) );
-		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["ChocolateBiscuit8"], 159 ) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Bananas5Pack"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["Apples5Pack"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["RedSeedlessGrapes500"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["PotatoesPack2500"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["BroccoliSingle"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["StillWater12"]) );
+		m_shoppingLists[1].Add( new ShoppingListItem( m_stockPrototypes["ChocolateBiscuit8"]) );
+
+		m_shoppingLists.Add(2, new List<ShoppingListItem>() );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["SMilk4pt"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["LargeEggs12"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["MilkChocolateMousse6"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["LemonTart385"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["BeefSteakMince500"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["BeefSteakBurgers4"]) );
+		m_shoppingLists[2].Add( new ShoppingListItem( m_stockPrototypes["GarlicBaguettes2"]) );
+
+		m_shoppingLists.Add(3, new List<ShoppingListItem>() );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["RedSeedlessGrapes500"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["PepperoniPizza309"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["BananaMilkshake400"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["Lasagne400"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["StillWater12"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["CocaColaDiet1750"]) );
+		m_shoppingLists[3].Add( new ShoppingListItem( m_stockPrototypes["BakedBeans4"]) );
+
+		m_shoppingLists.Add(4, new List<ShoppingListItem>() );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["LargeEggs12"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["BananaMilkshake400"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["HomeChips1500"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["ExtraChunkyHomeChips1000"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["OrangeJuice2000"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["PineappleJuice1000"]) );
+		m_shoppingLists[4].Add( new ShoppingListItem( m_stockPrototypes["MilkChocolateButtons119"]) );
 
 		m_numberOfMannedCheckouts = 0;
 

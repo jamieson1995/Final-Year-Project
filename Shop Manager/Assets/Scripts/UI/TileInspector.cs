@@ -39,7 +39,7 @@ public class TileInspector : MonoBehaviour {
 	{
 		Tile t = m_inputController.GetTileUnderMouse ();
 
-		string s = "NULL";
+		string s = "None";
 
 		if ( t != null && t.m_furniture != null )
 		{
@@ -52,7 +52,7 @@ public class TileInspector : MonoBehaviour {
 		}
 
 		m_furnitureTypeGOText.text = "Furniture: " + s;
-		s = "NULL";
+		s = "None";
 
 		if ( t != null && t.m_character != null )
 		{
@@ -66,6 +66,6 @@ public class TileInspector : MonoBehaviour {
 		}
 
 		m_characterTextGO.text = "Character: " + s;
-		s = "NULL";
+		s = "None";
 	}
 }
