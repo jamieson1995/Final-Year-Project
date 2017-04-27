@@ -292,7 +292,7 @@ public class SelectDisplay : MonoBehaviour {
 						m_characterRelationshipGOText.text = "Relationship Level - ";
 						if ( m_inputController.m_selectedChar.m_interactingCharacter != null )
 						{
-							m_characterInteractingGOText.text += m_inputController.m_selectedChar.m_interactingCharacter.ID;
+							m_characterInteractingGOText.text += m_inputController.m_selectedChar.m_interactingCharacter.m_name;
 							m_characterRelationshipGOText.text += m_inputController.m_selectedChar.m_relationships [ m_inputController.m_selectedChar.m_interactingCharacter.ID ].relationshipLevel;
 						}
 						else
