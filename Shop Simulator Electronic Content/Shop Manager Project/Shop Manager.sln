@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop Manager", "Assembly-CSharp.csproj", "{9308989A-A766-DB08-68F4-9B481EB28E87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop Manager", "Assembly-CSharp-Editor.csproj", "{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9308989A-A766-DB08-68F4-9B481EB28E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9308989A-A766-DB08-68F4-9B481EB28E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9308989A-A766-DB08-68F4-9B481EB28E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9308989A-A766-DB08-68F4-9B481EB28E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAE5085F-9965-7121-A1A5-F6A40B3F11B5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.StandardHeader = $1
+		$1.Text = @//////////////////////////////////////////////////////\n//Copyright James Jamieson 2016/2017\n//University Dissertation Project\n//Shop Manager AI Simulation\n//////////////////////////////////////////////////////
+		$1.IncludeInNewFiles = True
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,929 @@
+Initialize engine version: 5.5.1f1 (88d00a7498cd)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GT 820M (ID=0x1140)
+    Vendor:   NVIDIA
+    VRAM:     1999 MB
+    Driver:   21.21.13.7654
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll (this message is harmless)
+Loading C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll into Unity Child Domain
+- Completed reload, in  0.198 seconds
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\James\Desktop\tyuio\Built Program\ShopManager\ShopManager_Data\Managed\System.dll (this message is harmless)
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initialized touch support.
+UnloadTime: 1.324017 ms
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 2294 -> priority: 1 
+Cannot be Clean and Messy. Remove Clean as a trait to add Messy as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Clean and Messy. Remove Clean as a trait to add Messy as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Athletic and Clumsy. Remove Clumsy as a trait to add Athletic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Athletic and Clumsy. Remove Clumsy as a trait to add Athletic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quiet and Dramatic. Remove Dramatic as a trait to add Quiet as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Clean and Messy. Remove Messy as a trait to add Clean as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quiet and Dramatic. Remove Quiet as a trait to add Dramatic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quiet and Dramatic. Remove Quiet as a trait to add Dramatic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Clever and Ignorant. Remove Clever as a trait to add Ignorant as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Tried to add stock to furniture but it was too heavy: Stock: Cheese Feast Pizza, Furniture: Trolley
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Failed to give stock to trolley, it is probably full.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Moving furniture is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We are pushing our trolley into someone!!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Chloe tried to say hello to James
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Chloe tried to say hello to James
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Chloe tried to say hello to James
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Lawrence, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+NullReferenceException: Object reference not set to an instance of an object
+  at Character.Update_DoMovement (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Moving furniture is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Moving furniture is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Moving furniture is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+STILL waiting for customer to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Athletic and Slow. Remove Slow as a trait to add Athletic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quick and Slow. Remove Slow as a trait to add Quick as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quiet and Dramatic. Remove Quiet as a trait to add Dramatic as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Michael, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Michael, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Job's tile is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+All stock on this trolley has been worked.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Job's tile is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quick and Slow. Remove Slow as a trait to add Quick as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Clever and Ignorant. Remove Clever as a trait to add Ignorant as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+KeyNotFoundException: The given key was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[System.String,Stock].get_Item (System.String key) [0x00000] in <filename unknown>:0 
+  at Furniture.TryGiveStock (System.String _stock) [0x00000] in <filename unknown>:0 
+  at Character.TryTakeStock (.Stock _stock, .Furniture _furn) [0x00000] in <filename unknown>:0 
+  at Customer.Update_DoTask (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Customer.OnUpdate_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update_DoThink (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quick and Slow. Remove Slow as a trait to add Quick as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Quick and Slow. Remove Slow as a trait to add Quick as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Cannot be Clean and Messy. Remove Clean as a trait to add Messy as trait.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We are pushing our trolley into someone!!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Moving furniture is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Shop relations decreased
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Tried to add stock to furniture but it was too heavy: Stock: Coca Cola, Furniture: Trolley
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Failed to give stock to trolley, it is probably full.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Job's tile is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+All stock on this trolley has been worked.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Job's tile is null.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Shop relations decreased
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Shop relations decreased
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Failed to take any stock from stockcage, it is probably empty
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Shop relations decreased
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Tried to add stock to furniture but it was too heavy: Stock: Tomato Soup, Furniture: Trolley
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Failed to give stock to trolley, it is probably full.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Paul, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+NullReferenceException: Object reference not set to an instance of an object
+  at Character.Update_DoMovement (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at Character.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at World.Update (Single _deltaTime) [0x00000] in <filename unknown>:0 
+  at WorldController.Update () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Sarah, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, Sarah, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+We just lost some relationship with another character.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I asked someone to move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+I, James, have been asked to move.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Path_AStar -- The ending tile isn't in the list of nodes.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Finding a way around this character that is blocking me.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
